@@ -1,0 +1,39 @@
+{
+  "name": "ab-nextjs-template",
+  "version": "0.1.0",
+  "description": "✏️  A lightweight collection of React template created by Abraham Ukachi, and optimized for Next.js applications 😎.",
+  "main": "index.ts",
+  "types": "types/index.d.ts",
+
+  "homepage": "https://github.com/abraham-ukachi/ab-nextjs-template",
+
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abraham-ukachi/ab-nextjs-template.git"
+  },
+
+  "bugs": {
+    "url": "https://github.com/abraham-ukachi/ab-nextjs-template/issues"
+  },
+
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+
+  "keywords": [
+    "react",
+    "nextjs",
+    "template",
+    "abraham",
+    "ukachi",
+    "ab-nextjs-template"
+  ],
+
+  "author": {
+    "name": "Abraham Ukachi",
+    "url": "https://github.com/abraham-ukachi",
+    "email": "abraham.ukachi@laplateforme.io"
+  },
+
+  "license": "MIT"
+}
