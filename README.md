@@ -23,16 +23,16 @@
 
 
 <p align="center">
-    <a href="https://ab-elements.vercel.app/docs/template" target="_blank"><b>Checkout abElements &rarr;</b></a>
+    <a href="https://ab-elements.vercel.app/docs/core" target="_blank"><b>Checkout abElements &rarr;</b></a>
 </p>
 
 
-# `ab-nextjs-template`
+# `ab-nextjs-core`
 
 > IMPORTANT: This is a work in progress and subject to major changes until version 1.0.
 
 
-✏️ This is a lightweight collection of React template created by [Abraham Ukachi](https://github.com/abraham-ukachi), and optimized for [Next.js](https://nextjs.org/docs) applications 😎. 
+🌱 A lightweight collection of server & client React components as core abElements (i.e. ab-app-layout, ab-screen-layout, ...) created by [Abraham Ukachi](https://github.com/abraham-ukachi), and optimized for [Next.js](https://nextjs.org/docs) applications 😎. 
 
 
 
@@ -43,35 +43,43 @@
 #### npm
 
 ```bash
-npm i ab-nextjs-template 
+npm i ab-nextjs-core 
 ```
 
 #### pnpm
 
 ```bash
-pnpm install ab-nextjs-template 
+pnpm install ab-nextjs-core 
 ```
 
 ---
 
 
-## [Template]
+## Core Server Components
 
-A list of all the supported **template** and their current status:
-
-| No. | Name | Status |
-|:----|:-----|:-------|
-| 1 | *`?`* | Pending |
-| 2 | *`?`* | Pending |
-| 3 | *`?`* | Pending |
-
-Or
+A list of all the supported **core server components** and their current status:
 
 | No. | Name | File | Status |
 |:----|:-----|:-----|:-------|
-| 1 | *`?`* | **-** | Pending |
-| 2 | *`?`* | **-** | Pending |
-| 3 | *`?`* | **-** | Pending |
+| 1 | *`AbAppLayout`* | **server/ab-app-layout/index.tsx** | Pending |
+| 2 | *`AbScreenLayout`* | **server/ab-screen-layout/index.tsx** | Pending |
+| 3 | *`AbMainLayout`* | **server/ab-main-layout/index.tsx** | Pending |
+| 4 | *`AbAsideLayout`* | **server/ab-aside-layout/index.tsx** | Pending |
+
+
+
+## Core Client Components
+
+A list of all the supported **core client components** and their current status:
+
+| No. | Name | File | Status |
+|:----|:-----|:-----|:-------|
+| 1 | *`AbAppLayout`* | **ab-app-layout/index.tsx** | Pending |
+| 2 | *`AbScreenLayout`* | **ab-screen-layout/index.tsx** | Pending |
+| 3 | *`AbMainLayout`* | **ab-main-layout/index.tsx** | Pending |
+| 4 | *`AbAsideLayout`* | **ab-aside-layout/index.tsx** | Pending |
+
+
 
 
 > NOTE:
@@ -90,13 +98,14 @@ To learn more about **`abElements`**, take a look at the following resources:
 - [abElements Icons](https://ab-elements.vercel.app/docs/icons) - learn about **icons** in `abElements`.
 - [abElements Components](https://ab-elements.vercel.app/docs/components) - learn about **components** in `abElements`. 
 - [abElements Fonts](https://ab-elements.vercel.app/docs/fonts) - learn about **fonts** in `abElements`. 
+- [abElements Hooks](https://ab-elements.vercel.app/docs/hooks) - learn about **hooks** in `abElements`. 
 
 You can check out [the abElements GitHub repository](https://github.com/abraham-ukachi/ab-elements-app) for more details.
 
 
 ## License
 
-This **`ab-nextjs-template`** project is [MIT Licensed](./LICENSE) ;)
+This **`ab-nextjs-core`** project is [MIT Licensed](./LICENSE) ;)
 
 
 

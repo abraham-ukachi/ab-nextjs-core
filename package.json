@@ -1,19 +1,19 @@
 {
-  "name": "ab-nextjs-template",
+  "name": "ab-nextjs-core",
   "version": "0.1.0",
-  "description": "✏️  A lightweight collection of React template created by Abraham Ukachi, and optimized for Next.js applications 😎.",
+  "description": "🌱 A lightweight collection of server & client React components as core abElements (i.e. ab-app-layout, ab-screen-layout, ...) created by Abraham Ukachi, and optimized for Next.js applications 😎.",
   "main": "index.ts",
   "types": "types/index.d.ts",
 
-  "homepage": "https://github.com/abraham-ukachi/ab-nextjs-template",
+  "homepage": "https://github.com/abraham-ukachi/ab-nextjs-core",
 
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/abraham-ukachi/ab-nextjs-template.git"
+    "url": "git+https://github.com/abraham-ukachi/ab-nextjs-core.git"
   },
 
   "bugs": {
-    "url": "https://github.com/abraham-ukachi/ab-nextjs-template/issues"
+    "url": "https://github.com/abraham-ukachi/ab-nextjs-core/issues"
   },
 
   "scripts": {
@@ -23,10 +23,10 @@
   "keywords": [
     "react",
     "nextjs",
-    "template",
+    "core",
     "abraham",
     "ukachi",
-    "ab-nextjs-template"
+    "ab-nextjs-core"
   ],
 
   "author": {
