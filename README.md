@@ -36,6 +36,18 @@
 
 
 
+## Tooling
+
+This package targets **Next.js 16.3.4** / **React 19** (eslint 9 flat config + vitest).
+Layout shells are **Done** (LYD-faithful slot API). Consumers must configure Tailwind so its content covers this package (CSS Modules use `@apply`).
+
+
+Layout stylesheets are **plain CSS modules** (no Tailwind `@apply`) so Next/Turbopack consumers never hit CssSyntaxError expanding package CSS. Theme colors use CSS variables (`--color-background`, `--color-dark-background`, falling back to `--surface`).
+
+Peer: `clsx`, `next@16.3.4`, `react@^19`, `react-dom@^19`.
+
+Optional: wrap client `AbAsideLayout` with `AbPageProvider` / `useAbPage` for aside open state.
+
 ## Getting Started
 
 ### Installation
@@ -61,10 +73,10 @@ A list of all the supported **core server components** and their current status:
 
 | No. | Name | File | Status |
 |:----|:-----|:-----|:-------|
-| 1 | *`AbAppLayout`* | **server/ab-app-layout/index.tsx** | Pending |
-| 2 | *`AbScreenLayout`* | **server/ab-screen-layout/index.tsx** | Pending |
-| 3 | *`AbMainLayout`* | **server/ab-main-layout/index.tsx** | Pending |
-| 4 | *`AbAsideLayout`* | **server/ab-aside-layout/index.tsx** | Pending |
+| 1 | *`AbAppLayout`* | **server/ab-app-layout/index.tsx** | Done |
+| 2 | *`AbScreenLayout`* | **server/ab-screen-layout/index.tsx** | Done |
+| 3 | *`AbMainLayout`* | **server/ab-main-layout/index.tsx** | Done |
+| 4 | *`AbAsideLayout`* | **server/ab-aside-layout/index.tsx** | Done |
 
 
 
@@ -74,10 +86,10 @@ A list of all the supported **core client components** and their current status:
 
 | No. | Name | File | Status |
 |:----|:-----|:-----|:-------|
-| 1 | *`AbAppLayout`* | **ab-app-layout/index.tsx** | Pending |
-| 2 | *`AbScreenLayout`* | **ab-screen-layout/index.tsx** | Pending |
-| 3 | *`AbMainLayout`* | **ab-main-layout/index.tsx** | Pending |
-| 4 | *`AbAsideLayout`* | **ab-aside-layout/index.tsx** | Pending |
+| 1 | *`AbAppLayout`* | **ab-app-layout/index.tsx** | Done |
+| 2 | *`AbScreenLayout`* | **ab-screen-layout/index.tsx** | Done |
+| 3 | *`AbMainLayout`* | **ab-main-layout/index.tsx** | Done |
+| 4 | *`AbAsideLayout`* | **ab-aside-layout/index.tsx** | Done |
 
 
 
@@ -86,6 +98,30 @@ A list of all the supported **core client components** and their current status:
 
 
 
+
+
+
+## Imports
+
+```ts
+// catalog
+import { supportedCore } from 'ab-nextjs-core'
+
+// server layouts
+import AbAppLayout from 'ab-nextjs-core/server/ab-app-layout'
+import AbScreenLayout from 'ab-nextjs-core/server/ab-screen-layout'
+import AbMainLayout from 'ab-nextjs-core/server/ab-main-layout'
+import AbAsideLayout from 'ab-nextjs-core/server/ab-aside-layout'
+
+// client layouts
+import AbAppLayout from 'ab-nextjs-core/ab-app-layout'
+import AbScreenLayout from 'ab-nextjs-core/ab-screen-layout'
+import AbMainLayout from 'ab-nextjs-core/ab-main-layout'
+import AbAsideLayout from 'ab-nextjs-core/ab-aside-layout'
+import { AbPageProvider, useAbPage } from 'ab-nextjs-core/ab-page-provider'
+```
+
+> NOTE: `AbAppLayout` does **not** bake in sidebar/navbar/i18n — pass `sideBar` / `navBar` slots from the consumer. Content rule: `content ?? children`.
 
 ## Learn More abElements
 
