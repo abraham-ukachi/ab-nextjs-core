@@ -1,39 +1,65 @@
 {
   "name": "ab-nextjs-core",
   "version": "0.1.0",
-  "description": "🌱 A lightweight collection of server & client React components as core abElements (i.e. ab-app-layout, ab-screen-layout, ...) created by Abraham Ukachi, and optimized for Next.js applications 😎.",
+  "description": "\ud83c\udf31 A lightweight collection of server & client React components as core abElements (i.e. ab-app-layout, ab-screen-layout, ...) created by Abraham Ukachi, and optimized for Next.js applications \ud83d\ude0e.",
+  "type": "module",
   "main": "index.ts",
   "types": "types/index.d.ts",
-
   "homepage": "https://github.com/abraham-ukachi/ab-nextjs-core",
-
   "repository": {
     "type": "git",
     "url": "git+https://github.com/abraham-ukachi/ab-nextjs-core.git"
   },
-
   "bugs": {
     "url": "https://github.com/abraham-ukachi/ab-nextjs-core/issues"
   },
-
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint . --fix",
+    "test": "vitest run"
   },
-
   "keywords": [
     "react",
     "nextjs",
     "core",
     "abraham",
     "ukachi",
-    "ab-nextjs-core"
+    "ab-nextjs-core",
+    "ab-elements"
   ],
-
   "author": {
     "name": "Abraham Ukachi",
     "url": "https://github.com/abraham-ukachi",
     "email": "abraham.ukachi@laplateforme.io"
   },
-
-  "license": "MIT"
+  "license": "MIT",
+  "peerDependencies": {
+    "next": "16.3.4",
+    "react": "^19",
+    "react-dom": "^19"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "eslint": "^9.39.0",
+    "eslint-config-next": "16.3.4",
+    "next": "16.3.4",
+    "react": "^19",
+    "react-dom": "^19",
+    "typescript": "^5",
+    "vitest": "^3"
+  },
+  "files": [
+    "index.ts",
+    "types",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "default": "./index.ts"
+    },
+    "./package.json": "./package.json"
+  }
 }

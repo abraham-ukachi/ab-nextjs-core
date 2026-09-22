@@ -36,6 +36,11 @@
 
 
 
+## Tooling
+
+This package targets **Next.js 16.3.4** / **React 19** (eslint 9 flat config + vitest).
+Component implementations listed below are still **Pending**.
+
 ## Getting Started
 
 ### Installation
