@@ -1,0 +1,117 @@
+/* 
+* @license MIT
+* ~~~~~~~~~~~~
+* ab-nextjs-core
+* ~~~~~~~~~~~~
+* Copyright (c) 2023 Julien Athomas, Abraham Ukachi. The LesYeuxDoux Project Contributors.
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the 'Software'), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in all 
+* copies or substantial portions of the Software. 
+*
+* THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+* SOFTWARE.
+*
+*
+* @project: ab-nextjs-core
+* @name: AB Screen Layout - Component Stylesheet
+* @file: ab-screen-layout/styles.module.css
+* @type: CSS Module
+* @authors: Abraham Ukachi <abraham.ukachi@laplateforme.io>
+*
+* Example usage:
+*   1+|> 
+*    -|>
+*
+*/
+
+
+/*
+* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+* MOTTO: We'll always do more 😜!!!
+* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+*/
+
+
+/* ===== AB SCREEN LAYOUT STYLES ===== */
+
+
+
+/* AB ScreenLayout */
+.abScreenLayout {
+  @apply relative flex flex-col w-full h-full;
+}
+
+
+/* Header Wrapper - AB ScreenLayout */
+.abScreenLayout__headerWrapper {
+  @apply absolute top-0 left-0 right-0 flex flex-col w-full h-auto z-20 pointer-events-none;
+}
+
+/* Content Wrapper - AB ScreenLayout */
+.abScreenLayout__contentWrapper {
+  @apply relative flex flex-col w-full h-full justify-between z-10 md:!flex-row lg:!flex-row;
+}
+
+
+/* Sidebar of AB ScreenLayout */
+.abScreenLayout__contentWrapper > *:nth-child(1) {
+  @apply 2xl:m-6 2xl:rounded-3xl 2xl:max-h-[calc(100vh-3rem)];
+  /* @apply 2xl:rounded-tr-3xl 2xl:rounded-br-3xl 2xl:overflow-hidden 2xl:my-auto 2xl:mx-0 2xl:max-h-[calc(100vh-3rem)]; */
+}
+
+/** Content of AB ScreenLayout */
+/*
+.abScreenLayout__contentWrapper > *:nth-child(2) {
+  @apply 2xl:m-6 2xl:rounded-3xl 2xl:max-h-[calc(100vh-3rem)];
+}
+*/
+
+/* Footer Wrapper - AB ScreenLayout */
+.abScreenLayout__footerWrapper {
+  @apply absolute bottom-0 left-0 right-0 flex flex-col w-full h-auto z-20 pointer-events-none;
+}
+
+
+/* ==== MODALS ==== */
+
+/* Backdrop - AB ScreenLayout */
+.abScreenLayout__backdrop {
+  @apply w-full h-full absolute flex flex-col items-center inset-0 z-40 backdrop-blur-sm;
+}
+
+/* Menus - AB ScreenLayout */
+.abScreenLayout__menus {
+  @apply w-full h-full absolute inset-0 z-50;
+}
+
+/* Dialogs - AB ScreenLayout */
+.abScreenLayout__dialogs {
+  @apply w-full h-full absolute inset-0 z-50;
+}
+
+/* Toasts - AB ScreenLayout */
+.abScreenLayout__toasts {
+  @apply w-full h-full absolute inset-0 z-50 animate-[fadeIn_300ms_ease-in-out];
+}
+
+
+/* Canvas - AB ScreenLayout */
+.abScreenLayout__canvas {
+  @apply absolute size-full inset-0 pointer-events-none !z-50;
+}
+
+/* TODO: Snackbars - AB ScreenLayout */
+
+

@@ -1,7 +1,7 @@
 {
   "name": "ab-nextjs-core",
   "version": "0.1.0",
-  "description": "\ud83c\udf31 A lightweight collection of server & client React components as core abElements (i.e. ab-app-layout, ab-screen-layout, ...) created by Abraham Ukachi, and optimized for Next.js applications \ud83d\ude0e.",
+  "description": "🌱 A lightweight collection of server & client React components as core abElements (i.e. ab-app-layout, ab-screen-layout, ...) created by Abraham Ukachi, and optimized for Next.js applications 😎.",
   "type": "module",
   "main": "index.ts",
   "types": "types/index.d.ts",
@@ -33,6 +33,7 @@
   },
   "license": "MIT",
   "peerDependencies": {
+    "clsx": "^2",
     "next": "16.3.4",
     "react": "^19",
     "react-dom": "^19"
@@ -40,6 +41,7 @@
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^19",
+    "clsx": "^2.1.1",
     "eslint": "^9.39.0",
     "eslint-config-next": "16.3.4",
     "next": "16.3.4",
@@ -51,6 +53,13 @@
   "files": [
     "index.ts",
     "types",
+    "server",
+    "ab-app-layout",
+    "ab-screen-layout",
+    "ab-main-layout",
+    "ab-aside-layout",
+    "ab-linear-progress",
+    "ab-page-provider",
     "README.md",
     "LICENSE",
     "CHANGELOG.md"
@@ -60,6 +69,16 @@
       "types": "./types/index.d.ts",
       "default": "./index.ts"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./server/ab-app-layout": "./server/ab-app-layout/index.tsx",
+    "./server/ab-screen-layout": "./server/ab-screen-layout/index.tsx",
+    "./server/ab-main-layout": "./server/ab-main-layout/index.tsx",
+    "./server/ab-aside-layout": "./server/ab-aside-layout/index.tsx",
+    "./ab-app-layout": "./ab-app-layout/index.tsx",
+    "./ab-screen-layout": "./ab-screen-layout/index.tsx",
+    "./ab-main-layout": "./ab-main-layout/index.tsx",
+    "./ab-aside-layout": "./ab-aside-layout/index.tsx",
+    "./ab-page-provider": "./ab-page-provider/index.tsx",
+    "./ab-linear-progress": "./ab-linear-progress/index.tsx"
   }
 }

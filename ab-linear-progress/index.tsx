@@ -24,9 +24,6 @@
 * SOFTWARE.
 *
 * @project: ab-nextjs-core
-* @name: Core - Package Catalog
-* @file: index.ts
-* @type: TypeScript
 * @authors: Abraham Ukachi <abraham.ukachi@laplateforme.io>
 */
 
@@ -36,23 +33,39 @@
 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 */
 
-import type { CoreCatalogEntry } from './types'
+import type { ReactElement } from 'react';
+import clsx from 'clsx';
 
-const supportedCore: Array<CoreCatalogEntry> = [
-  // ------ SERVER components ------
-  { name: 'AbAppLayout', file: 'server/ab-app-layout/index.tsx', kind: 'server', status: 'Done' },
-  { name: 'AbScreenLayout', file: 'server/ab-screen-layout/index.tsx', kind: 'server', status: 'Done' },
-  { name: 'AbMainLayout', file: 'server/ab-main-layout/index.tsx', kind: 'server', status: 'Done' },
-  { name: 'AbAsideLayout', file: 'server/ab-aside-layout/index.tsx', kind: 'server', status: 'Done' },
+export interface AbLinearProgressProps {
+  className?: string;
+  color?: string;
+  hidden?: boolean;
+  isIndeterminate?: boolean;
+  progress?: number;
+}
 
-  // ------ CLIENT components ------
-  { name: 'AbAppLayout', file: 'ab-app-layout/index.tsx', kind: 'client', status: 'Done' },
-  { name: 'AbScreenLayout', file: 'ab-screen-layout/index.tsx', kind: 'client', status: 'Done' },
-  { name: 'AbMainLayout', file: 'ab-main-layout/index.tsx', kind: 'client', status: 'Done' },
-  { name: 'AbAsideLayout', file: 'ab-aside-layout/index.tsx', kind: 'client', status: 'Done' },
-]
+/**
+ * Minimal linear-progress stub (API parity with LYD chrome).
+ */
+const AbLinearProgress = ({
+  className,
+  hidden = true,
+  progress = 25,
+}: AbLinearProgressProps): ReactElement => {
+  return (
+    <div
+      className={clsx(['AbLinearProgress', className])}
+      hidden={hidden}
+      role="progressbar"
+      aria-valuenow={progress}
+      aria-hidden={hidden ? true : undefined}
+    >
+      <div
+        className="h-full bg-current opacity-60"
+        style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
+      />
+    </div>
+  );
+};
 
-const abCore = { supportedCore }
-
-export { supportedCore }
-export default abCore
+export default AbLinearProgress;

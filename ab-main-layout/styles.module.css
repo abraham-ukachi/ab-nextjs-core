@@ -1,0 +1,120 @@
+/* 
+* @license MIT
+* ~~~~~~~~~~~~
+* ab-nextjs-core
+* ~~~~~~~~~~~~
+* Copyright (c) 2023 Julien Athomas, Abraham Ukachi. The LesYeuxDoux Project Contributors.
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the 'Software'), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+* SOFTWARE.
+*
+*
+* @project: ab-nextjs-core
+* @name: AB Main Layout - Component Stylesheet
+* @file: ab-main-layout/styles.module.css
+* @type: CSS Module
+* @authors: Abraham Ukachi <abraham.ukachi@laplateforme.io>
+*
+* Example usage:
+*   1+|> 
+*    -|>
+*
+*/
+
+
+/*
+* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+* MOTTO: We'll always do more 😜!!!
+* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+*/
+
+
+/* ===== AB MAIN LAYOUT STYLES ===== */
+
+
+
+/* AB MainLayout */
+.abMainLayout {
+  /* b4: overflow-y-auto */
+  @apply relative flex flex-col w-full h-full overflow-hidden z-20 
+         max-sm:max-h-[calc(100vh-60px)]
+         max-md:max-h-[calc(100vh-64px)]
+         bg-background dark:bg-dark-background
+         2xl:rounded-3xl;
+}
+
+
+/* Header Wrapper - AB MainLayout */
+.abMainLayout__headerWrapper {
+  @apply relative flex flex-col w-full h-auto z-20 pointer-events-none;
+}
+
+/* Content Wrapper - AB MainLayout */
+.abMainLayout__contentWrapper {
+  /*
+      flex: 1;
+    flex-grow: 1;
+    height: fit-content;
+    min-height: fit-content;
+    overflow: auto;
+    overflow-x: hidden;
+    */
+  /* @apply relative flex w-full h-auto justify-between z-10 overflow-y-auto; */
+  @apply relative flex flex-col w-full h-fit grow flex-1 justify-between z-10 overflow-auto overflow-x-hidden;
+}
+
+/* Footer Wrapper - AB MainLayout */
+.abMainLayout__footerWrapper {
+  @apply relative flex flex-col w-full h-auto z-20 pointer-events-none
+         before:content-[''] before:absolute before:inset-0 before:w-full before:h-full before:z-[-1] before:translate-y-[-100%]
+         before:bg-gradient-to-b before:from-transparent before:to-background before:dark:from-transparent before:dark:to-dark-background;
+}
+
+
+/* ==== MODALS ==== */
+
+/* Backdrop - AB MainLayout */
+.abMainLayout__backdrop {
+  @apply absolute w-full h-full inset-0 z-40 backdrop-blur-md !bg-black !bg-opacity-10 dark:!bg-opacity-50;
+}
+
+/* Menus - AB MainLayout */
+.abMainLayout__menus {
+  @apply w-full h-full absolute inset-0 z-50 pb-0;
+}
+
+
+/* Dialogs - AB MainLayout */
+.abMainLayout__dialogs {
+  @apply w-full h-full absolute inset-0 z-50;
+}
+
+/* Toasts - AB MainLayout */
+.abMainLayout__toasts {
+  @apply w-full h-full absolute inset-0 z-50 animate-[fadeIn_300ms_ease-in-out];
+}
+
+/* Canvas - AB MainLayout */
+.abMainLayout__canvas {
+  @apply absolute size-full inset-0 pointer-events-none !z-50;
+}
+
+
+/* TODO: Snackbars - AB MainLayout */
+
+
