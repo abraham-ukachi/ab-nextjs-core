@@ -44,18 +44,23 @@
 */
 
 
+@reference "tailwindcss";
+
 /* ===== AB ASIDE LAYOUT STYLES ===== */
 
 
 
 /* AB AsideLayout */
 .abAsideLayout {
-  @apply flex flex-col w-full h-full z-10 overflow-hidden 
-         transition-all duration-300 ease-in-out
-         max-lg:animate-slide-right
-         bg-background dark:bg-dark-background
+ @apply flex flex-col w-full h-full z-10 overflow-hidden transition-all duration-300 ease-in-out max-lg:transition-transform
          2xl:ml-3 2xl:rounded-3xl;
+  background-color: var(--color-background, var(--surface, #ffffff));
 }
+:global(.dark) .abAsideLayout,
+:global([data-theme="dark"]) .abAsideLayout {
+  background-color: var(--color-dark-background, var(--surface, #0a0a0a));
+}
+
 
 
 .abAsideLayout__divider {
@@ -75,10 +80,25 @@
 /* Footer Wrapper - AB AsideLayout */
 .abAsideLayout__footerWrapper {
   @apply relative flex flex-col w-full h-auto z-20 pointer-events-none
-         before:content-[''] before:absolute before:inset-0 before:w-full before:h-full before:z-[-1] before:translate-y-[-100%]
-         before:bg-gradient-to-b before:from-transparent before:to-background before:dark:from-transparent before:dark:to-dark-background;
+         before:content-[''] before:absolute before:inset-0 before:w-full before:h-full before:z-[-1] before:translate-y-[-100%];
 }
 
+.abAsideLayout__footerWrapper::before {
+  background-image: linear-gradient(
+    to bottom,
+    transparent,
+    var(--color-background, var(--surface, #ffffff))
+  );
+}
+
+:global(.dark) .abAsideLayout__footerWrapper::before,
+:global([data-theme="dark"]) .abAsideLayout__footerWrapper::before {
+  background-image: linear-gradient(
+    to bottom,
+    transparent,
+    var(--color-dark-background, var(--surface, #0a0a0a))
+  );
+}
 
 /* ==== MODALS ==== */
 

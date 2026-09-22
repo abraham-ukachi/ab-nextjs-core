@@ -44,6 +44,8 @@
 */
 
 
+@reference "tailwindcss";
+
 /* ===== AB APP LAYOUT STYLES ===== */
 
 
@@ -79,7 +81,6 @@
 .abAppLayout__footerWrapper {
   @apply absolute bottom-0 left-0 right-0 flex flex-col w-full h-auto z-20 pointer-events-none;
 }
-
 
 /* ==== MODALS ==== */
 

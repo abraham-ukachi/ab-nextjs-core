@@ -44,19 +44,24 @@
 */
 
 
+@reference "tailwindcss";
+
 /* ===== AB MAIN LAYOUT STYLES ===== */
 
 
 
 /* AB MainLayout */
 .abMainLayout {
-  /* b4: overflow-y-auto */
-  @apply relative flex flex-col w-full h-full overflow-hidden z-20 
-         max-sm:max-h-[calc(100vh-60px)]
-         max-md:max-h-[calc(100vh-64px)]
-         bg-background dark:bg-dark-background
+ /* b4: overflow-y-auto */
+ @apply relative flex flex-col w-full h-full overflow-hidden z-20 max-sm:max-h-[calc(100vh-60px)] max-md:max-h-[calc(100vh-64px)]
          2xl:rounded-3xl;
+  background-color: var(--color-background, var(--surface, #ffffff));
 }
+:global(.dark) .abMainLayout,
+:global([data-theme="dark"]) .abMainLayout {
+  background-color: var(--color-dark-background, var(--surface, #0a0a0a));
+}
+
 
 
 /* Header Wrapper - AB MainLayout */
@@ -81,16 +86,31 @@
 /* Footer Wrapper - AB MainLayout */
 .abMainLayout__footerWrapper {
   @apply relative flex flex-col w-full h-auto z-20 pointer-events-none
-         before:content-[''] before:absolute before:inset-0 before:w-full before:h-full before:z-[-1] before:translate-y-[-100%]
-         before:bg-gradient-to-b before:from-transparent before:to-background before:dark:from-transparent before:dark:to-dark-background;
+         before:content-[''] before:absolute before:inset-0 before:w-full before:h-full before:z-[-1] before:translate-y-[-100%];
 }
 
+.abMainLayout__footerWrapper::before {
+  background-image: linear-gradient(
+    to bottom,
+    transparent,
+    var(--color-background, var(--surface, #ffffff))
+  );
+}
+
+:global(.dark) .abMainLayout__footerWrapper::before,
+:global([data-theme="dark"]) .abMainLayout__footerWrapper::before {
+  background-image: linear-gradient(
+    to bottom,
+    transparent,
+    var(--color-dark-background, var(--surface, #0a0a0a))
+  );
+}
 
 /* ==== MODALS ==== */
 
 /* Backdrop - AB MainLayout */
 .abMainLayout__backdrop {
-  @apply absolute w-full h-full inset-0 z-40 backdrop-blur-md !bg-black !bg-opacity-10 dark:!bg-opacity-50;
+  @apply absolute w-full h-full inset-0 z-40 backdrop-blur-md !bg-black/10 dark:!bg-black/50;
 }
 
 /* Menus - AB MainLayout */
