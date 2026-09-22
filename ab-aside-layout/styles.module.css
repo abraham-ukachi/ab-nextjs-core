@@ -3,7 +3,7 @@
 * ~~~~~~~~~~~~
 * ab-nextjs-core
 * ~~~~~~~~~~~~
-* Copyright (c) 2023 Julien Athomas, Abraham Ukachi. The LesYeuxDoux Project Contributors.
+* Copyright (c) 2026 Abraham Ukachi. The abElements Project.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the 'Software'), to deal
@@ -23,19 +23,12 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 * SOFTWARE.
 *
-*
 * @project: ab-nextjs-core
-* @name: AB Aside Layout - Component Stylesheet
+* @name: AB Aside Layout (client) - Component Stylesheet (plain CSS, Tailwind-independent)
 * @file: ab-aside-layout/styles.module.css
 * @type: CSS Module
 * @authors: Abraham Ukachi <abraham.ukachi@laplateforme.io>
-*
-* Example usage:
-*   1+|> 
-*    -|>
-*
 */
-
 
 /*
 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -44,90 +37,124 @@
 */
 
 
-@reference "tailwindcss";
-
 /* ===== AB ASIDE LAYOUT STYLES ===== */
 
-
-
-/* AB AsideLayout */
 .abAsideLayout {
- @apply flex flex-col w-full h-full z-10 overflow-hidden transition-all duration-300 ease-in-out max-lg:transition-transform
-         2xl:ml-3 2xl:rounded-3xl;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  overflow: hidden;
+  transition-property: all;
+  transition-duration: 300ms;
+  transition-timing-function: ease-in-out;
   background-color: var(--color-background, var(--surface, #ffffff));
 }
+
+@media (min-width: 1536px) {
+  .abAsideLayout {
+    margin-left: 0.75rem;
+    border-radius: 1.5rem;
+  }
+}
+
 :global(.dark) .abAsideLayout,
 :global([data-theme="dark"]) .abAsideLayout {
   background-color: var(--color-dark-background, var(--surface, #0a0a0a));
 }
 
-
-
-.abAsideLayout__divider {
-  @apply max-md:invisible 2xl:invisible;
+@media (max-width: 767px) {
+  .abAsideLayout__divider { visibility: hidden; }
 }
 
-/* Header Wrapper - AB AsideLayout */
+@media (min-width: 1536px) {
+  .abAsideLayout__divider { visibility: hidden; }
+}
+
 .abAsideLayout__headerWrapper {
-  @apply relative flex flex-col w-full h-auto z-20 pointer-events-none;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: auto;
+  z-index: 20;
+  pointer-events: none;
 }
 
-/* Content Wrapper - AB AsideLayout */
 .abAsideLayout__contentWrapper {
-  @apply relative flex flex-col w-full h-auto grow justify-between z-10 overflow-auto overflow-x-hidden pointer-events-auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: auto;
+  flex-grow: 1;
+  justify-content: space-between;
+  z-index: 10;
+  overflow: auto;
+  overflow-x: hidden;
+  pointer-events: auto;
 }
 
-/* Footer Wrapper - AB AsideLayout */
 .abAsideLayout__footerWrapper {
-  @apply relative flex flex-col w-full h-auto z-20 pointer-events-none
-         before:content-[''] before:absolute before:inset-0 before:w-full before:h-full before:z-[-1] before:translate-y-[-100%];
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: auto;
+  z-index: 20;
+  pointer-events: none;
 }
 
 .abAsideLayout__footerWrapper::before {
-  background-image: linear-gradient(
-    to bottom,
-    transparent,
-    var(--color-background, var(--surface, #ffffff))
-  );
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  transform: translateY(-100%);
+  background-image: linear-gradient(to bottom, transparent, var(--color-background, var(--surface, #ffffff)));
 }
 
 :global(.dark) .abAsideLayout__footerWrapper::before,
 :global([data-theme="dark"]) .abAsideLayout__footerWrapper::before {
-  background-image: linear-gradient(
-    to bottom,
-    transparent,
-    var(--color-dark-background, var(--surface, #0a0a0a))
-  );
+  background-image: linear-gradient(to bottom, transparent, var(--color-dark-background, var(--surface, #0a0a0a)));
 }
 
-/* ==== MODALS ==== */
-
-/* Backdrop - AB AsideLayout */
 .abAsideLayout__backdrop {
-  @apply absolute w-full h-full inset-0 z-40 backdrop-blur-sm;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 40;
+  backdrop-filter: blur(4px);
 }
 
-/* Menus - AB AsideLayout */
-.abAsideLayout__menus {
-  @apply w-full h-full absolute inset-0 z-50;
-}
-
-/* Dialogs - AB AsideLayout */
-.abAsideLayout__dialogs {
-  @apply w-full h-full absolute inset-0 z-50;
-}
-
-/* Toasts - AB AsideLayout */
+.abAsideLayout__menus,
+.abAsideLayout__dialogs,
 .abAsideLayout__toasts {
-  @apply w-full h-full absolute inset-0 z-50 animate-[fadeIn_300ms_ease-in-out];
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 50;
 }
 
+.abAsideLayout__toasts {
+  animation: abCoreFadeIn 300ms ease-in-out;
+}
 
-/* Canvas - AB AsideLayout */
 .abAsideLayout__canvas {
-  @apply absolute size-full inset-0 pointer-events-none !z-50;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 50;
 }
 
-/* TODO: Snackbars - AB AsideLayout */
-
-
+@keyframes abCoreFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

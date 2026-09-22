@@ -42,7 +42,7 @@ This package targets **Next.js 16.3.4** / **React 19** (eslint 9 flat config + v
 Layout shells are **Done** (LYD-faithful slot API). Consumers must configure Tailwind so its content covers this package (CSS Modules use `@apply`).
 
 
-Layout CSS modules use Tailwind v4 `@reference "tailwindcss"` so `@apply` works when consumed by Next. Custom `background` / `dark-background` colors use CSS variables (`--color-background`, `--color-dark-background`, falling back to `--surface`).
+Layout stylesheets are **plain CSS modules** (no Tailwind `@apply`) so Next/Turbopack consumers never hit CssSyntaxError expanding package CSS. Theme colors use CSS variables (`--color-background`, `--color-dark-background`, falling back to `--surface`).
 
 Peer: `clsx`, `next@16.3.4`, `react@^19`, `react-dom@^19`.
 
