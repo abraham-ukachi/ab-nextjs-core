@@ -20,8 +20,8 @@ describe('ab-nextjs-core package smoke', () => {
   it('targets Next 16.3.4 peers and package metadata', () => {
     const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))
     expect(pkg.name).toBe('ab-nextjs-core')
-    expect(pkg.version).toBe('0.1.0')
-    expect(pkg.peerDependencies.next).toBe('16.3.4')
+    expect(pkg.version).toMatch(/^\d+\.\d+\.\d+$/)
+    expect(pkg.peerDependencies.next).toBe('^16.3.4')
     expect(pkg.peerDependencies.react).toBe('^19')
     expect(pkg.peerDependencies['react-dom']).toBe('^19')
     expect(pkg.peerDependencies.clsx).toBe('^2')

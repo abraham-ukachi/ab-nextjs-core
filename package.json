@@ -15,7 +15,9 @@
   },
   "scripts": {
     "lint": "eslint . --fix",
-    "test": "vitest run"
+    "test": "vitest run",
+    "check:publish": "node scripts/check-publish-deps.mjs",
+    "prepublishOnly": "node scripts/check-publish-deps.mjs"
   },
   "keywords": [
     "react",
@@ -34,7 +36,7 @@
   "license": "MIT",
   "peerDependencies": {
     "clsx": "^2",
-    "next": "16.3.4",
+    "next": "^16.3.4",
     "react": "^19",
     "react-dom": "^19"
   },
