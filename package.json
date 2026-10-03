@@ -1,6 +1,6 @@
 {
   "name": "ab-nextjs-core",
-  "version": "0.1.0",
+  "version": "0.1.3",
   "description": "🌱 A lightweight collection of server & client React components as core abElements (i.e. ab-app-layout, ab-screen-layout, ...) created by Abraham Ukachi, and optimized for Next.js applications 😎.",
   "type": "module",
   "main": "index.ts",
