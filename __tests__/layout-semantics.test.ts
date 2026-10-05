@@ -36,4 +36,22 @@ describe('layout HTML landmarks (God constraint)', () => {
     expect(src).toMatch(/slideFromRight/)
     expect(src).not.toMatch(/animate-slide-from-right/)
   })
+
+  it('header and footer wrappers set data-ab-part="header" / "footer"', () => {
+    for (const file of [
+      'ab-main-layout/index.tsx',
+      'server/ab-main-layout/index.tsx',
+      'ab-aside-layout/index.tsx',
+      'server/ab-aside-layout/index.tsx',
+      'ab-app-layout/index.tsx',
+      'server/ab-app-layout/index.tsx',
+      'ab-screen-layout/index.tsx',
+      'server/ab-screen-layout/index.tsx',
+    ]) {
+      const src = read(file)
+      expect(src, file).toMatch(/data-ab-part="header"/)
+      expect(src, file).toMatch(/data-ab-part="footer"/)
+    }
+  })
+
 })

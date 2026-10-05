@@ -78,7 +78,7 @@ const AbMainLayout = ({
       data-ab-part="main"
       data-screen-name={screenName}
     >
-      <header className={clsx(['HeaderWrapper', styles.abMainLayout__headerWrapper])}>
+      <header className={clsx(['HeaderWrapper', styles.abMainLayout__headerWrapper])} data-ab-part="header">
         {header}
       </header>
 
@@ -93,7 +93,7 @@ const AbMainLayout = ({
         {content ?? children}
       </div>
 
-      <footer className={clsx(['FooterWrapper', styles.abMainLayout__footerWrapper])}>
+      <footer className={clsx(['FooterWrapper', styles.abMainLayout__footerWrapper])} data-ab-part="footer">
         {footer}
       </footer>
 

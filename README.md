@@ -56,8 +56,8 @@ Optional: wrap client `AbAsideLayout` with `AbPageProvider` / `useAbPage` for as
 |:--------------|:---------|:---------------|
 | `AbMainLayout` | `<main>` | `main` |
 | `AbAsideLayout` | `<aside>` | `aside` |
-| Header wrapper | `<header>` | — |
-| Footer wrapper | `<footer>` | — |
+| Header wrapper | `<header>` | `header` |
+| Footer wrapper | `<footer>` | `footer` |
 | Sidebar / bottom bar (via components) | `<nav>` (`AbSidebar` / `AbNavbar`) | `sidebar` (sidebar) |
 
 The client aside opens with the `.slideFromRight` class from `ab-nextjs-animations` (import `ab-nextjs-animations/slide-from-right/styles.css`).
