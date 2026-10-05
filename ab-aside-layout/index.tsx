@@ -134,18 +134,20 @@ const AbAsideLayout = ({
       ref={asideRef}
       className={clsx(
         ['AbAsideLayout', 'group/aside-layout', styles.abAsideLayout, className],
-        { 'is-open max-lg:!animate-slide-from-right': isAsideOpen },
+        { 'is-open': isAsideOpen },
+        { 'slideFromRight': isAsideOpen },
         { 'is-open-on-mobile': isAsideOpenOnMobile },
         { '!hidden': !isAsideOpen && !isAsideOpening && !isAsideClosing },
       )}
       hidden={hidden}
       data-page-name={pageName}
+      data-ab-part="aside"
       data-opened={isAsideOpen}
       data-open-on-mobile={isAsideOpenOnMobile}
     >
-      <div className={clsx(['HeaderWrapper', styles.abAsideLayout__headerWrapper])}>
+      <header className={clsx(['HeaderWrapper', styles.abAsideLayout__headerWrapper])}>
         {header}
-      </div>
+      </header>
 
       <div
         className={clsx([
@@ -157,9 +159,9 @@ const AbAsideLayout = ({
         {content ?? children}
       </div>
 
-      <div className={clsx(['FooterWrapper', styles.abAsideLayout__footerWrapper])}>
+      <footer className={clsx(['FooterWrapper', styles.abAsideLayout__footerWrapper])}>
         {footer}
-      </div>
+      </footer>
 
       <div className={clsx(['Backdrop', styles.abAsideLayout__backdrop])} hidden />
       <div className={clsx(['Menus', styles.abAsideLayout__menus])} hidden>

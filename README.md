@@ -48,6 +48,21 @@ Peer: `clsx`, `next@16.3.4`, `react@^19`, `react-dom@^19`.
 
 Optional: wrap client `AbAsideLayout` with `AbPageProvider` / `useAbPage` for aside open state.
 
+
+
+### Layout landmarks (0.1.4)
+
+| Slot / layout | HTML tag | `data-ab-part` |
+|:--------------|:---------|:---------------|
+| `AbMainLayout` | `<main>` | `main` |
+| `AbAsideLayout` | `<aside>` | `aside` |
+| Header wrapper | `<header>` | — |
+| Footer wrapper | `<footer>` | — |
+| Sidebar / bottom bar (via components) | `<nav>` (`AbSidebar` / `AbNavbar`) | `sidebar` (sidebar) |
+
+The client aside opens with the `.slideFromRight` class from `ab-nextjs-animations` (import `ab-nextjs-animations/slide-from-right/styles.css`).
+
+
 ## Getting Started
 
 ### Installation
