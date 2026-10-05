@@ -71,10 +71,11 @@ const AbAsideLayout = ({
       className={clsx(['AbAsideLayout', styles.abAsideLayout, className])}
       hidden={hidden}
       data-page-name={pageName}
+      data-ab-part="aside"
     >
-      <div className={clsx(['HeaderWrapper', styles.abAsideLayout__headerWrapper])}>
+      <header className={clsx(['HeaderWrapper', styles.abAsideLayout__headerWrapper])}>
         {header}
-      </div>
+      </header>
 
       <div
         className={clsx([
@@ -86,9 +87,9 @@ const AbAsideLayout = ({
         {content ?? children}
       </div>
 
-      <div className={clsx(['FooterWrapper', styles.abAsideLayout__footerWrapper])}>
+      <footer className={clsx(['FooterWrapper', styles.abAsideLayout__footerWrapper])}>
         {footer}
-      </div>
+      </footer>
 
       <div className={clsx(['Backdrop', styles.abAsideLayout__backdrop])} hidden />
       <div className={clsx(['Menus', styles.abAsideLayout__menus])} hidden>

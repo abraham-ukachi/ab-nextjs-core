@@ -71,15 +71,15 @@ const AbScreenLayout = ({
       data-screen-name={screenName}
       data-orientation={orientation ?? ''}
     >
-      <div className={clsx(['HeaderWrapper', styles.abScreenLayout__headerWrapper])}>
+      <header className={clsx(['HeaderWrapper', styles.abScreenLayout__headerWrapper])}>
         {header}
-      </div>
+      </header>
       <div className={clsx(['ContentWrapper', styles.abScreenLayout__contentWrapper])}>
         {content ?? children}
       </div>
-      <div className={clsx(['FooterWrapper', styles.abScreenLayout__footerWrapper])}>
+      <footer className={clsx(['FooterWrapper', styles.abScreenLayout__footerWrapper])}>
         {footer}
-      </div>
+      </footer>
       <div id="backdrop" className={clsx(['Backdrop', styles.abScreenLayout__backdrop])} hidden />
       <div id="menus" className={clsx(['Menus', styles.abScreenLayout__menus])} hidden>
         {menus}

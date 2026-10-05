@@ -75,11 +75,12 @@ const AbMainLayout = ({
       style={{ maxHeight: screenName ? 'initial' : undefined }}
       hidden={hidden}
       data-page-name={pageName}
+      data-ab-part="main"
       data-screen-name={screenName}
     >
-      <div className={clsx(['HeaderWrapper', styles.abMainLayout__headerWrapper])}>
+      <header className={clsx(['HeaderWrapper', styles.abMainLayout__headerWrapper])}>
         {header}
-      </div>
+      </header>
       <div
         className={clsx([
           'ContentWrapper',
@@ -90,9 +91,9 @@ const AbMainLayout = ({
       >
         {content ?? children}
       </div>
-      <div className={clsx(['FooterWrapper', styles.abMainLayout__footerWrapper])}>
+      <footer className={clsx(['FooterWrapper', styles.abMainLayout__footerWrapper])}>
         {footer}
-      </div>
+      </footer>
       <div className={clsx(['Backdrop', styles.abMainLayout__backdrop])} hidden />
       <div className={clsx(['Menus', styles.abMainLayout__menus])} hidden>
         {menus}
