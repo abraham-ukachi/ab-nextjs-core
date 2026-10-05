@@ -145,7 +145,7 @@ const AbAsideLayout = ({
       data-opened={isAsideOpen}
       data-open-on-mobile={isAsideOpenOnMobile}
     >
-      <header className={clsx(['HeaderWrapper', styles.abAsideLayout__headerWrapper])}>
+      <header className={clsx(['HeaderWrapper', styles.abAsideLayout__headerWrapper])} data-ab-part="header">
         {header}
       </header>
 
@@ -159,7 +159,7 @@ const AbAsideLayout = ({
         {content ?? children}
       </div>
 
-      <footer className={clsx(['FooterWrapper', styles.abAsideLayout__footerWrapper])}>
+      <footer className={clsx(['FooterWrapper', styles.abAsideLayout__footerWrapper])} data-ab-part="footer">
         {footer}
       </footer>
 

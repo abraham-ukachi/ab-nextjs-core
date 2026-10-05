@@ -75,7 +75,7 @@ const AbAppLayout = ({
       data-page-name={pageName}
       data-orientation={orientation ?? ''}
     >
-      <header className={clsx(['HeaderWrapper', styles.abAppLayout__headerWrapper])}>
+      <header className={clsx(['HeaderWrapper', styles.abAppLayout__headerWrapper])} data-ab-part="header">
         {header}
       </header>
       <div className={clsx(['ContentWrapper', styles.abAppLayout__contentWrapper])}>
@@ -83,7 +83,7 @@ const AbAppLayout = ({
         {content ?? children}
         {navBar}
       </div>
-      <footer className={clsx(['FooterWrapper', styles.abAppLayout__footerWrapper])}>
+      <footer className={clsx(['FooterWrapper', styles.abAppLayout__footerWrapper])} data-ab-part="footer">
         {footer}
       </footer>
       <div id="backdrop" className={clsx(['Backdrop', styles.abAppLayout__backdrop])} hidden />
