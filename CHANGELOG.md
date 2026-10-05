@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+### 0.1.5 (2026-10-05)
+
+* **Landmarks:** header / footer wrappers set `data-ab-part="header"` / `data-ab-part="footer"`
+
 ### 0.1.4 (2026-10-05)
 
 * **Semantics:** layout wrappers use landmark tags — `<header>` / `<footer>` (was `<div>`); `<main>` and `<aside>` unchanged; sidebar / bottom bar stay the consumer's `<nav>` (`AbSidebar` / `AbNavbar` in components)
