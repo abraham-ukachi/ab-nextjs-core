@@ -63,6 +63,43 @@ Optional: wrap client `AbAsideLayout` with `AbPageProvider` / `useAbPage` for as
 The client aside opens with the `.slideFromRight` class from `ab-nextjs-animations` (import `ab-nextjs-animations/slide-from-right/styles.css`).
 
 
+### Docs shell panes (0.1.6)
+
+```tsx
+'use client'
+import AbAppLayout from 'ab-nextjs-core/ab-app-layout'
+import AbMainLayout from 'ab-nextjs-core/ab-main-layout'
+import AbAsideLayout from 'ab-nextjs-core/ab-aside-layout'
+import { AbPageProvider, useAbAsideToggle } from 'ab-nextjs-core/ab-page-provider'
+
+<AbPageProvider>
+  <AbAppLayout
+    orientation="vertical"
+    variant="panes"            // 🧭 4 breakpoints
+    railCollapsed={rail}       // 🧷 icons-only sidebar (tablet+)
+    header={<AppBar />}
+    sideBar={<nav data-ab-part="sidebar" aria-label="Documentation">…</nav>}
+    content={<><AbMainLayout … /><AbAsideLayout … /></>}
+    navBar={<nav data-ab-part="bottomBar" aria-label="Primary">…</nav>}
+  />
+</AbPageProvider>
+
+// 📑 one button for the TOC sheet (<1024px) and the »/« pane toggle (≥1024px)
+const { props, expanded } = useAbAsideToggle() // aria-expanded + aria-controls + onClick
+<button {...props}>{expanded ? 'Hide page outline' : 'Show page outline'}</button>
+```
+
+| Width | Sidebar | Main | Aside | Bottom bar |
+|---|---|---|---|---|
+| < 768 | hidden | full | full-screen sheet (`isAsideOpenOnMobile`) | shown (safe-area padding) |
+| 768–1023 | 280px, or the 72px rail | rest | overlay on the right, hidden by default | hidden |
+| 1024–1439 | joined, hairline divider | | in the flow, `isAsideOpen` | hidden |
+| ≥ 1440 | gapped panes (`--ab-pane-gap`) with radii (`--ab-pane-radius`) | | | hidden |
+
+* The rail animates its width over 200ms and snaps under reduced motion. Without JS the sidebar stays expanded (`@media (scripting: none)`).
+* The aside uses the `slideFromRight` keyframe from **ab-nextjs-animations** (load its `slide-from-right/styles.css`) at 240ms. Under reduced motion there's no slide and the open/close timers are 0. `Escape` closes the sheet.
+* Tokens come from **ab-nextjs-theme ≥ 0.3.4** (`--ab-pane-gap`, `--ab-pane-radius`, `--ab-divider-hairline`), with fallbacks.
+
 ## Getting Started
 
 ### Installation
