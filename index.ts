@@ -27,7 +27,7 @@
 * @name: Core - Package Catalog
 * @file: index.ts
 * @type: TypeScript
-* @authors: Abraham Ukachi <abraham.ukachi@laplateforme.io>
+* @authors: Abraham Ukachi <abrahamukachi@gmail.com>
 */
 
 /*
