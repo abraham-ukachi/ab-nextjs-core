@@ -24,7 +24,7 @@
 * SOFTWARE.
 *
 * @project: ab-nextjs-core
-* @authors: Abraham Ukachi <abraham.ukachi@laplateforme.io>
+* @authors: Abraham Ukachi <abrahamukachi@gmail.com>
 */
 
 /*
@@ -52,6 +52,10 @@ export interface AbAppLayoutProps {
   footer?: ReactNode;
   children?: ReactNode;
   menus?: ReactNode;
+  /** 🧭 0.1.6 (G17): `'panes'` = the docs shell (4 breakpoints, rail, overlay aside). Default keeps the old layout. */
+  variant?: 'default' | 'panes';
+  /** 🧷 0.1.6: collapse the sidebar to the icon rail (tablet and up, `variant="panes"`). */
+  railCollapsed?: boolean;
 }
 
 /** Client markup mirror of server AbAppLayout (slots only). */
@@ -67,6 +71,8 @@ const AbAppLayout = ({
   footer,
   children,
   menus,
+  variant = 'default', // 🧭
+  railCollapsed = false, // 🧷
 }: AbAppLayoutProps): ReactElement => {
   return (
     <div
@@ -74,6 +80,8 @@ const AbAppLayout = ({
       hidden={hidden}
       data-page-name={pageName}
       data-orientation={orientation ?? ''}
+      data-variant={variant} // 🧭 CSS hook for the panes
+      data-rail={railCollapsed ? 'true' : 'false'} // 🧷
     >
       <header className={clsx(['HeaderWrapper', styles.abAppLayout__headerWrapper])} data-ab-part="header">
         {header}

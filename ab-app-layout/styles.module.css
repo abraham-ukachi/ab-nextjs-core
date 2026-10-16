@@ -27,7 +27,7 @@
 * @name: AB App Layout - Component Stylesheet (plain CSS, Tailwind-independent)
 * @file: ab-app-layout/styles.module.css
 * @type: CSS Module
-* @authors: Abraham Ukachi <abraham.ukachi@laplateforme.io>
+* @authors: Abraham Ukachi <abrahamukachi@gmail.com>
 */
 
 /*
@@ -142,4 +142,120 @@
 @keyframes abCoreFadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* ================================================================== */
+/* 🧭 0.1.6 (G17): docs-shell panes, opt in with variant="panes"       */
+/*    Children of the content wrapper are matched by data-ab-part:     */
+/*    sidebar (nav) · main · aside · bottomBar (nav)                   */
+/*    📱 <768  · 📟 768–1023 · 💻 1024–1439 joined · 🖥️ ≥1440 gapped   */
+/*    Tokens: --ab-pane-gap / --ab-pane-radius / --ab-divider-hairline */
+/*    (ab-nextjs-theme ≥ 0.3.4), with safe fallbacks                    */
+/* ================================================================== */
+.abAppLayout[data-variant="panes"] {
+  --ab-sidebar-width: 280px; /* 🗂️ expanded sidebar */
+  --ab-rail-width: 72px; /* 🧷 collapsed rail (icons only) */
+  --ab-aside-width: min(40vw, 360px); /* 📑 "On this page" */
+  --ab-rail-duration: 200ms; /* 🎞️ rail collapse (brief §4) */
+}
+
+/* 📱 mobile: one column, no sidebar, bottom bar visible, aside only as a full-screen sheet */
+.abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper {
+  flex-direction: column; /* ⬇️ stack */
+}
+.abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="sidebar"] {
+  display: none; /* 🙈 the bottom bar takes over */
+}
+.abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="main"] {
+  flex: 1 1 auto; /* ↔️ full width */
+  min-width: 0; /* 🚫 overflow */
+}
+.abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"] {
+  position: fixed; /* 📄 sheet over the page */
+  inset: 0; /* 🧱 100% (TOC button) */
+  width: 100%;
+  z-index: 30; /* ⬆️ above main, below menus/dialogs (50) */
+}
+.abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"]:not([data-open-on-mobile="true"]) {
+  display: none; /* 🙈 closed by default on mobile */
+}
+.abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="bottomBar"] {
+  flex: none; /* 📏 its own height */
+  padding-bottom: env(safe-area-inset-bottom, 0); /* 📱 home indicator */
+}
+
+/* 📟 tablet: sidebar (or rail) + main; the aside overlays on the right; no bottom bar */
+@media (min-width: 768px) {
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper {
+    flex-direction: row; /* ➡️ */
+  }
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="sidebar"] {
+    display: flex; /* 👀 */
+    flex: none;
+    width: var(--ab-sidebar-width); /* 🗂️ */
+    overflow: hidden auto; /* 📜 long sections scroll */
+    transition: width var(--ab-rail-duration) ease; /* 🎞️ rail */
+  }
+  .abAppLayout[data-variant="panes"][data-rail="true"] .abAppLayout__contentWrapper > [data-ab-part="sidebar"] {
+    width: var(--ab-rail-width); /* 🧷 rail */
+  }
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="bottomBar"] {
+    display: none; /* 🙈 sidebar replaces it */
+  }
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"] {
+    inset: 0 0 0 auto; /* ➡️ pinned right */
+    width: var(--ab-aside-width); /* 📑 ~30–40% */
+    border-left: var(--ab-divider-hairline, 1px solid rgb(0 0 0 / 0.12)); /* ➖ */
+  }
+  /* 🙈 still driven by the small-screen flag (data-open-on-mobile): hidden by default on tablet */
+}
+
+/* 💻 laptop: three joined panes with hairline dividers, aside in the flow */
+@media (min-width: 1024px) {
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="sidebar"] {
+    border-right: var(--ab-divider-hairline, 1px solid rgb(0 0 0 / 0.12)); /* ➖ joined */
+  }
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"] {
+    position: relative; /* 📌 back in the flow */
+    inset: auto;
+    flex: none;
+    z-index: auto;
+  }
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"][data-opened="true"] {
+    display: flex; /* 👀 laptop+ follows data-opened (isAsideOpen), not the small-screen flag (same specificity as the :not() rule, later wins) */
+  }
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"]:not([data-opened="true"]) {
+    display: none; /* 🙈 closed with the »/« toggle */
+  }
+}
+
+/* 🖥️ desktop: gapped panes with radii, no dividers */
+@media (min-width: 1440px) {
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper {
+    gap: var(--ab-pane-gap, 12px); /* 🧱 */
+    padding: var(--ab-pane-gap, 12px); /* 🖼️ outer gap */
+    box-sizing: border-box;
+  }
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="sidebar"],
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="main"],
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"] {
+    border: 0; /* 🚫 dividers */
+    border-radius: var(--ab-pane-radius, 16px); /* 🔲 */
+    margin: 0; /* 🧹 the legacy ≥1536 margins */
+    max-height: none;
+  }
+}
+
+/* ♿ reduced motion: the rail snaps instead of animating */
+@media (prefers-reduced-motion: reduce) {
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="sidebar"] {
+    transition: none;
+  }
+}
+
+/* 🚫 JS off: nothing can toggle the rail, so the sidebar stays expanded (gap-review, Joseph) */
+@media (scripting: none) {
+  .abAppLayout[data-variant="panes"][data-rail="true"] .abAppLayout__contentWrapper > [data-ab-part="sidebar"] {
+    width: var(--ab-sidebar-width);
+  }
 }
