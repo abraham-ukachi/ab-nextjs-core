@@ -24,7 +24,7 @@
 * SOFTWARE.
 *
 * @project: ab-nextjs-core
-* @authors: Abraham Ukachi <abraham.ukachi@laplateforme.io>
+* @authors: Abraham Ukachi <abrahamukachi@gmail.com>
 */
 
 /*
@@ -80,6 +80,7 @@ const AbAsideLayout = ({
     isAsideOpening,
     isAsideClosing,
     isAsideLoading,
+    asideId,
   } = useAbPage();
 
   const asideRef = useRef<HTMLElement | null>(null);
@@ -132,12 +133,14 @@ const AbAsideLayout = ({
   return (
     <aside
       ref={asideRef}
+      id={asideId} // 🆔 0.1.6: target of aria-controls (useAbAsideToggle)
       className={clsx(
         ['AbAsideLayout', 'group/aside-layout', styles.abAsideLayout, className],
         { 'is-open': isAsideOpen },
-        { 'slideFromRight': isAsideOpen },
+        { 'slideFromRight': isAsideOpen || isAsideOpenOnMobile }, // 🎞️ ab-nextjs-animations keyframe (240ms here, none under reduced motion)
         { 'is-open-on-mobile': isAsideOpenOnMobile },
-        { '!hidden': !isAsideOpen && !isAsideOpening && !isAsideClosing },
+        // 🙈 0.1.6: stay mounted-visible while the mobile/tablet sheet is open, even if the laptop pane is closed
+        { '!hidden': !isAsideOpen && !isAsideOpenOnMobile && !isAsideOpening && !isAsideClosing },
       )}
       hidden={hidden}
       data-page-name={pageName}

@@ -24,7 +24,7 @@
 * SOFTWARE.
 *
 * @project: ab-nextjs-core
-* @authors: Abraham Ukachi <abraham.ukachi@laplateforme.io>
+* @authors: Abraham Ukachi <abrahamukachi@gmail.com>
 */
 
 /*
@@ -39,6 +39,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactElement,
@@ -57,6 +58,31 @@ export interface AbPageContextValue {
   setAsideOpen: (open: boolean) => void;
   setAsideOpenOnMobile: (open: boolean) => void;
   setAsideLoading: (loading: boolean) => void;
+  /** 🆔 0.1.6: id of the aside element (for `aria-controls` on the TOC / »« buttons). */
+  asideId: string;
+  /** 🔁 0.1.6: flip the laptop+ aside (»/« toggle). */
+  toggleAside: () => void;
+  /** 📱 0.1.6: flip the mobile/tablet aside sheet (TOC button). */
+  toggleAsideOnMobile: () => void;
+}
+
+/** 🎞️ 0.1.6: aside slide duration (brief §4: slide-from-right 240ms). */
+export const AB_ASIDE_DURATION = 240;
+/** 📐 0.1.6: below this the aside is a sheet driven by `isAsideOpenOnMobile` (mobile + tablet). */
+export const AB_ASIDE_SHEET_QUERY = '(max-width: 1023px)';
+/** ♿ reduced-motion query (same string as ab-nextjs-hooks' AB_REDUCED_MOTION_QUERY). */
+export const AB_REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
+
+// 🔍 one-shot media check (false on the server / without matchMedia)
+const matches = (query: string): boolean =>
+  typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia(query).matches;
+
+/**
+ * ⏱️ getAbAsideDuration — the duration the open/close timers should use: `0` under reduced motion
+ * (instant toggle, brief §1.4), otherwise the provider's duration.
+ */
+export function getAbAsideDuration(duration: number, reducedMotion: boolean): number {
+  return reducedMotion ? 0 : Math.max(0, duration); // ♿ instant, never negative
 }
 
 const defaultValue: AbPageContextValue = {
@@ -71,6 +97,9 @@ const defaultValue: AbPageContextValue = {
   setAsideOpen: () => {},
   setAsideOpenOnMobile: () => {},
   setAsideLoading: () => {},
+  asideId: 'ab-aside',
+  toggleAside: () => {},
+  toggleAsideOnMobile: () => {},
 };
 
 const AbPageContext = createContext<AbPageContextValue>(defaultValue);
@@ -79,7 +108,10 @@ export interface AbPageProviderProps {
   children?: ReactNode;
   /** Initial aside open state (default true so shells render visibly). */
   defaultAsideOpen?: boolean;
+  /** 🎞️ slide duration in ms (default 240, 0.1.6; was 300). Reduced motion always makes it instant. */
   asideDuration?: number;
+  /** 🆔 aside element id for `aria-controls` (default `'ab-aside'`). */
+  asideId?: string;
 }
 
 /**
@@ -89,7 +121,8 @@ export interface AbPageProviderProps {
 export function AbPageProvider({
   children,
   defaultAsideOpen = true,
-  asideDuration = 300,
+  asideDuration = AB_ASIDE_DURATION,
+  asideId = 'ab-aside',
 }: AbPageProviderProps): ReactElement {
   const [isAsideOpen, setAsideOpen] = useState(defaultAsideOpen);
   const [isAsideOpenOnMobile, setAsideOpenOnMobile] = useState(false);
@@ -103,18 +136,34 @@ export function AbPageProvider({
   }, []);
 
   const setAsideOpenSafe = useCallback((open: boolean) => {
+    // ♿ 0.1.6: instant under reduced motion (no slide, no closing delay)
+    const ms = getAbAsideDuration(asideDuration, matches(AB_REDUCED_MOTION_QUERY));
     if (open) {
-      setAsideOpening(true);
+      setAsideOpening(ms > 0); // 🎞️ only "opening" when it animates
       setAsideOpen(true);
-      window.setTimeout(() => setAsideOpening(false), asideDuration);
+      if (ms > 0) window.setTimeout(() => setAsideOpening(false), ms);
+    } else if (ms === 0) {
+      setAsideOpen(false); // ⚡ instant
     } else {
       setAsideClosing(true);
       window.setTimeout(() => {
         setAsideOpen(false);
         setAsideClosing(false);
-      }, asideDuration);
+      }, ms);
     }
   }, [asideDuration]);
+
+  // 🔁 0.1.6: toggles for the »/« button (laptop+) and the TOC button (mobile/tablet sheet)
+  const toggleAside = useCallback(() => setAsideOpenSafe(!isAsideOpen), [isAsideOpen, setAsideOpenSafe]);
+  const toggleAsideOnMobile = useCallback(() => setAsideOpenOnMobile((v) => !v), []);
+
+  // ⎋ 0.1.6: Escape closes the mobile/tablet sheet
+  useEffect(() => {
+    if (!isAsideOpenOnMobile) return; // 💤 only while the sheet is open
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setAsideOpenOnMobile(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isAsideOpenOnMobile]);
 
   const value = useMemo<AbPageContextValue>(
     () => ({
@@ -129,6 +178,9 @@ export function AbPageProvider({
       setAsideOpen: setAsideOpenSafe,
       setAsideOpenOnMobile,
       setAsideLoading,
+      asideId,
+      toggleAside,
+      toggleAsideOnMobile,
     }),
     [
       isAsideOpen,
@@ -140,6 +192,9 @@ export function AbPageProvider({
       isAsideClosing,
       isAsideLoading,
       setAsideOpenSafe,
+      asideId,
+      toggleAside,
+      toggleAsideOnMobile,
     ],
   );
 
@@ -152,6 +207,39 @@ export function AbPageProvider({
  */
 export function useAbPage(): AbPageContextValue {
   return useContext(AbPageContext);
+}
+
+/** 🎛️ What {@link useAbAsideToggle} returns: spread `props` on the button. */
+export interface AbAsideToggle {
+  /** 📐 true below 1024px (the aside is a sheet, driven by `isAsideOpenOnMobile`). */
+  isSheet: boolean;
+  /** 👀 is the aside shown for the current viewport? */
+  expanded: boolean;
+  /** 🔁 flip it for the current viewport. */
+  toggle: () => void;
+  /** ♿ `aria-expanded` + `aria-controls` + `onClick` for a toggle button. */
+  props: { 'aria-expanded': boolean; 'aria-controls': string; onClick: () => void };
+}
+
+/**
+ * 📑 useAbAsideToggle (0.1.6) — one toggle for the TOC button (mobile/tablet sheet) and the »/« button
+ * (laptop+ pane). It picks the right state for the viewport and keeps `aria-expanded` / `aria-controls` right.
+ */
+export function useAbAsideToggle(): AbAsideToggle {
+  const { isAsideOpen, isAsideOpenOnMobile, asideId, toggleAside, toggleAsideOnMobile } = useAbPage();
+  // 📐 live viewport class (SSR: laptop+, so the server markup matches the default open pane)
+  const [isSheet, setSheet] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+    const mq = window.matchMedia(AB_ASIDE_SHEET_QUERY); // 📐
+    const update = () => setSheet(mq.matches);
+    update();
+    mq.addEventListener?.('change', update);
+    return () => mq.removeEventListener?.('change', update);
+  }, []);
+  const expanded = isSheet ? isAsideOpenOnMobile : isAsideOpen; // 👀
+  const toggle = isSheet ? toggleAsideOnMobile : toggleAside; // 🔁
+  return { isSheet, expanded, toggle, props: { 'aria-expanded': expanded, 'aria-controls': asideId, onClick: toggle } };
 }
 
 export default AbPageProvider;
