@@ -1,7 +1,7 @@
 {
   "name": "ab-nextjs-core",
   "version": "0.1.5",
-  "description": "\ud83c\udf31 A lightweight collection of server & client React components as core abElements (i.e. ab-app-layout, ab-screen-layout, ...) created by Abraham Ukachi, and optimized for Next.js applications \ud83d\ude0e.",
+  "description": "🌱 A lightweight collection of server & client React components as core abElements (i.e. ab-app-layout, ab-screen-layout, ...) created by Abraham Ukachi, and optimized for Next.js applications 😎.",
   "type": "module",
   "main": "index.ts",
   "types": "types/index.d.ts",
@@ -16,6 +16,7 @@
   "scripts": {
     "lint": "eslint . --fix",
     "test": "vitest run",
+    "typecheck": "tsc --noEmit -p .",
     "check:publish": "node scripts/check-publish-deps.mjs",
     "prepublishOnly": "node scripts/check-publish-deps.mjs"
   },
