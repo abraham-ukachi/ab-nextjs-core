@@ -1,11 +1,14 @@
-## 0.1.7 (Unreleased)
-
-* 📐 **Breakpoints (Decision 6, approved by God 2026-10-20):** mobile <768, tablet 768–1179 (the aside is a sheet), joined panes 1180–1919, gapped panes ≥1920. They were 1024 and 1440. `AB_ASIDE_SHEET_QUERY` is now `(max-width: 1179px)`. The 1180 boundary is the same one AbAppBar already uses to move its nav into More.
-* 🪟 **Gapped panes follow the desktop mock (05):** a 16px gap, an outer gap on the sides and bottom only (the header sits on top), a 20px radius and a soft `--ab-pane-shadow`. The defaults match `ab-nextjs-theme` 0.3.5.
-
 # Changelog
 
 All notable changes to this project will be documented in this file.
+
+## Unreleased (version: God decides 0.1.7 or 0.2.0)
+
+* 📐 **Breakpoints (Decision 6, approved by God 2026-10-20):** mobile <768, tablet 768–1179 (the aside is a sheet), joined panes 1180–1919, gapped panes ≥1920. They were 1024 and 1440. `AB_ASIDE_SHEET_QUERY` is now `(max-width: 1179px)`. The 1180 boundary is the same one AbAppBar already uses to move its nav into More.
+* 🪟 **Gapped panes follow the desktop mock (05):** a 16px gap, an outer gap on the sides and bottom only (the header sits on top), a 20px radius and a soft `--ab-pane-shadow`. The defaults match `ab-nextjs-theme` 0.3.5.
+* 🗂️ **Pane widths + header height (spec §3):** the defaults are now in `:where()` (zero specificity), so an app's `--ab-sidebar-width` / `--ab-aside-width` / `--ab-rail-width` / `--ab-header-height` always win. The values: tablet sidebar 248 · aside 320; joined 260 / 236; gapped 288 / 272; rail 64. The header row is `--ab-header-height`: 52px on mobile, 60px from 768, 64px from 1920.
+* 📟 **`tabletHeader="main"` (P2):** from 768 to 1179 the app header row is hidden and AbMainLayout's `mainHeader` becomes the bar. At other widths that slot is hidden.
+* 🌗 **`--ab-pane-shadow`** is `none` in dark.
 
 ### 0.1.6 (2026-10-16)
 
