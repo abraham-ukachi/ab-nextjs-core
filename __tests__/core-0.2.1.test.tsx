@@ -52,6 +52,8 @@ describe('main pane background 🎨 (God 00:08)', () => {
       const css = read(f) // 📄
       expect(css).toMatch(/\.abMainLayout \{[^}]*background-color: var\(--ab-color-pane-main, var\(--color-background, var\(--surface, #ffffff\)\)\);/) // 🎨
       expect(css).not.toMatch(/(?<!pane-main, )var\(--color-background/) // 🚫 no bare --color-background left (fade gradient too)
+      expect(css).toMatch(/:global\(\.dark\) \.abMainLayout,\s*:global\(\[data-theme="dark"\]\) \.abMainLayout \{\s*background-color: var\(--ab-color-pane-main, var\(--color-dark-background, var\(--surface, #0a0a0a\)\)\);/) // 🌙 dark too (#1d150f)
+      expect(css).not.toMatch(/(?<!pane-main, )var\(--color-dark-background/) // 🚫
     })
   }
 })
