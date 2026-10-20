@@ -149,7 +149,8 @@
 /*    opt in with variant="panes". Children of the content wrapper     */
 /*    are matched by data-ab-part:                                     */
 /*    sidebar | rail (nav) · main · aside · bottomBar (nav)            */
-/*    📱 <768  · 📟 768–1023 · 💻 1024–1439 joined · 🖥️ ≥1440 gapped   */
+/*    📱 <768  · 📟 768–1179 · 💻 1180–1919 joined · 🖥️ ≥1920 gapped   */
+/*    (0.2.0, Decision 6: the approved mocks are joined at 1440 and gapped at 1920)     */
 /*                                                                     */
 /*    📏 THE LAYOUT RULE (God, D34):                                   */
 /*    · the app is ONE 100dvh box and the DOCUMENT NEVER SCROLLS       */
@@ -172,11 +173,30 @@
   overscroll-behavior: none; /* 🚫 no iOS rubber band pulling the whole app */
 }
 
-.abAppLayout[data-variant="panes"] {
-  --ab-sidebar-width: 280px; /* 🗂️ expanded sidebar */
-  --ab-rail-width: 72px; /* 🧷 collapsed rail (icons only) */
-  --ab-aside-width: min(40vw, 360px); /* 📑 "On this page" */
+/* 📐 0.2.0: pane-width + header defaults live in :where() (zero specificity), so an app's
+   `.app { --ab-sidebar-width: … }` or a Tailwind arbitrary property always wins. Values = the approved
+   Home spec §3: tablet 248 · joined 260 / 236 · gapped 288 / 272 · rail 64 · header 52 / 60 / 64. */
+:where(.abAppLayout[data-variant="panes"]) {
+  --ab-sidebar-width: 248px; /* 🗂️ tablet sidebar */
+  --ab-rail-width: 64px; /* 🧷 collapsed rail (icons only) */
+  --ab-aside-width: 320px; /* 📑 tablet overlay TOC */
   --ab-rail-duration: 200ms; /* 🎞️ rail collapse (brief §4) */
+  --ab-header-height: 52px; /* 🔝 mobile app bar */
+}
+/* 🌗 0.2.0 (James): the gapped pane shadow is light-only; dark panes sit flat (theme 0.3.5 sets the same) */
+:where(.abAppLayout[data-variant="panes"]) { --ab-pane-shadow: 0 1px 2px rgb(33 26 22 / 0.04), 0 8px 28px rgb(92 64 48 / 0.06); }
+:where(:global(.dark), [data-theme="dark"]) :where(.abAppLayout[data-variant="panes"]),
+:where(.abAppLayout[data-variant="panes"]):where(:global(.dark), [data-theme="dark"]) { --ab-pane-shadow: none; } /* 🌙 dark on the layout OR any ancestor (body.dark) */
+@media (min-width: 768px) {
+  :where(.abAppLayout[data-variant="panes"]) { --ab-header-height: 60px; } /* 📟 = the tablet main bar height */
+}
+@media (min-width: 1180px) {
+  :where(.abAppLayout[data-variant="panes"]) { --ab-sidebar-width: 260px; --ab-aside-width: 236px; --ab-header-height: 60px; } /* 💻 joined */
+}
+@media (min-width: 1920px) {
+  :where(.abAppLayout[data-variant="panes"]) { --ab-sidebar-width: 288px; --ab-aside-width: 272px; --ab-header-height: 64px; } /* 🖥️ gapped */
+}
+.abAppLayout[data-variant="panes"] {
   display: grid; /* 🧱 rows: header · panes · footer */
   grid-template-rows: auto minmax(0, 1fr) auto; /* 📏 empty header/footer rows are 0px */
   grid-template-columns: minmax(0, 1fr); /* 🚫 no horizontal overflow */
@@ -199,6 +219,17 @@
   padding-inline: env(safe-area-inset-left, 0px) env(safe-area-inset-right, 0px); /* 📱 notch */
 }
 .abAppLayout[data-variant="panes"] > .abAppLayout__headerWrapper { grid-row: 1; padding-top: env(safe-area-inset-top, 0px); } /* 🔝 row 1 · 📱 */
+/* 🔝 0.2.0: the header row is exactly --ab-header-height (+ the notch); its child (AbAppBar) fills it */
+.abAppLayout[data-variant="panes"] > .abAppLayout__headerWrapper { height: calc(var(--ab-header-height) + env(safe-area-inset-top, 0px)); box-sizing: border-box; display: flex; flex-direction: column; }
+.abAppLayout[data-variant="panes"] > .abAppLayout__headerWrapper > * { flex: 1 1 auto; min-height: 0; }
+/* 📟 0.2.0 (P2): tabletHeader="main": 768–1179 has no app header row; the main pane's header slot is the bar.
+   Outside that range the main-header slot is hidden, so one tree serves every width. */
+@media (min-width: 768px) and (max-width: 1179px) {
+  .abAppLayout[data-variant="panes"][data-tablet-header="main"] > .abAppLayout__headerWrapper { display: none; } /* 📏 0px */
+}
+@media (max-width: 767px), (min-width: 1180px) {
+  .abAppLayout[data-variant="panes"][data-tablet-header="main"] [data-ab-part="main-header"] { display: none; } /* 🙈 tablet-only bar */
+}
 /* 📏 WebKit e2e (2026-10-20): pin the panes to the 1fr row. Auto-placement moved them into row 1 (auto) when
    the header was absent or collapsed, and the panes measured 0px tall */
 .abAppLayout[data-variant="panes"] > .abAppLayout__contentWrapper { grid-row: 2; } /* 🧱 the minmax(0,1fr) row */
@@ -230,6 +261,8 @@
 .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"], [data-ab-part="main"], [data-ab-part="aside"]) {
   min-height: 0; /* 🚫 */
   max-height: none; /* 🧹 legacy 100vh caps */
+  margin: 0; /* 🧹 legacy ≥1536px 1.5rem margins (shell shots: a 24px hole at 1180–1919) */
+  border-radius: 0; /* 🧹 legacy ≥1536px 1.5rem sidebar radius (the 1920 gapped rule sets 20px back) */
   box-sizing: border-box; /* 📦 */
   overscroll-behavior: contain; /* 🚫 scroll chaining */
 }
@@ -304,7 +337,7 @@
 }
 
 /* 💻 laptop: three joined panes with hairline dividers, aside in the flow */
-@media (min-width: 1024px) {
+@media (min-width: 1180px) {
   .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]) {
     border-right: var(--ab-divider-hairline, 1px solid rgb(0 0 0 / 0.12)); /* ➖ joined */
   }
@@ -328,17 +361,18 @@
 }
 
 /* 🖥️ desktop: gapped panes with radii, no dividers */
-@media (min-width: 1440px) {
+@media (min-width: 1920px) {
   .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper {
-    gap: var(--ab-pane-gap, 12px); /* 🧱 */
-    padding: var(--ab-pane-gap, 12px); /* 🖼️ outer gap */
+    gap: var(--ab-pane-gap, 16px); /* 🧱 */
+    padding: 0 var(--ab-pane-gap, 16px) var(--ab-pane-gap, 16px); /* 🖼️ outer gap: sides + bottom (the header sits on top, mock 05) */
     box-sizing: border-box;
   }
   .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]),
   .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="main"],
   .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"] {
     border: 0; /* 🚫 dividers */
-    border-radius: var(--ab-pane-radius, 16px); /* 🔲 */
+    border-radius: var(--ab-pane-radius, 20px); /* 🔲 */
+    box-shadow: var(--ab-pane-shadow, none); /* 🌗 mock 05 (light), none in dark */
     overflow: hidden; /* ✂️ radius */
     margin: 0; /* 🧹 legacy 2xl margins */
   }

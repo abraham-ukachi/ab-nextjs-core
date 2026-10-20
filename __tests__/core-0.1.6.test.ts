@@ -63,10 +63,14 @@ describe('G17: four-breakpoint panes 🧭', () => {
       expect(t).toMatch(/inset: 0 0 0 auto;\s*width: var\(--ab-aside-width\)/) // ➡️ overlay
     })
     it(`${file}: laptop joined with hairlines, desktop gapped with radii`, () => {
-      expect(media(css, '@media (min-width: 1024px)')).toMatch(/border-right: var\(--ab-divider-hairline/) // ➖
-      const d = media(css, '@media (min-width: 1440px)')
-      expect(d).toMatch(/gap: var\(--ab-pane-gap, 12px\)/) // 🧱
-      expect(d).toMatch(/border-radius: var\(--ab-pane-radius, 16px\)/) // 🔲
+      expect(media(css, '@media (min-width: 1180px)')).toMatch(/border-right: var\(--ab-divider-hairline/) // ➖
+      const d = media(css, '@media (min-width: 1920px)')
+      expect(d).toMatch(/gap: var\(--ab-pane-gap, 16px\)/) // 🧱 0.1.7: mock 05
+      expect(d).toMatch(/padding: 0 var\(--ab-pane-gap, 16px\) var\(--ab-pane-gap, 16px\)/) // 🖼️ sides + bottom only
+      expect(d).toMatch(/border-radius: var\(--ab-pane-radius, 20px\)/) // 🔲
+      expect(d).toMatch(/box-shadow: var\(--ab-pane-shadow, /) // 🌗
+      expect(media(css, '@media (min-width: 1180px)')).not.toBe('') // 💻 joined from 1180 (Decision 6)
+      expect(css).not.toMatch(/min-width: 1024px|min-width: 1440px/) // 🙅 old breakpoints gone
       expect(d).toMatch(/border: 0/) // 🚫 dividers
     })
     it(`${file}: the rail animates 200ms, snaps under reduced motion, stays expanded without JS`, () => {
@@ -91,7 +95,7 @@ describe('aside: slide-from-right 240ms, instant under reduced motion 🎞️', 
     expect(getAbAsideDuration(240, false)).toBe(240)
     expect(getAbAsideDuration(240, true)).toBe(0) // ♿
     expect(getAbAsideDuration(-5, false)).toBe(0) // 🛡️
-    expect(AB_ASIDE_SHEET_QUERY).toBe('(max-width: 1023px)') // 📐 mobile + tablet
+    expect(AB_ASIDE_SHEET_QUERY).toBe('(max-width: 1179px)') // 📐 mobile + tablet
   })
   it('the aside CSS sets the keyframe to 240ms and kills it under reduced motion', () => {
     const css = strip(read('ab-aside-layout/styles.module.css'))
