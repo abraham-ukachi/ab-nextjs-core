@@ -167,6 +167,15 @@ describe('layout rule 📏', () => {
       expect(css).toMatch(/env\(safe-area-inset-/) // 📱
     })
   }
+  for (const f of ['ab-app-layout/styles.module.css', 'server/ab-app-layout/styles.module.css']) {
+    // 🧪 WebKit e2e: with no header the panes were auto-placed into the `auto` row and measured 0px
+    it(`${f}: header / panes / footer are pinned to rows 1 / 2 / 3`, () => {
+      const css = strip(read(f))
+      expect(css).toMatch(/__headerWrapper \{ grid-row: 1;/) // 🔝
+      expect(css).toMatch(/__contentWrapper \{ grid-row: 2; \}/) // 🧱
+      expect(css).toMatch(/__footerWrapper \{ grid-row: 3;/) // 🦶
+    })
+  }
   for (const f of ['ab-main-layout/styles.module.css', 'server/ab-main-layout/styles.module.css', 'ab-aside-layout/styles.module.css', 'server/ab-aside-layout/styles.module.css']) {
     it(`${f}: the content wrapper is the pane's scroller`, () => {
       const css = strip(read(f))

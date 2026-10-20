@@ -198,8 +198,11 @@
   min-width: 0; /* 🚫 overflow */
   padding-inline: env(safe-area-inset-left, 0px) env(safe-area-inset-right, 0px); /* 📱 notch */
 }
-.abAppLayout[data-variant="panes"] > .abAppLayout__headerWrapper { padding-top: env(safe-area-inset-top, 0px); } /* 📱 */
-.abAppLayout[data-variant="panes"] > .abAppLayout__footerWrapper { padding-bottom: env(safe-area-inset-bottom, 0px); } /* 📱 */
+.abAppLayout[data-variant="panes"] > .abAppLayout__headerWrapper { grid-row: 1; padding-top: env(safe-area-inset-top, 0px); } /* 🔝 row 1 · 📱 */
+/* 📏 WebKit e2e (2026-10-20): pin the panes to the 1fr row. Auto-placement moved them into row 1 (auto) when
+   the header was absent or collapsed, and the panes measured 0px tall */
+.abAppLayout[data-variant="panes"] > .abAppLayout__contentWrapper { grid-row: 2; } /* 🧱 the minmax(0,1fr) row */
+.abAppLayout[data-variant="panes"] > .abAppLayout__footerWrapper { grid-row: 3; padding-bottom: env(safe-area-inset-bottom, 0px); } /* 📱 */
 /* 🫥 D37: not rendered when the prop is null; :empty / :has() collapse what still reaches the DOM */
 .abAppLayout[data-variant="panes"] > .abAppLayout__headerWrapper:empty,
 .abAppLayout[data-variant="panes"] > .abAppLayout__footerWrapper:empty,
