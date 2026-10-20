@@ -2,7 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased (version: God decides 0.1.7 or 0.2.0)
+## 0.2.0 (Unreleased)
+
+### ⚠️ BREAKING (`variant="panes"` only; the default variant is unchanged)
+
+* 📐 **Breakpoints moved:** joined panes now start at **1180px** (was 1024) and gapped panes at **1920px** (was 1440). So 1024–1179 now shows the tablet layout (overlay aside), and 1440–1919 shows joined panes.
+* 🔎 **`AB_ASIDE_SHEET_QUERY`** changed from `'(max-width: 1023px)'` to `'(max-width: 1179px)'`, so `isAsideSheet` / small-screen checks flip at 1180.
+* 🔝 **The header row has a fixed height:** `--ab-header-height` (52px on mobile, 60px from 768, 64px from 1920) plus the safe-area inset. A taller custom header gets clipped, so set `--ab-header-height` to keep it.
+* 🗂️ **New pane-width defaults:** tablet sidebar 248 (was 280), overlay aside 320 (was `min(40vw, 360px)`), rail 64 (was 72), joined 260 / 236, gapped 288 / 272.
+* 🪟 **Gapped look:** 16px gap (was 12), outer gap on the sides and bottom only, 20px radius (was 16), and a light-only `--ab-pane-shadow`.
+* 🧭 **Migrate (keep the 0.1.6 look):** `.AbAppLayout { --ab-sidebar-width: 280px; --ab-aside-width: min(40vw, 360px); --ab-rail-width: 72px; --ab-header-height: 64px; --ab-pane-gap: 12px; --ab-pane-radius: 16px; --ab-pane-shadow: none; }`. The breakpoints themselves can't be overridden (they're media queries; configurable breakpoints are P1).
+
+### Changes
 
 * 📐 **Breakpoints (Decision 6, approved by God 2026-10-20):** mobile <768, tablet 768–1179 (the aside is a sheet), joined panes 1180–1919, gapped panes ≥1920. They were 1024 and 1440. `AB_ASIDE_SHEET_QUERY` is now `(max-width: 1179px)`. The 1180 boundary is the same one AbAppBar already uses to move its nav into More.
 * 🪟 **Gapped panes follow the desktop mock (05):** a 16px gap, an outer gap on the sides and bottom only (the header sits on top), a 20px radius and a soft `--ab-pane-shadow`. The defaults match `ab-nextjs-theme` 0.3.5.
