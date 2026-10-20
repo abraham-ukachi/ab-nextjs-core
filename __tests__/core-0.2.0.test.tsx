@@ -63,7 +63,7 @@ describe.each(['ab-app-layout/styles.module.css', 'server/ab-app-layout/styles.m
   })
   it('--ab-pane-shadow is the mock shadow in light, none in dark', () => {
     expect(css).toMatch(/--ab-pane-shadow: 0 1px 2px rgb\(33 26 22 \/ 0\.04\), 0 8px 28px rgb\(92 64 48 \/ 0\.06\);/)
-    expect(css).toMatch(/:where\(\.dark, \[data-theme="dark"\]\) :where\(\.abAppLayout\[data-variant="panes"\]\)[^{]*\{ --ab-pane-shadow: none; \}/)
+    expect(css).toMatch(/:where\(:global\(\.dark\), \[data-theme="dark"\]\) :where\(\.abAppLayout\[data-variant="panes"\]\)[^{]*\{ --ab-pane-shadow: none; \}/)
     expect(css).toMatch(/box-shadow: var\(--ab-pane-shadow, none\);/)
   })
 })
@@ -73,4 +73,17 @@ describe('AbAppLayout tabletHeader prop 📟', () => {
     expect(renderToStaticMarkup(<L orientation="vertical" variant="panes" tabletHeader="main" header={<b>h</b>} />)).toContain('data-tablet-header="main"')
     expect(renderToStaticMarkup(<L orientation="vertical" variant="panes" header={<b>h</b>} />)).not.toContain('data-tablet-header')
   })
+})
+
+// 📸 James's shell shots found: legacy ≥1536 margins/radius leaking into the panes, and the dark shadow ignoring body.dark
+describe('0.2.0: panes ignore the legacy ≥1536 chrome; dark ancestors drop the pane shadow 🌙', () => {
+  for (const f of ['ab-app-layout/styles.module.css', 'server/ab-app-layout/styles.module.css']) {
+    it(f, () => {
+      const css = readFileSync(join(__dirname, '..', f), 'utf8')
+      expect(css).toMatch(/overscroll-behavior: contain;[\s\S]*?\}/)
+      expect(css).toMatch(/max-height: none;[^\n]*\n  margin: 0;[^\n]*\n  border-radius: 0;/) // 🧹
+      expect(css).toContain(':where(:global(.dark), [data-theme="dark"]) :where(.abAppLayout[data-variant="panes"]),') // 🌙 body.dark (unhashed: CSS modules would rename a bare .dark)
+      expect(css).not.toMatch(/:where\(\.dark/) // 🚫 a bare .dark is hashed by CSS modules and never matches
+    })
+  }
 })

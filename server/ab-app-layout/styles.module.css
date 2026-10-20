@@ -185,8 +185,8 @@
 }
 /* 🌗 0.2.0 (James): the gapped pane shadow is light-only; dark panes sit flat (theme 0.3.5 sets the same) */
 :where(.abAppLayout[data-variant="panes"]) { --ab-pane-shadow: 0 1px 2px rgb(33 26 22 / 0.04), 0 8px 28px rgb(92 64 48 / 0.06); }
-:where(.dark, [data-theme="dark"]) :where(.abAppLayout[data-variant="panes"]),
-:where(.abAppLayout[data-variant="panes"]):where(.dark, [data-theme="dark"]) { --ab-pane-shadow: none; }
+:where(:global(.dark), [data-theme="dark"]) :where(.abAppLayout[data-variant="panes"]),
+:where(.abAppLayout[data-variant="panes"]):where(:global(.dark), [data-theme="dark"]) { --ab-pane-shadow: none; } /* 🌙 dark on the layout OR any ancestor (body.dark) */
 @media (min-width: 768px) {
   :where(.abAppLayout[data-variant="panes"]) { --ab-header-height: 60px; } /* 📟 = the tablet main bar height */
 }
@@ -261,6 +261,8 @@
 .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"], [data-ab-part="main"], [data-ab-part="aside"]) {
   min-height: 0; /* 🚫 */
   max-height: none; /* 🧹 legacy 100vh caps */
+  margin: 0; /* 🧹 legacy ≥1536px 1.5rem margins (shell shots: a 24px hole at 1180–1919) */
+  border-radius: 0; /* 🧹 legacy ≥1536px 1.5rem sidebar radius (the 1920 gapped rule sets 20px back) */
   box-sizing: border-box; /* 📦 */
   overscroll-behavior: contain; /* 🚫 scroll chaining */
 }
