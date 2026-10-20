@@ -33,7 +33,7 @@
 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 */
 
-import type { ReactElement, ReactNode } from 'react';
+import { isValidElement, type ReactElement, type ReactNode } from 'react';
 import clsx from 'clsx';
 import AbLinearProgress from '../../ab-linear-progress';
 import styles from './styles.module.css';
@@ -54,6 +54,9 @@ export interface AbAppLayoutProps {
   variant?: 'default' | 'panes';
   /** 🧷 0.1.6: collapse the sidebar to the icon rail (tablet and up, `variant="panes"`). */
   railCollapsed?: boolean;
+  /** 🧰 0.1.6: render the legacy #backdrop / #menus / #dialogs / #toasts / progress / canvas layers.
+   *  Default: on for `variant="default"`, off for `"panes"` (the shell brings its own menus and dialogs). */
+  overlays?: boolean;
 }
 
 /**
@@ -74,7 +77,15 @@ const AbAppLayout = ({
   menus,
   variant = 'default', // 🧭
   railCollapsed = false, // 🧷
+  overlays, // 🧰
 }: AbAppLayoutProps): ReactElement => {
+  // 🧱 panes: the header slot is a plain in-flow, sticky grid row. Its child (e.g. AbAppBar) brings its own
+  //    <header>, so we never nest one header inside another. Same when the slot child IS a <header>.
+  const HeaderTag = variant === 'panes' || (isValidElement(header) && header.type === 'header') ? 'div' : 'header';
+  // 🧰 legacy overlay layers (off in panes unless asked for)
+  const showOverlays = overlays ?? variant !== 'panes';
+  // 🦶 panes: only render the footer row when there is a footer
+  const showFooter = variant !== 'panes' || footer != null;
   return (
     <div
       className={clsx(['AbAppLayout', styles.abAppLayout, className])}
@@ -84,9 +95,9 @@ const AbAppLayout = ({
       data-variant={variant} // 🧭 CSS hook for the panes
       data-rail={railCollapsed ? 'true' : 'false'} // 🧷
     >
-      <header className={clsx(['HeaderWrapper', styles.abAppLayout__headerWrapper])} data-ab-part="header">
+      <HeaderTag className={clsx(['HeaderWrapper', styles.abAppLayout__headerWrapper])} data-ab-part="header">
         {header}
-      </header>
+      </HeaderTag>
 
       <div className={clsx(['ContentWrapper', styles.abAppLayout__contentWrapper])}>
         {sideBar}
@@ -94,26 +105,32 @@ const AbAppLayout = ({
         {navBar}
       </div>
 
-      <footer className={clsx(['FooterWrapper', styles.abAppLayout__footerWrapper])} data-ab-part="footer">
-        {footer}
-      </footer>
-
-      <div id="backdrop" className={clsx(['Backdrop', styles.abAppLayout__backdrop])} hidden />
-      <div id="menus" className={clsx(['Menus', styles.abAppLayout__menus])} hidden>
-        {menus}
-      </div>
-      <div id="dialogs" className={clsx(['Dialogs', styles.abAppLayout__dialogs])} hidden />
-      <div id="toasts" className={clsx(['Toasts', styles.abAppLayout__toasts])} hidden />
-
-      <AbLinearProgress
-        className="absolute top-0 left-0 right-0 z-50 !h-0.5 lg:!h-1"
-        color="secondary"
-        hidden={true}
-        isIndeterminate={true}
-        progress={25}
-      />
-
-      <canvas className={clsx(['Canvas', styles.abAppLayout__canvas])} />
+      {showFooter && (
+        <footer className={clsx(['FooterWrapper', styles.abAppLayout__footerWrapper])} data-ab-part="footer">
+          {footer}
+        </footer>
+      )}
+      {/* 🧰 legacy layers (ids kept for old apps) */}
+      {showOverlays && (
+        <>
+          <div id="backdrop" className={clsx(['Backdrop', styles.abAppLayout__backdrop])} hidden />
+          <div id="menus" className={clsx(['Menus', styles.abAppLayout__menus])} hidden>
+            {menus}
+          </div>
+          <div id="dialogs" className={clsx(['Dialogs', styles.abAppLayout__dialogs])} hidden />
+          <div id="toasts" className={clsx(['Toasts', styles.abAppLayout__toasts])} hidden />
+          <AbLinearProgress
+            className="absolute top-0 left-0 right-0 z-50 !h-0.5 lg:!h-1"
+            color="secondary"
+            hidden={true}
+            isIndeterminate={true}
+            progress={25}
+          />
+          <canvas className={clsx(['Canvas', styles.abAppLayout__canvas])} />
+        </>
+      )}
+      {/* 📋 panes: still render menus when the app passes some */}
+      {!showOverlays && menus != null && <div className={clsx(['Menus', styles.abAppLayout__menus])}>{menus}</div>}
     </div>
   );
 };

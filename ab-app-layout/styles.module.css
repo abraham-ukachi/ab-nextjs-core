@@ -147,57 +147,104 @@
 /* ================================================================== */
 /* 🧭 0.1.6 (G17): docs-shell panes, opt in with variant="panes"       */
 /*    Children of the content wrapper are matched by data-ab-part:     */
-/*    sidebar (nav) · main · aside · bottomBar (nav)                   */
+/*    sidebar | rail (nav) · main · aside · bottomBar (nav)            */
 /*    📱 <768  · 📟 768–1023 · 💻 1024–1439 joined · 🖥️ ≥1440 gapped   */
 /*    Tokens: --ab-pane-gap / --ab-pane-radius / --ab-divider-hairline */
 /*    (ab-nextjs-theme ≥ 0.3.4), with safe fallbacks                    */
+/*    📜 The DOCUMENT scrolls (not main): the header is a sticky grid  */
+/*    row, sidebar + aside are sticky columns, so window scroll        */
+/*    listeners and IntersectionObserver scroll spies just work.       */
 /* ================================================================== */
 .abAppLayout[data-variant="panes"] {
   --ab-sidebar-width: 280px; /* 🗂️ expanded sidebar */
   --ab-rail-width: 72px; /* 🧷 collapsed rail (icons only) */
   --ab-aside-width: min(40vw, 360px); /* 📑 "On this page" */
   --ab-rail-duration: 200ms; /* 🎞️ rail collapse (brief §4) */
+  --ab-app-bar-height: 64px; /* 📏 sticky offset for the side panes (override if your bar is taller) */
+  display: grid; /* 🧱 rows: header · content · footer */
+  grid-template-rows: auto 1fr auto; /* 📏 */
+  grid-template-columns: minmax(0, 1fr); /* 🚫 no horizontal overflow */
+  height: auto; /* 📜 grow with the page (the document scrolls) */
+  min-height: 100dvh; /* 📐 at least one screen */
+}
+
+/* 🔝 header: in the flow (content starts BELOW it) and sticky at the top */
+.abAppLayout[data-variant="panes"] > .abAppLayout__headerWrapper {
+  position: sticky; /* 📌 */
+  top: 0; /* ⬆️ */
+  z-index: 25; /* ⬆️ above panes (10) and the aside sheet's backdrop, below the sheet (30) */
+  pointer-events: auto; /* 🖱️ the legacy wrapper disabled them */
+  min-width: 0; /* 🚫 overflow */
+}
+/* 🦶 footer: plain row */
+.abAppLayout[data-variant="panes"] > .abAppLayout__footerWrapper {
+  position: static; /* 📌 */
+  pointer-events: auto; /* 🖱️ */
+}
+/* 📋 menus the app passes: no full-screen click shield */
+.abAppLayout[data-variant="panes"] > .abAppLayout__menus {
+  display: contents; /* 🫥 */
 }
 
 /* 📱 mobile: one column, no sidebar, bottom bar visible, aside only as a full-screen sheet */
 .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper {
   flex-direction: column; /* ⬇️ stack */
+  height: auto; /* 📜 */
+  min-width: 0; /* 🚫 overflow */
+  justify-content: flex-start; /* ⬆️ */
 }
-.abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="sidebar"] {
+.abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]) {
   display: none; /* 🙈 the bottom bar takes over */
 }
 .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="main"] {
   flex: 1 1 auto; /* ↔️ full width */
   min-width: 0; /* 🚫 overflow */
+  height: auto; /* 📜 its full content height: the document scrolls */
+  max-height: none; /* 🧹 legacy caps */
+  overflow: visible; /* 📜 never a clipped fixed-height box */
 }
 .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"] {
   position: fixed; /* 📄 sheet over the page */
   inset: 0; /* 🧱 100% (TOC button) */
   width: 100%;
-  z-index: 30; /* ⬆️ above main, below menus/dialogs (50) */
+  z-index: 30; /* ⬆️ above main + header, below menus/dialogs (50) */
+  overflow: auto; /* 📜 long TOCs */
 }
 .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"]:not([data-open-on-mobile="true"]) {
   display: none; /* 🙈 closed by default on mobile */
 }
+/* 🌫️ sheet backdrop (rendered by AbAsideLayout): only while the sheet is open */
+.abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside-backdrop"] {
+  display: none; /* 🙈 */
+}
 .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="bottomBar"] {
+  position: sticky; /* 📌 always reachable while the document scrolls */
+  bottom: 0; /* ⬇️ */
+  z-index: 20; /* ⬆️ */
   flex: none; /* 📏 its own height */
   padding-bottom: env(safe-area-inset-bottom, 0); /* 📱 home indicator */
 }
 
-/* 📟 tablet: sidebar (or rail) + main; the aside overlays on the right; no bottom bar */
+/* 📟 tablet: sidebar (or rail) + main; the aside overlays on the right over a backdrop; no bottom bar */
 @media (min-width: 768px) {
   .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper {
     flex-direction: row; /* ➡️ */
+    align-items: flex-start; /* 📌 lets the side panes stick */
   }
-  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="sidebar"] {
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]) {
     display: flex; /* 👀 */
     flex: none;
+    position: sticky; /* 📌 stays put while the page scrolls */
+    top: var(--ab-app-bar-height); /* ⬇️ under the sticky bar */
     width: var(--ab-sidebar-width); /* 🗂️ */
-    overflow: hidden auto; /* 📜 long sections scroll */
+    max-width: none; /* 🧹 the component's own cap */
+    height: calc(100dvh - var(--ab-app-bar-height)); /* 📏 one screen */
+    overflow: hidden auto; /* 📜 long sections scroll on their own */
     transition: width var(--ab-rail-duration) ease; /* 🎞️ rail */
   }
-  .abAppLayout[data-variant="panes"][data-rail="true"] .abAppLayout__contentWrapper > [data-ab-part="sidebar"] {
-    width: var(--ab-rail-width); /* 🧷 rail */
+  .abAppLayout[data-variant="panes"][data-rail="true"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]),
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="rail"] {
+    width: var(--ab-rail-width); /* 🧷 rail (layout flag or AbSidebar's own rail markup) */
   }
   .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="bottomBar"] {
     display: none; /* 🙈 sidebar replaces it */
@@ -206,26 +253,40 @@
     inset: 0 0 0 auto; /* ➡️ pinned right */
     width: var(--ab-aside-width); /* 📑 ~30–40% */
     border-left: var(--ab-divider-hairline, 1px solid rgb(0 0 0 / 0.12)); /* ➖ */
+    background: var(--ab-color-surface, Canvas); /* 🎨 opaque over the page */
   }
-  /* 🙈 still driven by the small-screen flag (data-open-on-mobile): hidden by default on tablet */
+  /* 🌫️ tablet overlay backdrop (James review): dims the page, click closes the sheet */
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside-backdrop"][data-open="true"] {
+    display: block; /* 👀 */
+    position: fixed; /* 📄 */
+    inset: 0; /* 🧱 */
+    z-index: 29; /* ⬇️ just under the sheet */
+    background: rgb(0 0 0 / 0.32); /* 🌫️ scrim */
+  }
 }
 
-/* 💻 laptop: three joined panes with hairline dividers, aside in the flow */
+/* 💻 laptop: three joined panes with hairline dividers, aside in the flow (sticky) */
 @media (min-width: 1024px) {
-  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="sidebar"] {
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]) {
     border-right: var(--ab-divider-hairline, 1px solid rgb(0 0 0 / 0.12)); /* ➖ joined */
   }
   .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"] {
-    position: relative; /* 📌 back in the flow */
+    position: sticky; /* 📌 back in the flow, stays put */
+    top: var(--ab-app-bar-height); /* ⬇️ */
     inset: auto;
+    height: calc(100dvh - var(--ab-app-bar-height)); /* 📏 */
     flex: none;
     z-index: auto;
+    background: none; /* 🎨 */
   }
   .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"][data-opened="true"] {
     display: flex; /* 👀 laptop+ follows data-opened (isAsideOpen), not the small-screen flag (same specificity as the :not() rule, later wins) */
   }
   .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"]:not([data-opened="true"]) {
     display: none; /* 🙈 closed with the »/« toggle */
+  }
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside-backdrop"] {
+    display: none !important; /* 🙈 no sheet on laptop+ */
   }
 }
 
@@ -236,7 +297,12 @@
     padding: var(--ab-pane-gap, 12px); /* 🖼️ outer gap */
     box-sizing: border-box;
   }
-  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="sidebar"],
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]),
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"] {
+    top: calc(var(--ab-app-bar-height) + var(--ab-pane-gap, 12px)); /* ⬇️ */
+    height: calc(100dvh - var(--ab-app-bar-height) - 2 * var(--ab-pane-gap, 12px)); /* 📏 */
+  }
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]),
   .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="main"],
   .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"] {
     border: 0; /* 🚫 dividers */
@@ -248,14 +314,14 @@
 
 /* ♿ reduced motion: the rail snaps instead of animating */
 @media (prefers-reduced-motion: reduce) {
-  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="sidebar"] {
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]) {
     transition: none;
   }
 }
 
 /* 🚫 JS off: nothing can toggle the rail, so the sidebar stays expanded (gap-review, Joseph) */
 @media (scripting: none) {
-  .abAppLayout[data-variant="panes"][data-rail="true"] .abAppLayout__contentWrapper > [data-ab-part="sidebar"] {
+  .abAppLayout[data-variant="panes"][data-rail="true"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]) {
     width: var(--ab-sidebar-width);
   }
 }
