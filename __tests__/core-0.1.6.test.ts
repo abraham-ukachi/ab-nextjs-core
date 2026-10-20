@@ -207,3 +207,17 @@ describe('toAbSlot 🫥', () => {
     expect((toAbSlot('Docs') as { type: string }).type).toBe('span') // 🔤
   })
 })
+
+// 🔢 James nit: counted layout lock
+import { acquireAbLayoutLock } from '../ab-app-layout'
+describe('acquireAbLayoutLock 🔒', () => {
+  it('keeps the lock until the last panes layout unmounts, double release is a no-op', () => {
+    const attrs = new Set<string>() // 🎭 a tiny <html>
+    const doc = { documentElement: { setAttribute: (n: string) => attrs.add(n), removeAttribute: (n: string) => attrs.delete(n) } } as unknown as Document
+    const a = acquireAbLayoutLock(doc), b = acquireAbLayoutLock(doc)
+    a(); a() // 🔁 StrictMode-style double cleanup
+    expect(attrs.has('data-ab-layout-lock')).toBe(true) // 🔒 b still mounted
+    b()
+    expect(attrs.has('data-ab-layout-lock')).toBe(false) // 🔓 last one out
+  })
+})

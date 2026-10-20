@@ -42,6 +42,26 @@ import styles from './styles.module.css';
 // 🫥 G50: empty-slot helper
 import { toAbSlot } from '../ab-page-provider/slot';
 
+// 🔢 how many panes layouts are mounted (module scope: one document per bundle)
+let abLayoutLocks = 0;
+
+/**
+ * 🔒 acquireAbLayoutLock — sets `data-ab-layout-lock` on `<html>` and returns the release function.
+ * Counted: the attribute only goes away when the LAST mounted panes layout releases (James nit).
+ * Releasing twice is a no-op.
+ */
+export function acquireAbLayoutLock(doc: Document = document): () => void {
+  abLayoutLocks += 1; // ➕
+  doc.documentElement.setAttribute('data-ab-layout-lock', ''); // 🔒
+  let released = false; // 🛡️ StrictMode double cleanups
+  return () => {
+    if (released) return;
+    released = true;
+    abLayoutLocks = Math.max(0, abLayoutLocks - 1); // ➖
+    if (abLayoutLocks === 0) doc.documentElement.removeAttribute('data-ab-layout-lock'); // 🔓 last one out
+  };
+}
+
 export interface AbAppLayoutProps {
   orientation: 'vertical' | 'horizontal';
   className?: string;
@@ -92,9 +112,7 @@ const AbAppLayout = ({
   // 🔒 G54: lock the document while a panes layout is mounted (CSS :has() does it too; this covers older engines)
   useEffect(() => {
     if (variant !== 'panes' || typeof document === 'undefined') return;
-    const html = document.documentElement; // 🌐
-    html.setAttribute('data-ab-layout-lock', ''); // 🔒
-    return () => html.removeAttribute('data-ab-layout-lock'); // 🔓 unmount
+    return acquireAbLayoutLock(); // 🔒 counted, so unmounting one of two layouts keeps the lock (James)
   }, [variant]);
   return (
     <div
