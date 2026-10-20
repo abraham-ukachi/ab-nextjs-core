@@ -102,3 +102,14 @@ describe('aside column reads --ab-color-pane at ≥ 1180 🪟', () => {
     })
   }
 })
+
+// 🚫 James P2 (round 3): AbAsideLayout has no CSS transition (no-transitions rule; motion comes from ab-nextjs-animations)
+describe('AbAsideLayout: no transition', () => {
+  for (const f of ['ab-aside-layout/styles.module.css', 'server/ab-aside-layout/styles.module.css']) {
+    it(`${f}: no transition-property / transition-duration`, () => {
+      const css = read(f) // 📄
+      expect(css).not.toMatch(/transition-property:/) // 🚫 all
+      expect(css).not.toMatch(/transition-duration:/) // 🚫 300ms
+    })
+  }
+})

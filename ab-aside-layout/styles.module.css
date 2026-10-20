@@ -46,9 +46,7 @@
   height: 100%;
   z-index: 10;
   overflow: hidden;
-  transition-property: all;
-  transition-duration: 300ms;
-  transition-timing-function: ease-in-out;
+  /* 🚫 0.2.1 (James P2): no `transition: all 300ms` here (the no-transitions rule; motion = ab-nextjs-animations only) */
   background-color: var(--ab-color-pane, var(--ab-color-pane-main, var(--color-background, var(--surface, #ffffff))));
 
   /* 🎞️ 0.1.6: the slideFromRight keyframe (ab-nextjs-animations) runs 240ms here (brief §4) */
