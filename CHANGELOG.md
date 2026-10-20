@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 * 🎨 **Main pane background:** `AbMainLayout` (client + server) paints `--ab-color-pane-main` (theme ≥ 0.3.5) in light and dark, then the old chains (`--color-background` → `--surface` → `#fff`; dark `--color-dark-background` → `--surface` → `#0a0a0a`). The theme never defined `--color-background`, so the pane was white instead of #fff8f5 / #1d150f. The bottom fade uses the same colour.
 * 🎨 **Aside pane background (James):** `AbAsideLayout` (client + server) does the same: `--ab-color-pane-main` first in light and dark, for the pane and its fade. It was white too.
+* 🪟 **Side panes at 1920 (God 00:41):** the sidebar / rail pane (`:where()`, zero specificity), the ≥ 1180px aside column and `AbAsideLayout` read theme 0.3.6's `--ab-color-pane` first. The theme only sets it at ≥ 1920px in light (#fff, mock 05), so everywhere else, and in dark, the fallbacks keep today's colours: a transparent sidebar and a `--ab-color-pane-main` aside.
 * 📟 **`tabletHeader="main"`:** from 768 to 1179px, the main-header slot is now exactly `--ab-header-height` (60px) tall and its child fills it, like the app header row (mock 06 `.mbar`). It used to take the child's own height, which was 48px.
 * 🏷️ **Sidebar logo row:** AbSidebar's `logo` row (`data-ab-part="sidebar-logo"`, components ≥ 0.1.15) is shown only where the app header is hidden, which is `tabletHeader="main"` at 768–1179px. Everywhere else in panes it's hidden, because the app bar already carries the brand.
 

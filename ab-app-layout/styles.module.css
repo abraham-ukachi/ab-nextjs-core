@@ -279,6 +279,13 @@
   overscroll-behavior: contain; /* 🚫 scroll chaining */
 }
 
+/* 🪟 0.2.1 (God 00:41): the sidebar / rail pane reads theme ≥ 0.3.6 --ab-color-pane (#fff only at ≥ 1920px light,
+   mock 05). Unset anywhere else (and `initial` in dark), so it stays transparent like before. :where() = 0 specificity,
+   so an app's own sidebar background still wins. */
+:where(.abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"])) {
+  background-color: var(--ab-color-pane, transparent);
+}
+
 /* 📱 mobile: one column, no sidebar, bottom bar visible, aside only as a full-pane sheet */
 .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]) {
   display: none; /* 🙈 the bottom bar takes over */
@@ -359,7 +366,7 @@
     height: auto; /* 📏 stretched by the row */
     flex: none;
     z-index: auto;
-    background: none; /* 🎨 */
+    background: var(--ab-color-pane, none); /* 🎨 transparent column; 0.2.1: --ab-color-pane (theme ≥ 0.3.6: #fff at ≥ 1920px light) */
   }
   .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"][data-opened="true"] {
     display: flex; /* 👀 laptop+ follows data-opened (isAsideOpen), not the small-screen flag (same specificity as the :not() rule, later wins) */

@@ -78,9 +78,27 @@ describe('aside pane background 🎨 (James 00:22)', () => {
   for (const f of ['ab-aside-layout/styles.module.css', 'server/ab-aside-layout/styles.module.css']) {
     it(`${f} reads --ab-color-pane-main first in light and dark (pane + fade)`, () => {
       const css = read(f) // 📄
-      expect(css.match(/var\(--ab-color-pane-main, var\(--color-background, var\(--surface, #ffffff\)\)\)/g)).toHaveLength(2) // 🌞 pane + fade
-      expect(css.match(/var\(--ab-color-pane-main, var\(--color-dark-background, var\(--surface, #0a0a0a\)\)\)/g)).toHaveLength(2) // 🌙 pane + fade
+      expect(css.match(/var\(--ab-color-pane, var\(--ab-color-pane-main, var\(--color-background, var\(--surface, #ffffff\)\)\)\)/g)).toHaveLength(2) // 🌞 pane + fade (0.2.1: --ab-color-pane first)
+      expect(css.match(/var\(--ab-color-pane, var\(--ab-color-pane-main, var\(--color-dark-background, var\(--surface, #0a0a0a\)\)\)\)/g)).toHaveLength(2) // 🌙 pane + fade
       expect(css).not.toMatch(/(?<!pane-main, )var\(--color-(dark-)?background/) // 🚫 no bare chain left
+    })
+  }
+})
+
+describe('side panes read --ab-color-pane 🪟 (God 00:41)', () => {
+  for (const f of ['ab-app-layout/styles.module.css', 'server/ab-app-layout/styles.module.css']) {
+    it(`${f}: sidebar / rail = var(--ab-color-pane, transparent) at zero specificity`, () => {
+      expect(read(f)).toMatch(/:where\(\.abAppLayout\[data-variant="panes"\] \.abAppLayout__contentWrapper > :is\(\[data-ab-part="sidebar"\], \[data-ab-part="rail"\]\)\) \{\s*background-color: var\(--ab-color-pane, transparent\);\s*\}/) // 🪟
+    })
+  }
+})
+
+describe('aside column reads --ab-color-pane at ≥ 1180 🪟', () => {
+  for (const f of ['ab-app-layout/styles.module.css', 'server/ab-app-layout/styles.module.css']) {
+    it(`${f}: background: var(--ab-color-pane, none) (unset = the old transparent column)`, () => {
+      const css = read(f) // 📄
+      expect(css).toMatch(/> \[data-ab-part="aside"\] \{[^}]*z-index: auto;\s*background: var\(--ab-color-pane, none\);/) // 🪟
+      expect(css).not.toMatch(/> \[data-ab-part="aside"\] \{[^}]*background: none;/) // 🚫
     })
   }
 })
