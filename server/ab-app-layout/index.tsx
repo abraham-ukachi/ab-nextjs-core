@@ -56,7 +56,7 @@ export interface AbAppLayoutProps {
   variant?: 'default' | 'panes';
   /** 🧷 0.1.6: collapse the sidebar to the icon rail (tablet and up, `variant="panes"`). */
   railCollapsed?: boolean;
-  /** 📟 0.1.7 (P2): `'main'` = on tablet (768–1179) hide the app header and show AbMainLayout's `mainHeader` instead (hidden at other widths). Default `'header'`. */
+  /** 📟 0.2.0 (P2): `'main'` = on tablet (768–1179) hide the app header and show AbMainLayout's `mainHeader` instead (hidden at other widths). Default `'header'`. */
   tabletHeader?: 'header' | 'main';
   /** 🧰 0.1.6: render the legacy #backdrop / #menus / #dialogs / #toasts / progress / canvas layers.
    *  Default: on for `variant="default"`, off for `"panes"` (the shell brings its own menus and dialogs). */

@@ -24,7 +24,7 @@
 * SOFTWARE.
 *
 * @project: ab-nextjs-core
-* @name: Core 0.1.7 shell - Tests
+* @name: Core 0.2.0 shell - Tests
 * @file: __tests__/core-0.1.7.test.tsx
 * @type: Vitest
 * @authors: Abraham Ukachi <abrahamukachi@gmail.com>
@@ -47,7 +47,7 @@ import ServerAbAppLayout from '../server/ab-app-layout'
 
 const read = (f: string) => readFileSync(join(__dirname, '..', f), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '') // 🧹 no comments
 
-describe.each(['ab-app-layout/styles.module.css', 'server/ab-app-layout/styles.module.css'])('%s 0.1.7 📐', (file) => {
+describe.each(['ab-app-layout/styles.module.css', 'server/ab-app-layout/styles.module.css'])('%s 0.2.0 📐', (file) => {
   const css = read(file)
   it('pane widths + header height defaults are zero-specificity (:where) with the spec §3 values', () => {
     expect(css).toMatch(/:where\(\.abAppLayout\[data-variant="panes"\]\) \{\s*--ab-sidebar-width: 248px;\s*--ab-rail-width: 64px;\s*--ab-aside-width: 320px;[^}]*--ab-header-height: 52px;/) // 📱📟
