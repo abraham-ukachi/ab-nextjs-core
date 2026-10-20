@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 * 📟 **`tabletHeader="main"`:** from 768 to 1179px, the main-header slot is now exactly `--ab-header-height` (60px) tall and its child fills it, like the app header row (mock 06 `.mbar`). It used to take the child's own height, which was 48px.
 * 🏷️ **Sidebar logo row:** AbSidebar's `logo` row (`data-ab-part="sidebar-logo"`, components ≥ 0.1.15) is shown only where the app header is hidden, which is `tabletHeader="main"` at 768–1179px. Everywhere else in panes it's hidden, because the app bar already carries the brand.
 * 🚫 **AbAsideLayout:** no more `transition: all 300ms` (the no-transitions rule; motion comes from ab-nextjs-animations).
+* 📱 **AbAppLayout `mobileHeader="main"`** (drawers v2): below 768px the app header row is hidden and AbMainLayout's `mainHeader` becomes the 56px mobile bar (1px divider, notch padding, z 10). Hidden at 768px and up unless `tabletHeader="main"` shows it on tablet. Default `"header"` (unchanged).
 
 ## [0.2.0](https://github.com/abraham-ukachi/ab-nextjs-core/compare/v0.1.6...v0.2.0) (2026-10-20)
 

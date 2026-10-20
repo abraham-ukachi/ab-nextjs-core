@@ -227,8 +227,28 @@
 @media (min-width: 768px) and (max-width: 1179px) {
   .abAppLayout[data-variant="panes"][data-tablet-header="main"] > .abAppLayout__headerWrapper { display: none; } /* 📏 0px */
 }
-@media (max-width: 767px), (min-width: 1180px) {
+@media (min-width: 1180px) {
   .abAppLayout[data-variant="panes"][data-tablet-header="main"] [data-ab-part="main-header"] { display: none; } /* 🙈 tablet-only bar */
+}
+@media (max-width: 767px) {
+  /* 🙈 below 768px the tablet-only bar stays hidden, unless mobileHeader="main" makes it the mobile bar (below) */
+  .abAppLayout[data-variant="panes"][data-tablet-header="main"]:not([data-mobile-header="main"]) [data-ab-part="main-header"] { display: none; }
+}
+/* 📱 0.2.1 (drawers v2, God 01:22): mobileHeader="main": below 768px there is no app header row; the main pane's
+   header slot is the 56px mobile bar (logo · globe · theme) with a 1px divider. Other widths: hidden, unless
+   tabletHeader="main" shows it at 768–1179. One tree serves every width. */
+@media (max-width: 767px) {
+  .abAppLayout[data-variant="panes"][data-mobile-header="main"] > .abAppLayout__headerWrapper { display: none; } /* 📏 0px */
+  .abAppLayout[data-variant="panes"][data-mobile-header="main"] [data-ab-part="main-header"] {
+    height: calc(56px + env(safe-area-inset-top, 0px)); padding-top: env(safe-area-inset-top, 0px); /* 📏 56 + 📱 notch */
+    flex: none; box-sizing: border-box; display: flex; flex-direction: column; /* 📐 the child fills it */
+    border-bottom: 1px solid var(--ab-color-border, rgb(92 64 48 / 0.13)); /* ➖ the divider */
+    position: relative; z-index: 10; /* 🥞 spec z-order: bars = 10, below the scrim (20) */
+  }
+  .abAppLayout[data-variant="panes"][data-mobile-header="main"] [data-ab-part="main-header"] > * { flex: 1 1 auto; min-height: 0; }
+}
+@media (min-width: 768px) {
+  .abAppLayout[data-variant="panes"][data-mobile-header="main"]:not([data-tablet-header="main"]) [data-ab-part="main-header"] { display: none; } /* 🙈 mobile-only bar */
 }
 /* 📟 0.2.1 (Joseph, God 00:08): at 768–1179 the main-header slot IS the bar, so it gets the header-row height
    (--ab-header-height = 60px there) and its child fills it, like the app header row. Mock 06 `.mbar` = 60px. */

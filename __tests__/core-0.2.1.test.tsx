@@ -42,6 +42,9 @@ import { describe, expect, it } from 'vitest'
 // 📄 fs
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { renderToStaticMarkup } from 'react-dom/server'
+import AbAppLayout from '../ab-app-layout'
+import ServerAbAppLayout from '../server/ab-app-layout'
 
 // 📁 CSS without comments
 const read = (f: string) => readFileSync(join(__dirname, '..', f), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '') // 🧹
@@ -110,6 +113,29 @@ describe('AbAsideLayout: no transition', () => {
       const css = read(f) // 📄
       expect(css).not.toMatch(/transition-property:/) // 🚫 all
       expect(css).not.toMatch(/transition-duration:/) // 🚫 300ms
+    })
+  }
+})
+
+// 📱 drawers v2 (God 01:22): mobileHeader="main" = the mainHeader is the 56px mobile bar, the app header is hidden < 768
+describe('AbAppLayout mobileHeader', () => {
+  for (const [name, C] of [['client', AbAppLayout], ['server', ServerAbAppLayout]] as const) {
+    it(`${name}: data-mobile-header="main" only when asked`, () => {
+      const on = renderToStaticMarkup(<C orientation="vertical" variant="panes" mobileHeader="main" header={<i>bar</i>} />)
+      expect(on).toContain('data-mobile-header="main"') // 📱
+      const off = renderToStaticMarkup(<C orientation="vertical" variant="panes" header={<i>bar</i>} />)
+      expect(off).not.toContain('data-mobile-header') // 🧹 default unchanged
+    })
+  }
+  for (const f of ['ab-app-layout/styles.module.css', 'server/ab-app-layout/styles.module.css']) {
+    it(`${f}: < 768 hides the header row and makes main-header 56px with a divider; ≥ 768 hides it`, () => {
+      const css = read(f).replace(/\/\*[\s\S]*?\*\//g, '') // 🧹
+      const m = /@media \((?:max-width: 767px|width <= 767px)\) \{\s*\.abAppLayout\[data-variant="panes"\]\[data-mobile-header="main"\] > \.abAppLayout__headerWrapper \{ display: none; \}([\s\S]*?)\n\}/.exec(css)
+      expect(m, 'mobile block').not.toBeNull()
+      expect(m![1]).toMatch(/height: calc\(56px \+ env\(safe-area-inset-top, 0px\)\)/) // 📏
+      expect(m![1]).toMatch(/border-bottom: 1px solid var\(--ab-color-border/) // ➖
+      expect(css).toMatch(/\[data-mobile-header="main"\]:not\(\[data-tablet-header="main"\]\) \[data-ab-part="main-header"\] \{ display: none; \}/) // 🙈 ≥ 768
+      expect(css).toMatch(/\[data-tablet-header="main"\]:not\(\[data-mobile-header="main"\]\) \[data-ab-part="main-header"\] \{ display: none; \}/) // 📟 tablet-only stays tablet-only
     })
   }
 })
