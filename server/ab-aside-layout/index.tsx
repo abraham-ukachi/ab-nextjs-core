@@ -39,6 +39,8 @@ import AbLinearProgress from '../../ab-linear-progress';
 import styles from './styles.module.css';
 // 🫥 G52: empty-slot helper (strings get a <span>, so the :has() collapse never hides text)
 import { toAbSlot } from '../../ab-page-provider/slot';
+// 📌 G55 (Joseph): client island that publishes this pane's scroller on useAbPage()
+import AbScrollRegistrar from '../../ab-page-provider/scroll-registrar';
 
 export interface AbAsideLayoutProps {
   orientation: 'vertical' | 'horizontal';
@@ -108,6 +110,8 @@ const AbAsideLayout = ({
         ])}
         data-ab-part="aside-content" // 📜 G51/G55: THE scroller of this pane (useAbScrollSpy root)
       >
+        {/* 📜 sets asideScrollElement (server components can't hold refs) */}
+        <AbScrollRegistrar pane="aside" />
         {content ?? children}
       </div>
 

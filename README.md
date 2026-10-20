@@ -98,7 +98,7 @@ const { props, expanded } = useAbAsideToggle() // aria-expanded + aria-controls 
 | 1024–1439 | joined, hairline divider | | in the flow, `isAsideOpen` | hidden |
 | ≥ 1440 | gapped panes (`--ab-pane-gap`) with radii (`--ab-pane-radius`) | | | hidden |
 
-* 📏 **The page never scrolls.** Panes are a `100dvh` box and `<html>`/`<body>` are locked while mounted. Main, aside and sidebar scroll on their own (`min-height:0`, `overscroll-behavior: contain`, `scrollbar-gutter: stable`, safe-area padding). Hand `useAbPage().mainScrollElement` to `useAbScrollSpy({ root })` (hooks 0.1.7).
+* 📏 **The page never scrolls.** Panes are a `100dvh` box and `<html>`/`<body>` are locked while mounted. Main, aside and sidebar scroll on their own (`min-height:0`, `overscroll-behavior: contain`, `scrollbar-gutter: stable`, safe-area padding). Hand `useAbPage().mainScrollElement` to `useAbScrollSpy({ root })` (hooks 0.1.7). The client and the server layouts both set it (the server ones through a hidden client `AbScrollRegistrar`); wrap the app in `AbPageProvider`.
 * 📱 **Viewport meta for the app:** add `viewport-fit=cover` so `env(safe-area-inset-*)` is non-zero on notched phones (the panes pad the bars with it), and `interactive-widget=resizes-content` so the on-screen keyboard shrinks the `100dvh` box instead of sliding the locked page. In Next.js:
 
   ```ts

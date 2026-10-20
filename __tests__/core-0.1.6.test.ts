@@ -221,3 +221,20 @@ describe('acquireAbLayoutLock 🔒', () => {
     expect(attrs.has('data-ab-layout-lock')).toBe(false) // 🔓 last one out
   })
 })
+
+// 📌 Joseph: the server panes publish their scrollers through a client island
+import { renderToStaticMarkup } from 'react-dom/server'
+import { createElement as h } from 'react'
+import ServerAbMainLayout from '../server/ab-main-layout'
+import ServerAbAsideLayout from '../server/ab-aside-layout'
+describe('server panes + AbScrollRegistrar 📌', () => {
+  it('renders the registrar as the first child of the content scroller', () => {
+    expect(renderToStaticMarkup(h(ServerAbMainLayout, null, h('p', null, 'x')))).toMatch(/data-ab-part="main-content"[^>]*><span hidden="" data-ab-part="scroll-registrar"><\/span><p>x<\/p>/) // 📜
+    expect(renderToStaticMarkup(h(ServerAbAsideLayout, null, h('p', null, 'x')))).toMatch(/data-ab-part="aside-content"[^>]*><span hidden="" data-ab-part="scroll-registrar">/) // 📜
+  })
+  it('the registrar is a client component that sets the pane scroller in an effect', () => {
+    const src = read('ab-page-provider/scroll-registrar.tsx')
+    expect(src).toMatch(/^'use client';$/m) // 🏝️
+    expect(src).toMatch(/useEffect\(\(\) => \{[\s\S]*parentElement[\s\S]*return \(\) => set\(null\)/) // 📜 + 🧹
+  })
+})
