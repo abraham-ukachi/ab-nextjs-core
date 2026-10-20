@@ -73,3 +73,14 @@ describe('tabletHeader="main" bar + sidebar logo row 📟', () => {
     })
   }
 })
+
+describe('aside pane background 🎨 (James 00:22)', () => {
+  for (const f of ['ab-aside-layout/styles.module.css', 'server/ab-aside-layout/styles.module.css']) {
+    it(`${f} reads --ab-color-pane-main first in light and dark (pane + fade)`, () => {
+      const css = read(f) // 📄
+      expect(css.match(/var\(--ab-color-pane-main, var\(--color-background, var\(--surface, #ffffff\)\)\)/g)).toHaveLength(2) // 🌞 pane + fade
+      expect(css.match(/var\(--ab-color-pane-main, var\(--color-dark-background, var\(--surface, #0a0a0a\)\)\)/g)).toHaveLength(2) // 🌙 pane + fade
+      expect(css).not.toMatch(/(?<!pane-main, )var\(--color-(dark-)?background/) // 🚫 no bare chain left
+    })
+  }
+})
