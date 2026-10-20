@@ -47,7 +47,7 @@
   height: 100%;
   overflow: hidden;
   z-index: 20;
-  background-color: var(--color-background, var(--surface, #ffffff));
+  background-color: var(--ab-color-pane-main, var(--color-background, var(--surface, #ffffff)));
 }
 
 @media (max-width: 639px) {
@@ -109,7 +109,7 @@
   height: 100%;
   z-index: -1;
   transform: translateY(-100%);
-  background-image: linear-gradient(to bottom, transparent, var(--color-background, var(--surface, #ffffff)));
+  background-image: linear-gradient(to bottom, transparent, var(--ab-color-pane-main, var(--color-background, var(--surface, #ffffff))));
 }
 
 :global(.dark) .abMainLayout__footerWrapper::before,
