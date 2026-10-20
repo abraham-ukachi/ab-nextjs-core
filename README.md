@@ -86,7 +86,7 @@ import { AbPageProvider, useAbAsideToggle } from 'ab-nextjs-core/ab-page-provide
   />
 </AbPageProvider>
 
-// 📑 one button for the TOC sheet (<1024px) and the »/« pane toggle (≥1024px)
+// 📑 one button for the TOC sheet (<1180px) and the »/« pane toggle (≥1180px)
 const { props, expanded } = useAbAsideToggle() // aria-expanded + aria-controls + onClick
 <button {...props}>{expanded ? 'Hide page outline' : 'Show page outline'}</button>
 ```
@@ -94,9 +94,9 @@ const { props, expanded } = useAbAsideToggle() // aria-expanded + aria-controls 
 | Width | Sidebar | Main | Aside | Bottom bar |
 |---|---|---|---|---|
 | < 768 | hidden | full | full-screen sheet (`isAsideOpenOnMobile`) | shown (safe-area padding) |
-| 768–1023 | 280px, or the 72px rail | rest | overlay on the right, hidden by default | hidden |
-| 1024–1439 | joined, hairline divider | | in the flow, `isAsideOpen` | hidden |
-| ≥ 1440 | gapped panes (`--ab-pane-gap`) with radii (`--ab-pane-radius`) | | | hidden |
+| 768–1179 | 280px, or the 72px rail | rest | overlay on the right, hidden by default | hidden |
+| 1180–1919 | joined, hairline divider | | in the flow, `isAsideOpen` | hidden |
+| ≥ 1920 | gapped panes (`--ab-pane-gap`, sides + bottom) with radii (`--ab-pane-radius`) and `--ab-pane-shadow` | | | hidden |
 
 * 📏 **The page never scrolls.** Panes are a `100dvh` box and `<html>`/`<body>` are locked while mounted. Main, aside and sidebar scroll on their own (`min-height:0`, `overscroll-behavior: contain`, `scrollbar-gutter: stable`, safe-area padding). Hand `useAbPage().mainScrollElement` to `useAbScrollSpy({ root })` (hooks 0.1.7). The client and the server layouts both set it (the server ones through a hidden client `AbScrollRegistrar`); wrap the app in `AbPageProvider`.
 * 📱 **Viewport meta for the app:** add `viewport-fit=cover` so `env(safe-area-inset-*)` is non-zero on notched phones (the panes pad the bars with it), and `interactive-widget=resizes-content` so the on-screen keyboard shrinks the `100dvh` box instead of sliding the locked page. In Next.js:

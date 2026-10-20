@@ -77,7 +77,7 @@ export interface AbPageContextValue {
 /** 🎞️ 0.1.6: aside slide duration (brief §4: slide-from-right 240ms). */
 export const AB_ASIDE_DURATION = 240;
 /** 📐 0.1.6: below this the aside is a sheet driven by `isAsideOpenOnMobile` (mobile + tablet). */
-export const AB_ASIDE_SHEET_QUERY = '(max-width: 1023px)';
+export const AB_ASIDE_SHEET_QUERY = '(max-width: 1179px)'; // 📐 0.1.7: tablet ends at 1179 (Decision 6)
 /** ♿ reduced-motion query (same string as ab-nextjs-hooks' AB_REDUCED_MOTION_QUERY). */
 export const AB_REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 
@@ -261,7 +261,7 @@ export function useAbPage(): AbPageContextValue {
 
 /** 🎛️ What {@link useAbAsideToggle} returns: spread `props` on the button. */
 export interface AbAsideToggle {
-  /** 📐 true below 1024px (the aside is a sheet, driven by `isAsideOpenOnMobile`). */
+  /** 📐 true below 1180px (the aside is a sheet, driven by `isAsideOpenOnMobile`). */
   isSheet: boolean;
   /** 👀 is the aside shown for the current viewport? */
   expanded: boolean;

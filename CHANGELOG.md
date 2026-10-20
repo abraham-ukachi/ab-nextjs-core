@@ -1,3 +1,8 @@
+## 0.1.7 (Unreleased)
+
+* 📐 **Breakpoints (Decision 6, approved by God 2026-10-20):** mobile <768, tablet 768–1179 (the aside is a sheet), joined panes 1180–1919, gapped panes ≥1920. They were 1024 and 1440. `AB_ASIDE_SHEET_QUERY` is now `(max-width: 1179px)`. The 1180 boundary is the same one AbAppBar already uses to move its nav into More.
+* 🪟 **Gapped panes follow the desktop mock (05):** a 16px gap, an outer gap on the sides and bottom only (the header sits on top), a 20px radius and a soft `--ab-pane-shadow`. The defaults match `ab-nextjs-theme` 0.3.5.
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
