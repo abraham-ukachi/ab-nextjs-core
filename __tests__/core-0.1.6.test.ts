@@ -149,3 +149,15 @@ describe('0.1.6 review fixes 🛠️', () => {
     for (const f of ['ab-app-layout/index.tsx', 'server/ab-app-layout/index.tsx']) expect(read(f)).toMatch(/variant === 'panes'[^\n]*\? 'div' : 'header'/)
   })
 })
+
+// 🧪 WebKit finding (2026-10-20): on laptop+ `inset: auto` came after `top` and reset it, so the aside scrolled away
+describe('laptop aside stays sticky 📌', () => {
+  for (const f of ['ab-app-layout/styles.module.css', 'server/ab-app-layout/styles.module.css']) {
+    it(f, () => {
+      const lap = strip(read(f)).split('@media (min-width: 1024px)')[1] ?? '' // 💻
+      const rule = /\[data-ab-part="aside"\] \{([^}]*)\}/.exec(lap)?.[1] ?? '' // 📑
+      expect(rule.indexOf('inset: auto')).toBeGreaterThan(-1) // 🧹
+      expect(rule.indexOf('inset: auto')).toBeLessThan(rule.indexOf('top: var(--ab-app-bar-height)')) // ⬇️ top wins
+    })
+  }
+})

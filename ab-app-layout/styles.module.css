@@ -272,8 +272,8 @@
   }
   .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"] {
     position: sticky; /* 📌 back in the flow, stays put */
+    inset: auto; /* 🧹 the tablet overlay's inset (must come BEFORE top, or it resets it) */
     top: var(--ab-app-bar-height); /* ⬇️ */
-    inset: auto;
     height: calc(100dvh - var(--ab-app-bar-height)); /* 📏 */
     flex: none;
     z-index: auto;
