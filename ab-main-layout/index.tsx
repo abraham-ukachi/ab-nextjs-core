@@ -51,6 +51,12 @@ export interface AbMainLayoutProps {
   footer?: ReactNode;
   children?: ReactNode;
   menus?: ReactNode;
+  /** 🆔 0.1.6: element id (e.g. the skip-link target), no inner wrapper needed. */
+  id?: string;
+  /** 🧰 0.1.6: legacy chrome opt-out for docs-shell panes. `false` drops the empty header/footer wrappers
+   *  and the backdrop / menus / dialogs / toasts / progress / canvas layers (the shell brings its own).
+   *  Default `true` (unchanged markup for older apps). A header/footer you pass is always rendered. */
+  chrome?: boolean;
 }
 
 /** Client markup mirror of server AbMainLayout. */
@@ -65,9 +71,12 @@ const AbMainLayout = ({
   footer,
   children,
   menus,
+  id, // 🆔
+  chrome = true, // 🧰
 }: AbMainLayoutProps): ReactElement => {
   return (
     <main
+      id={id} // 🆔 0.1.6
       className={clsx(
         ['AbMainLayout', 'group-mainLayout', styles.abMainLayout, className],
         { 'has-screen-name': !!screenName },
@@ -78,9 +87,11 @@ const AbMainLayout = ({
       data-ab-part="main"
       data-screen-name={screenName}
     >
-      <header className={clsx(['HeaderWrapper', styles.abMainLayout__headerWrapper])} data-ab-part="header">
-        {header}
-      </header>
+      {(chrome || header != null) && ( // 🧰 0.1.6
+        <header className={clsx(['HeaderWrapper', styles.abMainLayout__headerWrapper])} data-ab-part="header">
+          {header}
+        </header>
+      )}
       <div
         className={clsx([
           'ContentWrapper',
@@ -91,23 +102,29 @@ const AbMainLayout = ({
       >
         {content ?? children}
       </div>
-      <footer className={clsx(['FooterWrapper', styles.abMainLayout__footerWrapper])} data-ab-part="footer">
-        {footer}
-      </footer>
-      <div className={clsx(['Backdrop', styles.abMainLayout__backdrop])} hidden />
-      <div className={clsx(['Menus', styles.abMainLayout__menus])} hidden>
-        {menus}
-      </div>
-      <div className={clsx(['Dialogs', styles.abMainLayout__dialogs])} hidden />
-      <div className={clsx(['Toasts', styles.abMainLayout__toasts])} hidden />
-      <AbLinearProgress
-        className="absolute top-0 left-0 right-0 z-50 !w-1/2 place-self-center !my-1 3xl:!my-2 !mx-auto !h-0.5 lg:!h-1 3xl:!h-1.5"
-        color="secondary"
-        hidden={true}
-        isIndeterminate={true}
-        progress={25}
-      />
-      <canvas className={clsx(['Canvas', styles.abMainLayout__canvas])} />
+      {(chrome || footer != null) && ( // 🧰 0.1.6
+        <footer className={clsx(['FooterWrapper', styles.abMainLayout__footerWrapper])} data-ab-part="footer">
+          {footer}
+        </footer>
+      )}
+      {chrome && ( // 🧰 0.1.6: legacy layers
+        <>
+        <div className={clsx(['Backdrop', styles.abMainLayout__backdrop])} hidden />
+        <div className={clsx(['Menus', styles.abMainLayout__menus])} hidden>
+          {menus}
+        </div>
+        <div className={clsx(['Dialogs', styles.abMainLayout__dialogs])} hidden />
+        <div className={clsx(['Toasts', styles.abMainLayout__toasts])} hidden />
+        <AbLinearProgress
+          className="absolute top-0 left-0 right-0 z-50 !w-1/2 place-self-center !my-1 3xl:!my-2 !mx-auto !h-0.5 lg:!h-1 3xl:!h-1.5"
+          color="secondary"
+          hidden={true}
+          isIndeterminate={true}
+          progress={25}
+        />
+        <canvas className={clsx(['Canvas', styles.abMainLayout__canvas])} />
+        </>
+      )}
     </main>
   );
 };

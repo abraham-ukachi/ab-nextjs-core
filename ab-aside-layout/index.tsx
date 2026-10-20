@@ -53,6 +53,12 @@ export interface AbAsideLayoutProps {
   children?: ReactNode;
   dividerHidden?: boolean;
   menus?: ReactNode;
+  /** 🆔 0.1.6: element id (e.g. the skip-link target), no inner wrapper needed. */
+  id?: string;
+  /** 🧰 0.1.6: legacy chrome opt-out for docs-shell panes. `false` drops the empty header/footer wrappers
+   *  and the backdrop / menus / dialogs / toasts / progress / canvas layers (the shell brings its own).
+   *  Default `true` (unchanged markup for older apps). A header/footer you pass is always rendered. */
+  chrome?: boolean;
 }
 
 /**
@@ -70,6 +76,8 @@ const AbAsideLayout = ({
   children,
   dividerHidden,
   menus,
+  id, // 🆔
+  chrome = true, // 🧰
 }: AbAsideLayoutProps): ReactElement => {
   const {
     isAsideOpen,
@@ -81,6 +89,7 @@ const AbAsideLayout = ({
     isAsideClosing,
     isAsideLoading,
     asideId,
+    setAsideOpenOnMobile,
   } = useAbPage();
 
   const asideRef = useRef<HTMLElement | null>(null);
@@ -131,9 +140,18 @@ const AbAsideLayout = ({
   ]);
 
   return (
+    <>
+    {/* 🌫️ 0.1.6 (James review): tablet/mobile sheet backdrop, a sibling so AbAppLayout's pane CSS shows it; click closes */}
+    <div
+      data-ab-part="aside-backdrop"
+      data-open={isAsideOpenOnMobile ? 'true' : 'false'}
+      aria-hidden="true"
+      onClick={() => setAsideOpenOnMobile(false)}
+      hidden={!isAsideOpenOnMobile}
+    />
     <aside
       ref={asideRef}
-      id={asideId} // 🆔 0.1.6: target of aria-controls (useAbAsideToggle)
+      id={id ?? asideId} // 🆔 0.1.6: target of aria-controls (useAbAsideToggle)
       className={clsx(
         ['AbAsideLayout', 'group/aside-layout', styles.abAsideLayout, className],
         { 'is-open': isAsideOpen },
@@ -148,9 +166,11 @@ const AbAsideLayout = ({
       data-opened={isAsideOpen}
       data-open-on-mobile={isAsideOpenOnMobile}
     >
-      <header className={clsx(['HeaderWrapper', styles.abAsideLayout__headerWrapper])} data-ab-part="header">
-        {header}
-      </header>
+      {(chrome || header != null) && ( // 🧰 0.1.6
+        <header className={clsx(['HeaderWrapper', styles.abAsideLayout__headerWrapper])} data-ab-part="header">
+          {header}
+        </header>
+      )}
 
       <div
         className={clsx([
@@ -162,31 +182,38 @@ const AbAsideLayout = ({
         {content ?? children}
       </div>
 
-      <footer className={clsx(['FooterWrapper', styles.abAsideLayout__footerWrapper])} data-ab-part="footer">
-        {footer}
-      </footer>
-
-      <div className={clsx(['Backdrop', styles.abAsideLayout__backdrop])} hidden />
-      <div className={clsx(['Menus', styles.abAsideLayout__menus])} hidden>
-        {menus}
-      </div>
-      <div className={clsx(['Dialogs', styles.abAsideLayout__dialogs])} hidden />
-      <div className={clsx(['Toasts', styles.abAsideLayout__toasts])} hidden />
-
-      {!dividerHidden && (
-        <span className={clsx(['divider', 'vertical', 'left', styles.abAsideLayout__divider])} />
+      {(chrome || footer != null) && ( // 🧰 0.1.6
+        <footer className={clsx(['FooterWrapper', styles.abAsideLayout__footerWrapper])} data-ab-part="footer">
+          {footer}
+        </footer>
       )}
 
-      <AbLinearProgress
-        className="absolute top-0 left-0 right-0 z-50 !h-0.5 lg:!h-1"
-        color="secondary"
-        hidden={!isAsideLoading}
-        isIndeterminate={true}
-        progress={25}
-      />
-
-      <canvas className={clsx(['Canvas', styles.abAsideLayout__canvas])} />
+      {chrome && ( // 🧰 0.1.6: legacy layers
+        <>
+        <div className={clsx(['Backdrop', styles.abAsideLayout__backdrop])} hidden />
+        <div className={clsx(['Menus', styles.abAsideLayout__menus])} hidden>
+          {menus}
+        </div>
+        <div className={clsx(['Dialogs', styles.abAsideLayout__dialogs])} hidden />
+        <div className={clsx(['Toasts', styles.abAsideLayout__toasts])} hidden />
+  
+        {!dividerHidden && (
+          <span className={clsx(['divider', 'vertical', 'left', styles.abAsideLayout__divider])} />
+        )}
+  
+        <AbLinearProgress
+          className="absolute top-0 left-0 right-0 z-50 !h-0.5 lg:!h-1"
+          color="secondary"
+          hidden={!isAsideLoading}
+          isIndeterminate={true}
+          progress={25}
+        />
+  
+        <canvas className={clsx(['Canvas', styles.abAsideLayout__canvas])} />
+        </>
+      )}
     </aside>
+    </>
   );
 };
 
