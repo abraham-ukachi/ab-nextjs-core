@@ -41,6 +41,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactElement,
   type ReactNode,
@@ -135,18 +136,27 @@ export function AbPageProvider({
     setAsideElementState(el);
   }, []);
 
+  // ⏲️ 0.1.6 (James review): ONE pending open/close timer, so quick toggles never race
+  const asideTimerRef = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(asideTimerRef.current), []); // 🧹 unmount
+
   const setAsideOpenSafe = useCallback((open: boolean) => {
     // ♿ 0.1.6: instant under reduced motion (no slide, no closing delay)
     const ms = getAbAsideDuration(asideDuration, matches(AB_REDUCED_MOTION_QUERY));
+    window.clearTimeout(asideTimerRef.current); // 🛑 cancel the previous transition's timer
     if (open) {
+      setAsideClosing(false); // 🔁 a close in flight is cancelled
       setAsideOpening(ms > 0); // 🎞️ only "opening" when it animates
       setAsideOpen(true);
-      if (ms > 0) window.setTimeout(() => setAsideOpening(false), ms);
+      if (ms > 0) asideTimerRef.current = window.setTimeout(() => setAsideOpening(false), ms);
     } else if (ms === 0) {
+      setAsideOpening(false); // 🔁
+      setAsideClosing(false); // 🔁
       setAsideOpen(false); // ⚡ instant
     } else {
+      setAsideOpening(false); // 🔁 an open in flight is cancelled
       setAsideClosing(true);
-      window.setTimeout(() => {
+      asideTimerRef.current = window.setTimeout(() => {
         setAsideOpen(false);
         setAsideClosing(false);
       }, ms);
@@ -157,13 +167,33 @@ export function AbPageProvider({
   const toggleAside = useCallback(() => setAsideOpenSafe(!isAsideOpen), [isAsideOpen, setAsideOpenSafe]);
   const toggleAsideOnMobile = useCallback(() => setAsideOpenOnMobile((v) => !v), []);
 
-  // ⎋ 0.1.6: Escape closes the mobile/tablet sheet
+  // ⎋ 0.1.6: Escape closes the mobile/tablet sheet, unless an inner menu/dialog already handled it
   useEffect(() => {
     if (!isAsideOpenOnMobile) return; // 💤 only while the sheet is open
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setAsideOpenOnMobile(false); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape' || e.defaultPrevented) return; // 🙅 an inner menu caught it (James review)
+      setAsideOpenOnMobile(false);
+    };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [isAsideOpenOnMobile]);
+
+  // 🎯 0.1.6 (James review): move focus INTO the sheet when it opens, and back to the opener when it closes
+  const sheetOpenerRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (isAsideOpenOnMobile) {
+      sheetOpenerRef.current = document.activeElement as HTMLElement | null; // 💾 the TOC button
+      const el = asideElement;
+      if (el) {
+        if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1'); // 🎯 focusable container
+        el.focus({ preventScroll: true });
+      }
+    } else if (sheetOpenerRef.current) {
+      sheetOpenerRef.current.focus?.({ preventScroll: true }); // ↩️ return focus
+      sheetOpenerRef.current = null;
+    }
+  }, [isAsideOpenOnMobile, asideElement]);
 
   const value = useMemo<AbPageContextValue>(
     () => ({
