@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## 0.2.0 (Unreleased)
+## [0.2.0](https://github.com/abraham-ukachi/ab-nextjs-core/compare/v0.1.6...v0.2.0) (2026-10-20)
 
 ### ⚠️ BREAKING (`variant="panes"` only; the default variant is unchanged)
 
