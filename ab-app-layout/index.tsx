@@ -24,7 +24,7 @@
 * SOFTWARE.
 *
 * @project: ab-nextjs-core
-* @authors: Abraham Ukachi <abraham.ukachi@laplateforme.io>
+* @authors: Abraham Ukachi <abrahamukachi@gmail.com>
 */
 
 /*
@@ -35,10 +35,32 @@
 
 'use client';
 
-import type { ReactElement, ReactNode } from 'react';
+import { isValidElement, useEffect, type ReactElement, type ReactNode } from 'react';
 import clsx from 'clsx';
 import AbLinearProgress from '../ab-linear-progress';
 import styles from './styles.module.css';
+// 🫥 G50: empty-slot helper
+import { toAbSlot } from '../ab-page-provider/slot';
+
+// 🔢 how many panes layouts are mounted (module scope: one document per bundle)
+let abLayoutLocks = 0;
+
+/**
+ * 🔒 acquireAbLayoutLock — sets `data-ab-layout-lock` on `<html>` and returns the release function.
+ * Counted: the attribute only goes away when the LAST mounted panes layout releases (James nit).
+ * Releasing twice is a no-op.
+ */
+export function acquireAbLayoutLock(doc: Document = document): () => void {
+  abLayoutLocks += 1; // ➕
+  doc.documentElement.setAttribute('data-ab-layout-lock', ''); // 🔒
+  let released = false; // 🛡️ StrictMode double cleanups
+  return () => {
+    if (released) return;
+    released = true;
+    abLayoutLocks = Math.max(0, abLayoutLocks - 1); // ➖
+    if (abLayoutLocks === 0) doc.documentElement.removeAttribute('data-ab-layout-lock'); // 🔓 last one out
+  };
+}
 
 export interface AbAppLayoutProps {
   orientation: 'vertical' | 'horizontal';
@@ -52,6 +74,13 @@ export interface AbAppLayoutProps {
   footer?: ReactNode;
   children?: ReactNode;
   menus?: ReactNode;
+  /** 🧭 0.1.6 (G17): `'panes'` = the docs shell (4 breakpoints, rail, overlay aside). Default keeps the old layout. */
+  variant?: 'default' | 'panes';
+  /** 🧷 0.1.6: collapse the sidebar to the icon rail (tablet and up, `variant="panes"`). */
+  railCollapsed?: boolean;
+  /** 🧰 0.1.6: render the legacy #backdrop / #menus / #dialogs / #toasts / progress / canvas layers.
+   *  Default: on for `variant="default"`, off for `"panes"` (the shell brings its own menus and dialogs). */
+  overlays?: boolean;
 }
 
 /** Client markup mirror of server AbAppLayout (slots only). */
@@ -67,39 +96,69 @@ const AbAppLayout = ({
   footer,
   children,
   menus,
+  variant = 'default', // 🧭
+  railCollapsed = false, // 🧷
+  overlays, // 🧰
 }: AbAppLayoutProps): ReactElement => {
+  // 🧱 panes: the header slot is a plain grid row (0px when empty). Its child (e.g. AbAppBar) brings its own
+  //    <header>, so we never nest one header inside another. Same when the slot child IS a <header>.
+  const HeaderTag = variant === 'panes' || (isValidElement(header) && header.type === 'header') ? 'div' : 'header';
+  // 🧰 legacy overlay layers (off in panes unless asked for)
+  const showOverlays = overlays ?? variant !== 'panes';
+  // 🫥 G50 (D37): panes never render an empty header / footer row (0px); the CSS :empty / :has() catch the rest
+  const top = toAbSlot(header);
+  const showHeader = variant !== 'panes' || top != null;
+  const showFooter = variant !== 'panes' || toAbSlot(footer) != null;
+  // 🔒 G54: lock the document while a panes layout is mounted (CSS :has() does it too; this covers older engines)
+  useEffect(() => {
+    if (variant !== 'panes' || typeof document === 'undefined') return;
+    return acquireAbLayoutLock(); // 🔒 counted, so unmounting one of two layouts keeps the lock (James)
+  }, [variant]);
   return (
     <div
       className={clsx(['AbAppLayout', styles.abAppLayout, className])}
       hidden={hidden}
       data-page-name={pageName}
       data-orientation={orientation ?? ''}
+      data-variant={variant} // 🧭 CSS hook for the panes
+      data-rail={railCollapsed ? 'true' : 'false'} // 🧷
     >
-      <header className={clsx(['HeaderWrapper', styles.abAppLayout__headerWrapper])} data-ab-part="header">
-        {header}
-      </header>
+      {showHeader && (
+        <HeaderTag className={clsx(['HeaderWrapper', styles.abAppLayout__headerWrapper])} data-ab-part="header">
+          {variant === 'panes' ? top : header}
+        </HeaderTag>
+      )}
       <div className={clsx(['ContentWrapper', styles.abAppLayout__contentWrapper])}>
         {sideBar}
         {content ?? children}
         {navBar}
       </div>
-      <footer className={clsx(['FooterWrapper', styles.abAppLayout__footerWrapper])} data-ab-part="footer">
-        {footer}
-      </footer>
-      <div id="backdrop" className={clsx(['Backdrop', styles.abAppLayout__backdrop])} hidden />
-      <div id="menus" className={clsx(['Menus', styles.abAppLayout__menus])} hidden>
-        {menus}
-      </div>
-      <div id="dialogs" className={clsx(['Dialogs', styles.abAppLayout__dialogs])} hidden />
-      <div id="toasts" className={clsx(['Toasts', styles.abAppLayout__toasts])} hidden />
-      <AbLinearProgress
-        className="absolute top-0 left-0 right-0 z-50 !h-0.5 lg:!h-1"
-        color="secondary"
-        hidden={true}
-        isIndeterminate={true}
-        progress={25}
-      />
-      <canvas className={clsx(['Canvas', styles.abAppLayout__canvas])} />
+      {showFooter && (
+        <footer className={clsx(['FooterWrapper', styles.abAppLayout__footerWrapper])} data-ab-part="footer">
+          {footer}
+        </footer>
+      )}
+      {/* 🧰 legacy layers (ids kept for old apps) */}
+      {showOverlays && (
+        <>
+          <div id="backdrop" className={clsx(['Backdrop', styles.abAppLayout__backdrop])} hidden />
+          <div id="menus" className={clsx(['Menus', styles.abAppLayout__menus])} hidden>
+            {menus}
+          </div>
+          <div id="dialogs" className={clsx(['Dialogs', styles.abAppLayout__dialogs])} hidden />
+          <div id="toasts" className={clsx(['Toasts', styles.abAppLayout__toasts])} hidden />
+          <AbLinearProgress
+            className="absolute top-0 left-0 right-0 z-50 !h-0.5 lg:!h-1"
+            color="secondary"
+            hidden={true}
+            isIndeterminate={true}
+            progress={25}
+          />
+          <canvas className={clsx(['Canvas', styles.abAppLayout__canvas])} />
+        </>
+      )}
+      {/* 📋 panes: still render menus when the app passes some */}
+      {!showOverlays && menus != null && <div className={clsx(['Menus', styles.abAppLayout__menus])}>{menus}</div>}
     </div>
   );
 };

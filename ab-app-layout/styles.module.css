@@ -27,7 +27,7 @@
 * @name: AB App Layout - Component Stylesheet (plain CSS, Tailwind-independent)
 * @file: ab-app-layout/styles.module.css
 * @type: CSS Module
-* @authors: Abraham Ukachi <abraham.ukachi@laplateforme.io>
+* @authors: Abraham Ukachi <abrahamukachi@gmail.com>
 */
 
 /*
@@ -142,4 +142,221 @@
 @keyframes abCoreFadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* ================================================================== */
+/* 🧭 0.1.6 (G17 + D34/D35 layout rule): docs-shell panes             */
+/*    opt in with variant="panes". Children of the content wrapper     */
+/*    are matched by data-ab-part:                                     */
+/*    sidebar | rail (nav) · main · aside · bottomBar (nav)            */
+/*    📱 <768  · 📟 768–1023 · 💻 1024–1439 joined · 🖥️ ≥1440 gapped   */
+/*                                                                     */
+/*    📏 THE LAYOUT RULE (God, D34):                                   */
+/*    · the app is ONE 100dvh box and the DOCUMENT NEVER SCROLLS       */
+/*    · header / footer rows are 0px (not rendered / :empty) when empty*/
+/*    · sidebar, main content and aside content each scroll on their   */
+/*      own (min-height:0 + overflow:auto + overscroll containment)    */
+/*    · no hard-coded bar heights: rows size to their content          */
+/*    Tokens: --ab-pane-gap / --ab-pane-radius / --ab-divider-hairline */
+/*    (ab-nextjs-theme ≥ 0.3.4), with safe fallbacks                    */
+/* ================================================================== */
+
+/* 🔒 G54: lock the document while a panes layout is on the page (CSS-only via :has, so the server twin
+ *    works without JS; the client twin also sets html[data-ab-layout-lock] for browsers without :has) */
+:global(html:has(.AbAppLayout[data-variant="panes"])),
+:global(html:has(.AbAppLayout[data-variant="panes"])) :global(body),
+:global(html[data-ab-layout-lock]),
+:global(html[data-ab-layout-lock]) :global(body) {
+  height: 100%; /* 📏 */
+  overflow: hidden; /* 🚫 the page itself never scrolls */
+  overscroll-behavior: none; /* 🚫 no iOS rubber band pulling the whole app */
+}
+
+.abAppLayout[data-variant="panes"] {
+  --ab-sidebar-width: 280px; /* 🗂️ expanded sidebar */
+  --ab-rail-width: 72px; /* 🧷 collapsed rail (icons only) */
+  --ab-aside-width: min(40vw, 360px); /* 📑 "On this page" */
+  --ab-rail-duration: 200ms; /* 🎞️ rail collapse (brief §4) */
+  display: grid; /* 🧱 rows: header · panes · footer */
+  grid-template-rows: auto minmax(0, 1fr) auto; /* 📏 empty header/footer rows are 0px */
+  grid-template-columns: minmax(0, 1fr); /* 🚫 no horizontal overflow */
+  width: 100%; /* ↔️ */
+  height: 100vh; /* 🕰️ fallback */
+  height: 100dvh; /* 📱 the dynamic viewport (mobile toolbars) */
+  min-height: 0; /* 🚫 */
+  overflow: hidden; /* 🔒 the app box never scrolls */
+  overscroll-behavior: contain; /* 🚫 scroll chaining */
+}
+
+/* 🔝🦶 app header / footer: plain grid rows in the flow, 0px + invisible when empty (G50) */
+.abAppLayout[data-variant="panes"] > .abAppLayout__headerWrapper,
+.abAppLayout[data-variant="panes"] > .abAppLayout__footerWrapper {
+  position: relative; /* 📌 in the flow (no overlay) */
+  inset: auto; /* 🧹 the legacy absolute overlay */
+  z-index: 25; /* ⬆️ above the panes, below the sheet (30) */
+  pointer-events: auto; /* 🖱️ the legacy wrapper disabled them */
+  min-width: 0; /* 🚫 overflow */
+  padding-inline: env(safe-area-inset-left, 0px) env(safe-area-inset-right, 0px); /* 📱 notch */
+}
+.abAppLayout[data-variant="panes"] > .abAppLayout__headerWrapper { grid-row: 1; padding-top: env(safe-area-inset-top, 0px); } /* 🔝 row 1 · 📱 */
+/* 📏 WebKit e2e (2026-10-20): pin the panes to the 1fr row. Auto-placement moved them into row 1 (auto) when
+   the header was absent or collapsed, and the panes measured 0px tall */
+.abAppLayout[data-variant="panes"] > .abAppLayout__contentWrapper { grid-row: 2; } /* 🧱 the minmax(0,1fr) row */
+.abAppLayout[data-variant="panes"] > .abAppLayout__footerWrapper { grid-row: 3; padding-bottom: env(safe-area-inset-bottom, 0px); } /* 📱 */
+/* 🫥 D37: not rendered when the prop is null; :empty / :has() collapse what still reaches the DOM */
+.abAppLayout[data-variant="panes"] > .abAppLayout__headerWrapper:empty,
+.abAppLayout[data-variant="panes"] > .abAppLayout__footerWrapper:empty,
+.abAppLayout[data-variant="panes"] > .abAppLayout__headerWrapper:not(:has(> *)),
+.abAppLayout[data-variant="panes"] > .abAppLayout__footerWrapper:not(:has(> *)) {
+  display: none; /* 📏 0px */
+}
+/* 📋 menus the app passes: no full-screen click shield */
+.abAppLayout[data-variant="panes"] > .abAppLayout__menus {
+  display: contents; /* 🫥 */
+}
+
+/* 🧱 the panes row: a bounded box (the positioning context for sheets and future drawers) */
+.abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper {
+  position: relative; /* 📍 sheets / drawers are scoped to it */
+  flex-direction: column; /* 📱 stack */
+  height: 100%; /* 📏 the 1fr row */
+  min-height: 0; /* 🚫 lets the children shrink and scroll */
+  min-width: 0; /* 🚫 overflow */
+  overflow: hidden; /* 🔒 */
+  justify-content: flex-start; /* ⬆️ */
+}
+
+/* 📜 every pane: bounded, scrolls on its own, never chains to the page (G51 + G54) */
+.abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"], [data-ab-part="main"], [data-ab-part="aside"]) {
+  min-height: 0; /* 🚫 */
+  max-height: none; /* 🧹 legacy 100vh caps */
+  box-sizing: border-box; /* 📦 */
+  overscroll-behavior: contain; /* 🚫 scroll chaining */
+}
+
+/* 📱 mobile: one column, no sidebar, bottom bar visible, aside only as a full-pane sheet */
+.abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]) {
+  display: none; /* 🙈 the bottom bar takes over */
+}
+.abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="main"] {
+  flex: 1 1 0; /* ↔️↕️ the rest of the box */
+  min-width: 0; /* 🚫 overflow */
+  height: auto; /* 📏 the flex item size */
+  overflow: hidden; /* 🔒 its content wrapper is the scroller */
+}
+.abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"] {
+  position: absolute; /* 📄 sheet over main, INSIDE the app box */
+  inset: 0; /* 🧱 100% (TOC button) */
+  width: 100%;
+  height: auto; /* 📏 from inset */
+  z-index: 30; /* ⬆️ above main + header, below menus/dialogs (50) */
+  overflow: hidden; /* 🔒 its content wrapper scrolls */
+}
+.abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"]:not([data-open-on-mobile="true"]) {
+  display: none; /* 🙈 closed by default on mobile */
+}
+/* 🌫️ sheet backdrop (rendered by AbAsideLayout): only while the sheet is open */
+.abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside-backdrop"] {
+  display: none; /* 🙈 */
+}
+.abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="bottomBar"] {
+  flex: none; /* 📏 its own height: a row at the bottom of the box (no sticky needed) */
+  padding-bottom: env(safe-area-inset-bottom, 0px); /* 📱 home indicator */
+}
+
+/* 📟 tablet: sidebar (or rail) + main; the aside overlays on the right over a backdrop; no bottom bar */
+@media (min-width: 768px) {
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper {
+    flex-direction: row; /* ➡️ */
+    align-items: stretch; /* 📏 every pane is full height */
+  }
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]) {
+    display: flex; /* 👀 */
+    flex: none;
+    width: var(--ab-sidebar-width); /* 🗂️ */
+    max-width: none; /* 🧹 the component's own cap */
+    height: auto; /* 📏 stretched by the row */
+    overflow: hidden auto; /* 📜 D42: the sidebar is the third scroller */
+    scrollbar-gutter: stable; /* 📏 no jump when it starts scrolling */
+    transition: width var(--ab-rail-duration) ease; /* 🎞️ rail */
+  }
+  .abAppLayout[data-variant="panes"][data-rail="true"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]),
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="rail"] {
+    width: var(--ab-rail-width); /* 🧷 rail (layout flag or AbSidebar's own rail markup) */
+  }
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="bottomBar"] {
+    display: none; /* 🙈 sidebar replaces it */
+  }
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"] {
+    inset: 0 0 0 auto; /* ➡️ pinned right, inside the panes box */
+    width: var(--ab-aside-width); /* 📑 ~30–40% */
+    border-left: var(--ab-divider-hairline, 1px solid rgb(0 0 0 / 0.12)); /* ➖ */
+    background: var(--ab-color-surface, Canvas); /* 🎨 opaque over the page */
+  }
+  /* 🌫️ tablet overlay backdrop (James review): dims the panes, click closes the sheet */
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside-backdrop"][data-open="true"] {
+    display: block; /* 👀 */
+    position: absolute; /* 📄 inside the panes box */
+    inset: 0; /* 🧱 */
+    z-index: 29; /* ⬇️ just under the sheet */
+    background: rgb(0 0 0 / 0.32); /* 🌫️ scrim */
+  }
+}
+
+/* 💻 laptop: three joined panes with hairline dividers, aside in the flow */
+@media (min-width: 1024px) {
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]) {
+    border-right: var(--ab-divider-hairline, 1px solid rgb(0 0 0 / 0.12)); /* ➖ joined */
+  }
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"] {
+    position: relative; /* 📌 back in the flow, a full-height column */
+    inset: auto; /* 🧹 the tablet overlay */
+    height: auto; /* 📏 stretched by the row */
+    flex: none;
+    z-index: auto;
+    background: none; /* 🎨 */
+  }
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"][data-opened="true"] {
+    display: flex; /* 👀 laptop+ follows data-opened (isAsideOpen), not the small-screen flag (same specificity as the :not() rule, later wins) */
+  }
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"]:not([data-opened="true"]) {
+    display: none; /* 🙈 closed with the »/« toggle */
+  }
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside-backdrop"] {
+    display: none !important; /* 🙈 no sheet on laptop+ */
+  }
+}
+
+/* 🖥️ desktop: gapped panes with radii, no dividers */
+@media (min-width: 1440px) {
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper {
+    gap: var(--ab-pane-gap, 12px); /* 🧱 */
+    padding: var(--ab-pane-gap, 12px); /* 🖼️ outer gap */
+    box-sizing: border-box;
+  }
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]),
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="main"],
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"] {
+    border: 0; /* 🚫 dividers */
+    border-radius: var(--ab-pane-radius, 16px); /* 🔲 */
+    overflow: hidden; /* ✂️ radius */
+    margin: 0; /* 🧹 legacy 2xl margins */
+  }
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]) {
+    overflow: hidden auto; /* 📜 the sidebar still scrolls (radius kept) */
+  }
+}
+
+/* ♿ reduced motion: the rail snaps instead of animating */
+@media (prefers-reduced-motion: reduce) {
+  .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]) {
+    transition: none;
+  }
+}
+
+/* 🚫 JS off: nothing can toggle the rail, so the sidebar stays expanded (gap-review, Joseph) */
+@media (scripting: none) {
+  .abAppLayout[data-variant="panes"][data-rail="true"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]) {
+    width: var(--ab-sidebar-width);
+  }
 }

@@ -24,7 +24,7 @@
 * SOFTWARE.
 *
 * @project: ab-nextjs-core
-* @authors: Abraham Ukachi <abraham.ukachi@laplateforme.io>
+* @authors: Abraham Ukachi <abrahamukachi@gmail.com>
 */
 
 /*
@@ -37,18 +37,33 @@ import type { ReactElement, ReactNode } from 'react';
 import clsx from 'clsx';
 import AbLinearProgress from '../../ab-linear-progress';
 import styles from './styles.module.css';
+// 🫥 G52: empty-slot helper (strings get a <span>, so the :has() collapse never hides text)
+import { toAbSlot } from '../../ab-page-provider/slot';
+// 📌 G55 (Joseph): client island that publishes this pane's scroller on useAbPage()
+import AbScrollRegistrar from '../../ab-page-provider/scroll-registrar';
 
 export interface AbAsideLayoutProps {
   orientation: 'vertical' | 'horizontal';
   className?: string;
   hidden?: boolean;
   pageName?: string;
+  /** 🔝 0.1.6 (G52): the aside pane's header slot (data-ab-part="aside-header"); 0px and not rendered when empty. */
+  asideHeader?: ReactNode;
+  /** 🔚 0.1.6 (G52): the aside pane's bottom bar slot (data-ab-part="aside-bar"); 0px and not rendered when empty. */
+  asideBar?: ReactNode;
+  /** @deprecated 0.1.6: use `asideHeader` (kept as an alias for one minor). */
   header?: ReactNode;
   content?: ReactNode;
+  /** @deprecated 0.1.6: use `asideBar` (kept as an alias for one minor). */
   footer?: ReactNode;
   children?: ReactNode;
   dividerHidden?: boolean;
   menus?: ReactNode;
+  /** 🆔 0.1.6: element id (e.g. the skip-link target), no inner wrapper needed. */
+  id?: string;
+  /** @deprecated 0.1.6: `false` drops the legacy backdrop / menus / dialogs / toasts / progress / canvas layers.
+   *  Empty header / bar slots are never rendered any more, so this only gates those layers (default `true`). */
+  chrome?: boolean;
 }
 
 /**
@@ -59,23 +74,33 @@ const AbAsideLayout = ({
   className,
   hidden,
   pageName,
-  header,
+  asideHeader,
+  asideBar,
+  header, // 🕰️ deprecated alias
   content,
-  footer,
+  footer, // 🕰️ deprecated alias
   children,
   dividerHidden,
   menus,
+  id, // 🆔
+  chrome = true, // 🧰
 }: AbAsideLayoutProps): ReactElement => {
+  // 🔝🔚 G52: the new slot names win, the 0.1.5 names still work
+  const top = toAbSlot(asideHeader ?? header);
+  const bar = toAbSlot(asideBar ?? footer);
   return (
     <aside
+      id={id ?? 'ab-aside'} // 🆔 0.1.6 (James review): same default as AbPageProvider's asideId, for aria-controls
       className={clsx(['AbAsideLayout', styles.abAsideLayout, className])}
       hidden={hidden}
       data-page-name={pageName}
       data-ab-part="aside"
     >
-      <header className={clsx(['HeaderWrapper', styles.abAsideLayout__headerWrapper])} data-ab-part="header">
-        {header}
-      </header>
+      {top != null && ( // 🫥 not rendered when empty (D37)
+        <header className={clsx(['HeaderWrapper', styles.abAsideLayout__headerWrapper])} data-ab-part="aside-header">
+          {top}
+        </header>
+      )}
 
       <div
         className={clsx([
@@ -83,34 +108,43 @@ const AbAsideLayout = ({
           styles.abAsideLayout__contentWrapper,
           orientation === 'horizontal' && '!flex-row',
         ])}
+        data-ab-part="aside-content" // 📜 G51/G55: THE scroller of this pane (useAbScrollSpy root)
       >
+        {/* 📜 sets asideScrollElement (server components can't hold refs) */}
+        <AbScrollRegistrar pane="aside" />
         {content ?? children}
       </div>
 
-      <footer className={clsx(['FooterWrapper', styles.abAsideLayout__footerWrapper])} data-ab-part="footer">
-        {footer}
-      </footer>
-
-      <div className={clsx(['Backdrop', styles.abAsideLayout__backdrop])} hidden />
-      <div className={clsx(['Menus', styles.abAsideLayout__menus])} hidden>
-        {menus}
-      </div>
-      <div className={clsx(['Dialogs', styles.abAsideLayout__dialogs])} hidden />
-      <div className={clsx(['Toasts', styles.abAsideLayout__toasts])} hidden />
-
-      {!dividerHidden && (
-        <span className={clsx(['divider', 'vertical', 'left', styles.abAsideLayout__divider])} />
+      {bar != null && ( // 🫥 not rendered when empty (D37)
+        <footer className={clsx(['FooterWrapper', styles.abAsideLayout__footerWrapper])} data-ab-part="aside-bar">
+          {bar}
+        </footer>
       )}
 
-      <AbLinearProgress
-        className="absolute top-0 left-0 right-0 z-50 !h-0.5 lg:!h-1"
-        color="secondary"
-        hidden={true}
-        isIndeterminate={true}
-        progress={25}
-      />
-
-      <canvas className={clsx(['Canvas', styles.abAsideLayout__canvas])} />
+      {chrome && ( // 🧰 0.1.6: legacy layers
+        <>
+        <div className={clsx(['Backdrop', styles.abAsideLayout__backdrop])} hidden />
+        <div className={clsx(['Menus', styles.abAsideLayout__menus])} hidden>
+          {menus}
+        </div>
+        <div className={clsx(['Dialogs', styles.abAsideLayout__dialogs])} hidden />
+        <div className={clsx(['Toasts', styles.abAsideLayout__toasts])} hidden />
+  
+        {!dividerHidden && (
+          <span className={clsx(['divider', 'vertical', 'left', styles.abAsideLayout__divider])} />
+        )}
+  
+        <AbLinearProgress
+          className="absolute top-0 left-0 right-0 z-50 !h-0.5 lg:!h-1"
+          color="secondary"
+          hidden={true}
+          isIndeterminate={true}
+          progress={25}
+        />
+  
+        <canvas className={clsx(['Canvas', styles.abAsideLayout__canvas])} />
+        </>
+      )}
     </aside>
   );
 };

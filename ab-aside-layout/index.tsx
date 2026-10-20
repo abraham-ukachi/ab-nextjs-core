@@ -24,7 +24,7 @@
 * SOFTWARE.
 *
 * @project: ab-nextjs-core
-* @authors: Abraham Ukachi <abraham.ukachi@laplateforme.io>
+* @authors: Abraham Ukachi <abrahamukachi@gmail.com>
 */
 
 /*
@@ -41,18 +41,31 @@ import clsx from 'clsx';
 import { useAbPage } from '../ab-page-provider';
 import AbLinearProgress from '../ab-linear-progress';
 import styles from './styles.module.css';
+// 🫥 G52: empty-slot helper (strings get a <span>, so the :has() collapse never hides text)
+import { toAbSlot } from '../ab-page-provider/slot';
 
 export interface AbAsideLayoutProps {
   orientation: 'vertical' | 'horizontal';
   className?: string;
   hidden?: boolean;
   pageName?: string;
+  /** 🔝 0.1.6 (G52): the aside pane's header slot (data-ab-part="aside-header"); 0px and not rendered when empty. */
+  asideHeader?: ReactNode;
+  /** 🔚 0.1.6 (G52): the aside pane's bottom bar slot (data-ab-part="aside-bar"); 0px and not rendered when empty. */
+  asideBar?: ReactNode;
+  /** @deprecated 0.1.6: use `asideHeader` (kept as an alias for one minor). */
   header?: ReactNode;
   content?: ReactNode;
+  /** @deprecated 0.1.6: use `asideBar` (kept as an alias for one minor). */
   footer?: ReactNode;
   children?: ReactNode;
   dividerHidden?: boolean;
   menus?: ReactNode;
+  /** 🆔 0.1.6: element id (e.g. the skip-link target), no inner wrapper needed. */
+  id?: string;
+  /** @deprecated 0.1.6: `false` drops the legacy backdrop / menus / dialogs / toasts / progress / canvas layers.
+   *  Empty header / bar slots are never rendered any more, so this only gates those layers (default `true`). */
+  chrome?: boolean;
 }
 
 /**
@@ -64,12 +77,16 @@ const AbAsideLayout = ({
   className,
   hidden,
   pageName,
-  header,
+  asideHeader,
+  asideBar,
+  header, // 🕰️ deprecated alias
   content,
-  footer,
+  footer, // 🕰️ deprecated alias
   children,
   dividerHidden,
   menus,
+  id, // 🆔
+  chrome = true, // 🧰
 }: AbAsideLayoutProps): ReactElement => {
   const {
     isAsideOpen,
@@ -80,6 +97,8 @@ const AbAsideLayout = ({
     isAsideOpening,
     isAsideClosing,
     isAsideLoading,
+    asideId,
+    setAsideOpenOnMobile,
   } = useAbPage();
 
   const asideRef = useRef<HTMLElement | null>(null);
@@ -129,15 +148,31 @@ const AbAsideLayout = ({
     asideDuration,
   ]);
 
+  // 🔝🔚 G52: the new slot names win, the 0.1.5 names still work
+  const top = toAbSlot(asideHeader ?? header);
+  const bar = toAbSlot(asideBar ?? footer);
+  // 📜 G55: publish this pane's scroller (the content wrapper) so scroll spies / TOCs can use it as `root`
+  const { setAsideScrollElement } = useAbPage();
   return (
+    <>
+    {/* 🌫️ 0.1.6 (James review): tablet/mobile sheet backdrop, a sibling so AbAppLayout's pane CSS shows it; click closes */}
+    <div
+      data-ab-part="aside-backdrop"
+      data-open={isAsideOpenOnMobile ? 'true' : 'false'}
+      aria-hidden="true"
+      onClick={() => setAsideOpenOnMobile(false)}
+      hidden={!isAsideOpenOnMobile}
+    />
     <aside
       ref={asideRef}
+      id={id ?? asideId} // 🆔 0.1.6: target of aria-controls (useAbAsideToggle)
       className={clsx(
         ['AbAsideLayout', 'group/aside-layout', styles.abAsideLayout, className],
         { 'is-open': isAsideOpen },
-        { 'slideFromRight': isAsideOpen },
+        { 'slideFromRight': isAsideOpen || isAsideOpenOnMobile }, // 🎞️ ab-nextjs-animations keyframe (240ms here, none under reduced motion)
         { 'is-open-on-mobile': isAsideOpenOnMobile },
-        { '!hidden': !isAsideOpen && !isAsideOpening && !isAsideClosing },
+        // 🙈 0.1.6: stay mounted-visible while the mobile/tablet sheet is open, even if the laptop pane is closed
+        { '!hidden': !isAsideOpen && !isAsideOpenOnMobile && !isAsideOpening && !isAsideClosing },
       )}
       hidden={hidden}
       data-page-name={pageName}
@@ -145,9 +180,11 @@ const AbAsideLayout = ({
       data-opened={isAsideOpen}
       data-open-on-mobile={isAsideOpenOnMobile}
     >
-      <header className={clsx(['HeaderWrapper', styles.abAsideLayout__headerWrapper])} data-ab-part="header">
-        {header}
-      </header>
+      {top != null && ( // 🫥 not rendered when empty (D37)
+        <header className={clsx(['HeaderWrapper', styles.abAsideLayout__headerWrapper])} data-ab-part="aside-header">
+          {top}
+        </header>
+      )}
 
       <div
         className={clsx([
@@ -155,35 +192,44 @@ const AbAsideLayout = ({
           styles.abAsideLayout__contentWrapper,
           orientation === 'horizontal' && '!flex-row',
         ])}
+        data-ab-part="aside-content" // 📜 G51/G55: THE scroller of this pane (useAbScrollSpy root)
+        ref={setAsideScrollElement} // 📜 G55: useAbPage().asideScrollElement
       >
         {content ?? children}
       </div>
 
-      <footer className={clsx(['FooterWrapper', styles.abAsideLayout__footerWrapper])} data-ab-part="footer">
-        {footer}
-      </footer>
-
-      <div className={clsx(['Backdrop', styles.abAsideLayout__backdrop])} hidden />
-      <div className={clsx(['Menus', styles.abAsideLayout__menus])} hidden>
-        {menus}
-      </div>
-      <div className={clsx(['Dialogs', styles.abAsideLayout__dialogs])} hidden />
-      <div className={clsx(['Toasts', styles.abAsideLayout__toasts])} hidden />
-
-      {!dividerHidden && (
-        <span className={clsx(['divider', 'vertical', 'left', styles.abAsideLayout__divider])} />
+      {bar != null && ( // 🫥 not rendered when empty (D37)
+        <footer className={clsx(['FooterWrapper', styles.abAsideLayout__footerWrapper])} data-ab-part="aside-bar">
+          {bar}
+        </footer>
       )}
 
-      <AbLinearProgress
-        className="absolute top-0 left-0 right-0 z-50 !h-0.5 lg:!h-1"
-        color="secondary"
-        hidden={!isAsideLoading}
-        isIndeterminate={true}
-        progress={25}
-      />
-
-      <canvas className={clsx(['Canvas', styles.abAsideLayout__canvas])} />
+      {chrome && ( // 🧰 0.1.6: legacy layers
+        <>
+        <div className={clsx(['Backdrop', styles.abAsideLayout__backdrop])} hidden />
+        <div className={clsx(['Menus', styles.abAsideLayout__menus])} hidden>
+          {menus}
+        </div>
+        <div className={clsx(['Dialogs', styles.abAsideLayout__dialogs])} hidden />
+        <div className={clsx(['Toasts', styles.abAsideLayout__toasts])} hidden />
+  
+        {!dividerHidden && (
+          <span className={clsx(['divider', 'vertical', 'left', styles.abAsideLayout__divider])} />
+        )}
+  
+        <AbLinearProgress
+          className="absolute top-0 left-0 right-0 z-50 !h-0.5 lg:!h-1"
+          color="secondary"
+          hidden={!isAsideLoading}
+          isIndeterminate={true}
+          progress={25}
+        />
+  
+        <canvas className={clsx(['Canvas', styles.abAsideLayout__canvas])} />
+        </>
+      )}
     </aside>
+    </>
   );
 };
 

@@ -24,7 +24,7 @@
 * SOFTWARE.
 *
 * @project: ab-nextjs-core
-* @authors: Abraham Ukachi <abraham.ukachi@laplateforme.io>
+* @authors: Abraham Ukachi <abrahamukachi@gmail.com>
 */
 
 /*
@@ -38,7 +38,10 @@
 import type { ReactElement, ReactNode } from 'react';
 import clsx from 'clsx';
 import AbLinearProgress from '../ab-linear-progress';
+import { useAbPage } from '../ab-page-provider';
 import styles from './styles.module.css';
+// 🫥 G52: empty-slot helper (strings get a <span>, so the :has() collapse never hides text)
+import { toAbSlot } from '../ab-page-provider/slot';
 
 export interface AbMainLayoutProps {
   orientation: 'vertical' | 'horizontal';
@@ -46,11 +49,22 @@ export interface AbMainLayoutProps {
   hidden?: boolean;
   pageName?: string;
   screenName?: string;
+  /** 🔝 0.1.6 (G52): the main pane's header slot (data-ab-part="main-header"); 0px and not rendered when empty. */
+  mainHeader?: ReactNode;
+  /** 🔚 0.1.6 (G52): the main pane's bottom bar slot (data-ab-part="main-bar"); 0px and not rendered when empty. */
+  mainBar?: ReactNode;
+  /** @deprecated 0.1.6: use `mainHeader` (kept as an alias for one minor). */
   header?: ReactNode;
   content?: ReactNode;
+  /** @deprecated 0.1.6: use `mainBar` (kept as an alias for one minor). */
   footer?: ReactNode;
   children?: ReactNode;
   menus?: ReactNode;
+  /** 🆔 0.1.6: element id (e.g. the skip-link target), no inner wrapper needed. */
+  id?: string;
+  /** @deprecated 0.1.6: `false` drops the legacy backdrop / menus / dialogs / toasts / progress / canvas layers.
+   *  Empty header / bar slots are never rendered any more, so this only gates those layers (default `true`). */
+  chrome?: boolean;
 }
 
 /** Client markup mirror of server AbMainLayout. */
@@ -60,14 +74,24 @@ const AbMainLayout = ({
   hidden,
   pageName,
   screenName,
-  header,
+  mainHeader,
+  mainBar,
+  header, // 🕰️ deprecated alias
   content,
-  footer,
+  footer, // 🕰️ deprecated alias
   children,
   menus,
+  id, // 🆔
+  chrome = true, // 🧰
 }: AbMainLayoutProps): ReactElement => {
+  // 🔝🔚 G52: the new slot names win, the 0.1.5 names still work
+  const top = toAbSlot(mainHeader ?? header);
+  const bar = toAbSlot(mainBar ?? footer);
+  // 📜 G55: publish this pane's scroller (the content wrapper) so scroll spies / TOCs can use it as `root`
+  const { setMainScrollElement } = useAbPage();
   return (
     <main
+      id={id} // 🆔 0.1.6
       className={clsx(
         ['AbMainLayout', 'group-mainLayout', styles.abMainLayout, className],
         { 'has-screen-name': !!screenName },
@@ -78,36 +102,46 @@ const AbMainLayout = ({
       data-ab-part="main"
       data-screen-name={screenName}
     >
-      <header className={clsx(['HeaderWrapper', styles.abMainLayout__headerWrapper])} data-ab-part="header">
-        {header}
-      </header>
+      {top != null && ( // 🫥 not rendered when empty (D37)
+        <header className={clsx(['HeaderWrapper', styles.abMainLayout__headerWrapper])} data-ab-part="main-header">
+          {top}
+        </header>
+      )}
       <div
         className={clsx([
           'ContentWrapper',
           styles.abMainLayout__contentWrapper,
           orientation === 'horizontal' && 'md:!flex-row',
         ])}
+        data-ab-part="main-content" // 📜 G51/G55: THE scroller of this pane (useAbScrollSpy root)
+        ref={setMainScrollElement} // 📜 G55: useAbPage().mainScrollElement
         data-orientation={orientation ? orientation.toString() : undefined}
       >
         {content ?? children}
       </div>
-      <footer className={clsx(['FooterWrapper', styles.abMainLayout__footerWrapper])} data-ab-part="footer">
-        {footer}
-      </footer>
-      <div className={clsx(['Backdrop', styles.abMainLayout__backdrop])} hidden />
-      <div className={clsx(['Menus', styles.abMainLayout__menus])} hidden>
-        {menus}
-      </div>
-      <div className={clsx(['Dialogs', styles.abMainLayout__dialogs])} hidden />
-      <div className={clsx(['Toasts', styles.abMainLayout__toasts])} hidden />
-      <AbLinearProgress
-        className="absolute top-0 left-0 right-0 z-50 !w-1/2 place-self-center !my-1 3xl:!my-2 !mx-auto !h-0.5 lg:!h-1 3xl:!h-1.5"
-        color="secondary"
-        hidden={true}
-        isIndeterminate={true}
-        progress={25}
-      />
-      <canvas className={clsx(['Canvas', styles.abMainLayout__canvas])} />
+      {bar != null && ( // 🫥 not rendered when empty (D37)
+        <footer className={clsx(['FooterWrapper', styles.abMainLayout__footerWrapper])} data-ab-part="main-bar">
+          {bar}
+        </footer>
+      )}
+      {chrome && ( // 🧰 0.1.6: legacy layers
+        <>
+        <div className={clsx(['Backdrop', styles.abMainLayout__backdrop])} hidden />
+        <div className={clsx(['Menus', styles.abMainLayout__menus])} hidden>
+          {menus}
+        </div>
+        <div className={clsx(['Dialogs', styles.abMainLayout__dialogs])} hidden />
+        <div className={clsx(['Toasts', styles.abMainLayout__toasts])} hidden />
+        <AbLinearProgress
+          className="absolute top-0 left-0 right-0 z-50 !w-1/2 place-self-center !my-1 3xl:!my-2 !mx-auto !h-0.5 lg:!h-1 3xl:!h-1.5"
+          color="secondary"
+          hidden={true}
+          isIndeterminate={true}
+          progress={25}
+        />
+        <canvas className={clsx(['Canvas', styles.abMainLayout__canvas])} />
+        </>
+      )}
     </main>
   );
 };
