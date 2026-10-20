@@ -1,3 +1,38 @@
+/* 
+* @license MIT
+* ~~~~~~~~~~~~
+* ab-nextjs-core
+* ~~~~~~~~~~~~ 
+* Copyright (c) 2026 Abraham Ukachi. The abElements Project.
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the 'Software'), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions: 
+*  
+* The above copyright notice and this permission notice shall be included in all 
+* copies or substantial portions of the Software. 
+*
+* THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+* SOFTWARE.
+*
+* @project: ab-nextjs-core
+* @authors: Abraham Ukachi <abrahamukachi@gmail.com>
+*/
+
+/*
+* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+* MOTTO: We'll always do more 😜!!!
+* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+*/
+
 // 🧪 vitest
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
@@ -16,7 +51,7 @@ describe('G17: four-breakpoint panes 🧭', () => {
   for (const file of ['ab-app-layout/styles.module.css', 'server/ab-app-layout/styles.module.css']) {
     const css = strip(read(file))
     it(`${file}: mobile hides the sidebar, shows the bottom bar, aside is a closed sheet`, () => {
-      expect(css).toMatch(/\[data-variant="panes"\] \.abAppLayout__contentWrapper > \[data-ab-part="sidebar"\] \{\s*display: none/) // 🙈
+      expect(css).toMatch(/\[data-variant="panes"\] \.abAppLayout__contentWrapper > :is\(\[data-ab-part="sidebar"\], \[data-ab-part="rail"\]\) \{\s*display: none/) // 🙈
       expect(css).toMatch(/\[data-ab-part="aside"\]:not\(\[data-open-on-mobile="true"\]\) \{\s*display: none/) // 📄
       expect(css).toMatch(/env\(safe-area-inset-bottom/) // 📱
     })
@@ -65,13 +100,52 @@ describe('aside: slide-from-right 240ms, instant under reduced motion 🎞️', 
   })
   it('the aside has the aria-controls id and stays visible while the sheet is open', () => {
     const src = read('ab-aside-layout/index.tsx')
-    expect(src).toMatch(/id=\{asideId\}/) // 🆔
+    expect(src).toMatch(/id=\{id \?\? asideId\}/) // 🆔
     expect(src).toMatch(/'!hidden': !isAsideOpen && !isAsideOpenOnMobile/) // 👀
   })
   it('useAbPage gains toggleAside / toggleAsideOnMobile / asideId and useAbAsideToggle sets aria', () => {
     const src = read('ab-page-provider/index.tsx')
     for (const k of ['toggleAside: () => void', 'toggleAsideOnMobile: () => void', 'asideId: string', 'export function useAbAsideToggle']) expect(src).toContain(k)
     expect(src).toMatch(/'aria-expanded': expanded, 'aria-controls': asideId/) // ♿
-    expect(src).toMatch(/e\.key === 'Escape'/) // ⎋ closes the sheet
+    expect(src).toMatch(/e\.key !== 'Escape'/) // ⎋ closes the sheet
+  })
+})
+
+// 🛠️ 0.1.6 review + integration fixes (James, Joseph)
+describe('0.1.6 review fixes 🛠️', () => {
+  const provider = read('ab-page-provider/index.tsx') // 📄
+  it('one pending aside timer, cleared on every toggle (no races) ⏲️', () => {
+    expect(provider).toMatch(/asideTimerRef/) // 💾
+    expect(provider).toMatch(/window\.clearTimeout\(asideTimerRef\.current\)/) // 🛑
+  })
+  it('Escape respects defaultPrevented ⎋', () => {
+    expect(provider).toMatch(/e\.defaultPrevented\) return/) // 🙅
+  })
+  it('the sheet moves focus in and returns it 🎯', () => {
+    expect(provider).toMatch(/sheetOpenerRef/) // 💾
+    expect(provider).toMatch(/el\.focus\(/) // 🎯
+  })
+  it('client aside renders a tablet backdrop, server aside sets an id 🌫️🆔', () => {
+    expect(read('ab-aside-layout/index.tsx')).toMatch(/data-ab-part="aside-backdrop"/) // 🌫️
+    expect(read('server/ab-aside-layout/index.tsx')).toMatch(/id=\{id \?\? 'ab-aside'\}/) // 🆔
+  })
+  for (const f of ['ab-main-layout/index.tsx', 'server/ab-main-layout/index.tsx', 'ab-aside-layout/index.tsx', 'server/ab-aside-layout/index.tsx']) {
+    it(`${f}: accepts id and a chrome opt-out 🧰`, () => {
+      const src = read(f)
+      expect(src).toMatch(/id\?: string;/) // 🆔
+      expect(src).toMatch(/chrome = true/) // 🧰 default unchanged
+      expect(src).toMatch(/\{chrome && \(/) // 🧰 legacy layers gated
+    })
+  }
+  for (const f of ['ab-app-layout/styles.module.css', 'server/ab-app-layout/styles.module.css']) {
+    it(`${f}: panes header is in-flow + sticky, the document scrolls 📜`, () => {
+      const css = strip(read(f))
+      expect(css).toMatch(/\[data-variant="panes"\] > \.abAppLayout__headerWrapper \{\s*position: sticky/) // 📌
+      expect(css).toMatch(/\[data-ab-part="main"\] \{[^}]*overflow: visible/) // 📜
+      expect(css).toMatch(/\[data-ab-part="rail"\]/) // 🧷
+    })
+  }
+  it('panes never nest a <header> in the header slot 🧱', () => {
+    for (const f of ['ab-app-layout/index.tsx', 'server/ab-app-layout/index.tsx']) expect(read(f)).toMatch(/variant === 'panes'[^\n]*\? 'div' : 'header'/)
   })
 })
