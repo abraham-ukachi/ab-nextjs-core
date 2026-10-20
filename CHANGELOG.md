@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.2.1 (Unreleased)
+
+* 🎨 **Main pane background:** `AbMainLayout` (client + server) paints `--ab-color-pane-main` (theme ≥ 0.3.5), then the old `--color-background` → `--surface` → `#fff` chain. The theme never defined `--color-background`, so the pane was white instead of #fff8f5 / #1d150f. The bottom fade uses the same colour.
+* 📟 **`tabletHeader="main"`:** from 768 to 1179px, the main-header slot is now exactly `--ab-header-height` (60px) tall and its child fills it, like the app header row (mock 06 `.mbar`). It used to take the child's own height, which was 48px.
+* 🏷️ **Sidebar logo row:** AbSidebar's `logo` row (`data-ab-part="sidebar-logo"`, components ≥ 0.1.15) is shown only where the app header is hidden, which is `tabletHeader="main"` at 768–1179px. Everywhere else in panes it's hidden, because the app bar already carries the brand.
+
 ## [0.2.0](https://github.com/abraham-ukachi/ab-nextjs-core/compare/v0.1.6...v0.2.0) (2026-10-20)
 
 ### ⚠️ BREAKING (`variant="panes"` only; the default variant is unchanged)
