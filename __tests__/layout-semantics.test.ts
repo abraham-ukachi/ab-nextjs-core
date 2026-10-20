@@ -85,8 +85,10 @@ describe('layout HTML landmarks (God constraint)', () => {
       'server/ab-screen-layout/index.tsx',
     ]) {
       const src = read(file)
-      expect(src, file).toMatch(/data-ab-part="header"/)
-      expect(src, file).toMatch(/data-ab-part="footer"/)
+      // 📏 0.1.6 (G52): main / aside name their slots main-header / main-bar / aside-header / aside-bar
+      const k = file.includes('main-layout') ? 'main' : file.includes('aside-layout') ? 'aside' : ''
+      expect(src, file).toMatch(k ? new RegExp(`data-ab-part="${k}-header"`) : /data-ab-part="header"/)
+      expect(src, file).toMatch(k ? new RegExp(`data-ab-part="${k}-bar"`) : /data-ab-part="footer"/)
     }
   })
 

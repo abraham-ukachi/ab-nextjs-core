@@ -48,6 +48,13 @@ import {
 } from 'react';
 
 export interface AbPageContextValue {
+  /** 📜 0.1.6 (G55): the main pane's scroller (AbMainLayout's content wrapper), e.g. `useAbScrollSpy({ root })`. */
+  mainScrollElement: HTMLElement | null;
+  /** 📜 0.1.6 (G55): the aside pane's scroller. */
+  asideScrollElement: HTMLElement | null;
+  /** 🔗 ref callbacks used by AbMainLayout / AbAsideLayout. */
+  setMainScrollElement: (el: HTMLElement | null) => void;
+  setAsideScrollElement: (el: HTMLElement | null) => void;
   isAsideOpen: boolean;
   isAsideOpenOnMobile: boolean;
   asideDuration: number;
@@ -87,6 +94,10 @@ export function getAbAsideDuration(duration: number, reducedMotion: boolean): nu
 }
 
 const defaultValue: AbPageContextValue = {
+  mainScrollElement: null,
+  asideScrollElement: null,
+  setMainScrollElement: () => {},
+  setAsideScrollElement: () => {},
   isAsideOpen: true,
   isAsideOpenOnMobile: false,
   asideDuration: 300,
@@ -131,6 +142,9 @@ export function AbPageProvider({
   const [isAsideClosing, setAsideClosing] = useState(false);
   const [isAsideLoading, setAsideLoading] = useState(false);
   const [asideElement, setAsideElementState] = useState<HTMLElement | null>(null);
+  // 📜 G55: the two pane scrollers (state, so consumers re-render once they mount)
+  const [mainScrollElement, setMainScrollElement] = useState<HTMLElement | null>(null);
+  const [asideScrollElement, setAsideScrollElement] = useState<HTMLElement | null>(null);
 
   const setAsideElement = useCallback((el: HTMLElement | null) => {
     setAsideElementState(el);
@@ -197,6 +211,10 @@ export function AbPageProvider({
 
   const value = useMemo<AbPageContextValue>(
     () => ({
+      mainScrollElement,
+      asideScrollElement,
+      setMainScrollElement,
+      setAsideScrollElement,
       isAsideOpen,
       isAsideOpenOnMobile,
       asideDuration,
@@ -213,6 +231,8 @@ export function AbPageProvider({
       toggleAsideOnMobile,
     }),
     [
+      mainScrollElement,
+      asideScrollElement,
       isAsideOpen,
       isAsideOpenOnMobile,
       asideDuration,

@@ -58,6 +58,8 @@ Optional: wrap client `AbAsideLayout` with `AbPageProvider` / `useAbPage` for as
 | `AbAsideLayout` | `<aside>` | `aside` |
 | Header wrapper | `<header>` | `header` |
 | Footer wrapper | `<footer>` | `footer` |
+| Main slots (0.1.6) | `<header>` / `<footer>` | `main-header` / `main-bar`, scroller `main-content` |
+| Aside slots (0.1.6) | `<header>` / `<footer>` | `aside-header` / `aside-bar`, scroller `aside-content` |
 | Sidebar / bottom bar (via components) | `<nav>` (`AbSidebar` / `AbNavbar`) | `sidebar` (sidebar) |
 
 The client aside opens with the `.slideFromRight` class from `ab-nextjs-animations` (import `ab-nextjs-animations/slide-from-right/styles.css`).
@@ -96,6 +98,8 @@ const { props, expanded } = useAbAsideToggle() // aria-expanded + aria-controls 
 | 1024–1439 | joined, hairline divider | | in the flow, `isAsideOpen` | hidden |
 | ≥ 1440 | gapped panes (`--ab-pane-gap`) with radii (`--ab-pane-radius`) | | | hidden |
 
+* 📏 **The page never scrolls.** Panes are a `100dvh` box and `<html>`/`<body>` are locked while mounted. Main, aside and sidebar scroll on their own (`min-height:0`, `overscroll-behavior: contain`, `scrollbar-gutter: stable`, safe-area padding). Hand `useAbPage().mainScrollElement` to `useAbScrollSpy({ root })` (hooks 0.1.7).
+* 🫥 Empty header / footer slots render nothing and measure 0px. Use `mainHeader` / `mainBar` and `asideHeader` / `asideBar`; `header` / `footer` / `chrome` are deprecated aliases.
 * The rail animates its width over 200ms and snaps under reduced motion. Without JS the sidebar stays expanded (`@media (scripting: none)`).
 * The aside uses the `slideFromRight` keyframe from **ab-nextjs-animations** (load its `slide-from-right/styles.css`) at 240ms. Under reduced motion there's no slide and the open/close timers are 0. `Escape` closes the sheet.
 * Tokens come from **ab-nextjs-theme ≥ 0.3.4** (`--ab-pane-gap`, `--ab-pane-radius`, `--ab-divider-hairline`), with fallbacks.

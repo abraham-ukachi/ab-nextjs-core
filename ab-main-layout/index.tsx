@@ -38,7 +38,10 @@
 import type { ReactElement, ReactNode } from 'react';
 import clsx from 'clsx';
 import AbLinearProgress from '../ab-linear-progress';
+import { useAbPage } from '../ab-page-provider';
 import styles from './styles.module.css';
+// 🫥 G52: empty-slot helper (strings get a <span>, so the :has() collapse never hides text)
+import { toAbSlot } from '../ab-page-provider/slot';
 
 export interface AbMainLayoutProps {
   orientation: 'vertical' | 'horizontal';
@@ -46,16 +49,21 @@ export interface AbMainLayoutProps {
   hidden?: boolean;
   pageName?: string;
   screenName?: string;
+  /** 🔝 0.1.6 (G52): the main pane's header slot (data-ab-part="main-header"); 0px and not rendered when empty. */
+  mainHeader?: ReactNode;
+  /** 🔚 0.1.6 (G52): the main pane's bottom bar slot (data-ab-part="main-bar"); 0px and not rendered when empty. */
+  mainBar?: ReactNode;
+  /** @deprecated 0.1.6: use `mainHeader` (kept as an alias for one minor). */
   header?: ReactNode;
   content?: ReactNode;
+  /** @deprecated 0.1.6: use `mainBar` (kept as an alias for one minor). */
   footer?: ReactNode;
   children?: ReactNode;
   menus?: ReactNode;
   /** 🆔 0.1.6: element id (e.g. the skip-link target), no inner wrapper needed. */
   id?: string;
-  /** 🧰 0.1.6: legacy chrome opt-out for docs-shell panes. `false` drops the empty header/footer wrappers
-   *  and the backdrop / menus / dialogs / toasts / progress / canvas layers (the shell brings its own).
-   *  Default `true` (unchanged markup for older apps). A header/footer you pass is always rendered. */
+  /** @deprecated 0.1.6: `false` drops the legacy backdrop / menus / dialogs / toasts / progress / canvas layers.
+   *  Empty header / bar slots are never rendered any more, so this only gates those layers (default `true`). */
   chrome?: boolean;
 }
 
@@ -66,14 +74,21 @@ const AbMainLayout = ({
   hidden,
   pageName,
   screenName,
-  header,
+  mainHeader,
+  mainBar,
+  header, // 🕰️ deprecated alias
   content,
-  footer,
+  footer, // 🕰️ deprecated alias
   children,
   menus,
   id, // 🆔
   chrome = true, // 🧰
 }: AbMainLayoutProps): ReactElement => {
+  // 🔝🔚 G52: the new slot names win, the 0.1.5 names still work
+  const top = toAbSlot(mainHeader ?? header);
+  const bar = toAbSlot(mainBar ?? footer);
+  // 📜 G55: publish this pane's scroller (the content wrapper) so scroll spies / TOCs can use it as `root`
+  const { setMainScrollElement } = useAbPage();
   return (
     <main
       id={id} // 🆔 0.1.6
@@ -87,9 +102,9 @@ const AbMainLayout = ({
       data-ab-part="main"
       data-screen-name={screenName}
     >
-      {(chrome || header != null) && ( // 🧰 0.1.6
-        <header className={clsx(['HeaderWrapper', styles.abMainLayout__headerWrapper])} data-ab-part="header">
-          {header}
+      {top != null && ( // 🫥 not rendered when empty (D37)
+        <header className={clsx(['HeaderWrapper', styles.abMainLayout__headerWrapper])} data-ab-part="main-header">
+          {top}
         </header>
       )}
       <div
@@ -98,13 +113,15 @@ const AbMainLayout = ({
           styles.abMainLayout__contentWrapper,
           orientation === 'horizontal' && 'md:!flex-row',
         ])}
+        data-ab-part="main-content" // 📜 G51/G55: THE scroller of this pane (useAbScrollSpy root)
+        ref={setMainScrollElement} // 📜 G55: useAbPage().mainScrollElement
         data-orientation={orientation ? orientation.toString() : undefined}
       >
         {content ?? children}
       </div>
-      {(chrome || footer != null) && ( // 🧰 0.1.6
-        <footer className={clsx(['FooterWrapper', styles.abMainLayout__footerWrapper])} data-ab-part="footer">
-          {footer}
+      {bar != null && ( // 🫥 not rendered when empty (D37)
+        <footer className={clsx(['FooterWrapper', styles.abMainLayout__footerWrapper])} data-ab-part="main-bar">
+          {bar}
         </footer>
       )}
       {chrome && ( // 🧰 0.1.6: legacy layers

@@ -35,10 +35,12 @@
 
 'use client';
 
-import { isValidElement, type ReactElement, type ReactNode } from 'react';
+import { isValidElement, useEffect, type ReactElement, type ReactNode } from 'react';
 import clsx from 'clsx';
 import AbLinearProgress from '../ab-linear-progress';
 import styles from './styles.module.css';
+// 🫥 G50: empty-slot helper
+import { toAbSlot } from '../ab-page-provider/slot';
 
 export interface AbAppLayoutProps {
   orientation: 'vertical' | 'horizontal';
@@ -78,13 +80,22 @@ const AbAppLayout = ({
   railCollapsed = false, // 🧷
   overlays, // 🧰
 }: AbAppLayoutProps): ReactElement => {
-  // 🧱 panes: the header slot is a plain in-flow, sticky grid row. Its child (e.g. AbAppBar) brings its own
+  // 🧱 panes: the header slot is a plain grid row (0px when empty). Its child (e.g. AbAppBar) brings its own
   //    <header>, so we never nest one header inside another. Same when the slot child IS a <header>.
   const HeaderTag = variant === 'panes' || (isValidElement(header) && header.type === 'header') ? 'div' : 'header';
   // 🧰 legacy overlay layers (off in panes unless asked for)
   const showOverlays = overlays ?? variant !== 'panes';
-  // 🦶 panes: only render the footer row when there is a footer
-  const showFooter = variant !== 'panes' || footer != null;
+  // 🫥 G50 (D37): panes never render an empty header / footer row (0px); the CSS :empty / :has() catch the rest
+  const top = toAbSlot(header);
+  const showHeader = variant !== 'panes' || top != null;
+  const showFooter = variant !== 'panes' || toAbSlot(footer) != null;
+  // 🔒 G54: lock the document while a panes layout is mounted (CSS :has() does it too; this covers older engines)
+  useEffect(() => {
+    if (variant !== 'panes' || typeof document === 'undefined') return;
+    const html = document.documentElement; // 🌐
+    html.setAttribute('data-ab-layout-lock', ''); // 🔒
+    return () => html.removeAttribute('data-ab-layout-lock'); // 🔓 unmount
+  }, [variant]);
   return (
     <div
       className={clsx(['AbAppLayout', styles.abAppLayout, className])}
@@ -94,9 +105,11 @@ const AbAppLayout = ({
       data-variant={variant} // 🧭 CSS hook for the panes
       data-rail={railCollapsed ? 'true' : 'false'} // 🧷
     >
-      <HeaderTag className={clsx(['HeaderWrapper', styles.abAppLayout__headerWrapper])} data-ab-part="header">
-        {header}
-      </HeaderTag>
+      {showHeader && (
+        <HeaderTag className={clsx(['HeaderWrapper', styles.abAppLayout__headerWrapper])} data-ab-part="header">
+          {variant === 'panes' ? top : header}
+        </HeaderTag>
+      )}
       <div className={clsx(['ContentWrapper', styles.abAppLayout__contentWrapper])}>
         {sideBar}
         {content ?? children}

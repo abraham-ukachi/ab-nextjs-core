@@ -137,27 +137,64 @@ describe('0.1.6 review fixes 🛠️', () => {
       expect(src).toMatch(/\{chrome && \(/) // 🧰 legacy layers gated
     })
   }
-  for (const f of ['ab-app-layout/styles.module.css', 'server/ab-app-layout/styles.module.css']) {
-    it(`${f}: panes header is in-flow + sticky, the document scrolls 📜`, () => {
-      const css = strip(read(f))
-      expect(css).toMatch(/\[data-variant="panes"\] > \.abAppLayout__headerWrapper \{\s*position: sticky/) // 📌
-      expect(css).toMatch(/\[data-ab-part="main"\] \{[^}]*overflow: visible/) // 📜
-      expect(css).toMatch(/\[data-ab-part="rail"\]/) // 🧷
-    })
-  }
   it('panes never nest a <header> in the header slot 🧱', () => {
     for (const f of ['ab-app-layout/index.tsx', 'server/ab-app-layout/index.tsx']) expect(read(f)).toMatch(/variant === 'panes'[^\n]*\? 'div' : 'header'/)
   })
 })
 
-// 🧪 WebKit finding (2026-10-20): on laptop+ `inset: auto` came after `top` and reset it, so the aside scrolled away
-describe('laptop aside stays sticky 📌', () => {
+// 📏 D35 layout rule (G50–G52, G54, G55): the document never scrolls, panes scroll on their own,
+//    empty chrome is 0px, no hard-coded bar height
+describe('layout rule 📏', () => {
   for (const f of ['ab-app-layout/styles.module.css', 'server/ab-app-layout/styles.module.css']) {
-    it(f, () => {
-      const lap = strip(read(f)).split('@media (min-width: 1024px)')[1] ?? '' // 💻
-      const rule = /\[data-ab-part="aside"\] \{([^}]*)\}/.exec(lap)?.[1] ?? '' // 📑
-      expect(rule.indexOf('inset: auto')).toBeGreaterThan(-1) // 🧹
-      expect(rule.indexOf('inset: auto')).toBeLessThan(rule.indexOf('top: var(--ab-app-bar-height)')) // ⬇️ top wins
+    const css = strip(read(f))
+    it(`${f}: a 100dvh box that never scrolls`, () => {
+      expect(css).toMatch(/100dvh/) // 📐
+      expect(css).toMatch(/minmax\(0, ?1fr\)/) // 📏
+      expect(css).not.toMatch(/--ab-app-bar-height/) // 🚫 no 64px offset
+      expect(css).not.toMatch(/position: sticky/) // 🚫 no sticky columns
+    })
+    it(`${f}: locks html/body while mounted (G54)`, () => {
+      expect(css).toMatch(/html:has\(\.AbAppLayout\[data-variant="panes"\]\)/) // 🔒
+      expect(css).toMatch(/html\[data-ab-layout-lock\]/) // 🔒
+      expect(css).toMatch(/overscroll-behavior: none/) // 🚫 rubber band
+    })
+    it(`${f}: empty chrome collapses, panes are contained (G50/G51)`, () => {
+      expect(css).toMatch(/:empty/) // 🫥
+      expect(css).toMatch(/:not\(:has\(> \*\)\)/) // 🫥
+      expect(css).toMatch(/min-height: 0/) // 📜
+      expect(css).toMatch(/overscroll-behavior: contain/) // 📜
+      expect(css).toMatch(/scrollbar-gutter: stable/) // 📜
+      expect(css).toMatch(/env\(safe-area-inset-/) // 📱
     })
   }
+  for (const f of ['ab-main-layout/styles.module.css', 'server/ab-main-layout/styles.module.css', 'ab-aside-layout/styles.module.css', 'server/ab-aside-layout/styles.module.css']) {
+    it(`${f}: the content wrapper is the pane's scroller`, () => {
+      const css = strip(read(f))
+      expect(css).toMatch(/overflow: hidden auto/) // 📜
+      expect(css).toMatch(/overscroll-behavior: contain/) // 📜
+      expect(css).toMatch(/:empty/) // 🫥
+    })
+  }
+  for (const f of ['ab-main-layout/index.tsx', 'server/ab-main-layout/index.tsx', 'ab-aside-layout/index.tsx', 'server/ab-aside-layout/index.tsx']) {
+    it(`${f}: new slots + deprecated aliases (G52)`, () => {
+      const src = read(f); const k = f.includes('main') ? 'main' : 'aside'
+      expect(src).toMatch(new RegExp(`${k}Header\\?:`)) // 🔝
+      expect(src).toMatch(new RegExp(`${k}Bar\\?:`)) // 🔚
+      expect(src).toMatch(/@deprecated/) // 🕰️
+      expect(src).toMatch(new RegExp(`data-ab-part="${k}-content"`)) // 📜
+    })
+  }
+  it('client panes publish their scrollers on useAbPage (G55)', () => {
+    expect(read('ab-main-layout/index.tsx')).toMatch(/setMainScrollElement/) // 📜
+    expect(read('ab-aside-layout/index.tsx')).toMatch(/setAsideScrollElement/) // 📜
+  })
+})
+
+// 🫥 toAbSlot (G52)
+import { toAbSlot } from '../ab-page-provider/slot'
+describe('toAbSlot 🫥', () => {
+  it('empty → null, text → a span, elements as is', () => {
+    for (const v of [null, undefined, false, '', []]) expect(toAbSlot(v as never)).toBeNull() // 🙅
+    expect((toAbSlot('Docs') as { type: string }).type).toBe('span') // 🔤
+  })
 })

@@ -169,3 +169,45 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+/* ================================================================== */
+/* 📏 0.1.6 layout rule (G51 + G52 + G54): a bounded box whose CONTENT */
+/*    scrolls on its own; aside-header / aside-bar collapse when empty   */
+/* ================================================================== */
+/* 🫥 D37: an empty slot is 0px (also outside panes: an empty wrapper had no size anyway) */
+.abAsideLayout__headerWrapper:empty,
+.abAsideLayout__footerWrapper:empty,
+:global(.AbAppLayout[data-variant="panes"]) .abAsideLayout__headerWrapper:not(:has(> *)),
+:global(.AbAppLayout[data-variant="panes"]) .abAsideLayout__footerWrapper:not(:has(> *)) {
+  display: none; /* 📏 0px, and no footer gradient */
+}
+/* 🧭 inside AbAppLayout variant="panes": a full-height column, only the content wrapper scrolls */
+:global(.AbAppLayout[data-variant="panes"]) .abAsideLayout {
+  height: 100%; /* 📏 the pane */
+  min-height: 0; /* 🚫 */
+  max-height: none; /* 🧹 the legacy 100vh caps */
+  overflow: hidden; /* 🔒 */
+  display: flex; /* 🧱 header · content · bar */
+  flex-direction: column;
+  margin: 0; /* 🧹 legacy 2xl margins */
+}
+:global(.AbAppLayout[data-variant="panes"]) .abAsideLayout__headerWrapper,
+:global(.AbAppLayout[data-variant="panes"]) .abAsideLayout__footerWrapper {
+  flex: none; /* 📏 rows size to their content: no hard-coded heights */
+  pointer-events: auto; /* 🖱️ real chrome, not an overlay */
+}
+:global(.AbAppLayout[data-variant="panes"]) .abAsideLayout__footerWrapper {
+  padding-bottom: env(safe-area-inset-bottom, 0px); /* 📱 home indicator */
+}
+:global(.AbAppLayout[data-variant="panes"]) .abAsideLayout__footerWrapper::before {
+  content: none; /* 🧹 no gradient over the scroller */
+}
+:global(.AbAppLayout[data-variant="panes"]) .abAsideLayout__contentWrapper {
+  flex: 1 1 0; /* ↕️ the rest */
+  height: auto; /* 📏 */
+  min-height: 0; /* 🚫 lets it scroll */
+  overflow: hidden auto; /* 📜 THE scroller of this pane */
+  overscroll-behavior: contain; /* 🚫 never chains to the page (G54) */
+  scrollbar-gutter: stable; /* 📏 no layout jump */
+  justify-content: flex-start; /* ⬆️ */
+}

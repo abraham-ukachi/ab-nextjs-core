@@ -37,23 +37,30 @@ import type { ReactElement, ReactNode } from 'react';
 import clsx from 'clsx';
 import AbLinearProgress from '../../ab-linear-progress';
 import styles from './styles.module.css';
+// 🫥 G52: empty-slot helper (strings get a <span>, so the :has() collapse never hides text)
+import { toAbSlot } from '../../ab-page-provider/slot';
 
 export interface AbAsideLayoutProps {
   orientation: 'vertical' | 'horizontal';
   className?: string;
   hidden?: boolean;
   pageName?: string;
+  /** 🔝 0.1.6 (G52): the aside pane's header slot (data-ab-part="aside-header"); 0px and not rendered when empty. */
+  asideHeader?: ReactNode;
+  /** 🔚 0.1.6 (G52): the aside pane's bottom bar slot (data-ab-part="aside-bar"); 0px and not rendered when empty. */
+  asideBar?: ReactNode;
+  /** @deprecated 0.1.6: use `asideHeader` (kept as an alias for one minor). */
   header?: ReactNode;
   content?: ReactNode;
+  /** @deprecated 0.1.6: use `asideBar` (kept as an alias for one minor). */
   footer?: ReactNode;
   children?: ReactNode;
   dividerHidden?: boolean;
   menus?: ReactNode;
   /** 🆔 0.1.6: element id (e.g. the skip-link target), no inner wrapper needed. */
   id?: string;
-  /** 🧰 0.1.6: legacy chrome opt-out for docs-shell panes. `false` drops the empty header/footer wrappers
-   *  and the backdrop / menus / dialogs / toasts / progress / canvas layers (the shell brings its own).
-   *  Default `true` (unchanged markup for older apps). A header/footer you pass is always rendered. */
+  /** @deprecated 0.1.6: `false` drops the legacy backdrop / menus / dialogs / toasts / progress / canvas layers.
+   *  Empty header / bar slots are never rendered any more, so this only gates those layers (default `true`). */
   chrome?: boolean;
 }
 
@@ -65,15 +72,20 @@ const AbAsideLayout = ({
   className,
   hidden,
   pageName,
-  header,
+  asideHeader,
+  asideBar,
+  header, // 🕰️ deprecated alias
   content,
-  footer,
+  footer, // 🕰️ deprecated alias
   children,
   dividerHidden,
   menus,
   id, // 🆔
   chrome = true, // 🧰
 }: AbAsideLayoutProps): ReactElement => {
+  // 🔝🔚 G52: the new slot names win, the 0.1.5 names still work
+  const top = toAbSlot(asideHeader ?? header);
+  const bar = toAbSlot(asideBar ?? footer);
   return (
     <aside
       id={id ?? 'ab-aside'} // 🆔 0.1.6 (James review): same default as AbPageProvider's asideId, for aria-controls
@@ -82,9 +94,9 @@ const AbAsideLayout = ({
       data-page-name={pageName}
       data-ab-part="aside"
     >
-      {(chrome || header != null) && ( // 🧰 0.1.6
-        <header className={clsx(['HeaderWrapper', styles.abAsideLayout__headerWrapper])} data-ab-part="header">
-          {header}
+      {top != null && ( // 🫥 not rendered when empty (D37)
+        <header className={clsx(['HeaderWrapper', styles.abAsideLayout__headerWrapper])} data-ab-part="aside-header">
+          {top}
         </header>
       )}
 
@@ -94,13 +106,14 @@ const AbAsideLayout = ({
           styles.abAsideLayout__contentWrapper,
           orientation === 'horizontal' && '!flex-row',
         ])}
+        data-ab-part="aside-content" // 📜 G51/G55: THE scroller of this pane (useAbScrollSpy root)
       >
         {content ?? children}
       </div>
 
-      {(chrome || footer != null) && ( // 🧰 0.1.6
-        <footer className={clsx(['FooterWrapper', styles.abAsideLayout__footerWrapper])} data-ab-part="footer">
-          {footer}
+      {bar != null && ( // 🫥 not rendered when empty (D37)
+        <footer className={clsx(['FooterWrapper', styles.abAsideLayout__footerWrapper])} data-ab-part="aside-bar">
+          {bar}
         </footer>
       )}
 
