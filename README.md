@@ -99,6 +99,11 @@ const { props, expanded } = useAbAsideToggle() // aria-expanded + aria-controls 
 | ≥ 1440 | gapped panes (`--ab-pane-gap`) with radii (`--ab-pane-radius`) | | | hidden |
 
 * 📏 **The page never scrolls.** Panes are a `100dvh` box and `<html>`/`<body>` are locked while mounted. Main, aside and sidebar scroll on their own (`min-height:0`, `overscroll-behavior: contain`, `scrollbar-gutter: stable`, safe-area padding). Hand `useAbPage().mainScrollElement` to `useAbScrollSpy({ root })` (hooks 0.1.7).
+* 📱 **Viewport meta for the app:** add `viewport-fit=cover` so `env(safe-area-inset-*)` is non-zero on notched phones (the panes pad the bars with it), and `interactive-widget=resizes-content` so the on-screen keyboard shrinks the `100dvh` box instead of sliding the locked page. In Next.js:
+
+  ```ts
+  export const viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover', interactiveWidget: 'resizes-content' }
+  ```
 * 🫥 Empty header / footer slots render nothing and measure 0px. Use `mainHeader` / `mainBar` and `asideHeader` / `asideBar`; `header` / `footer` / `chrome` are deprecated aliases.
 * The rail animates its width over 200ms and snaps under reduced motion. Without JS the sidebar stays expanded (`@media (scripting: none)`).
 * The aside uses the `slideFromRight` keyframe from **ab-nextjs-animations** (load its `slide-from-right/styles.css`) at 240ms. Under reduced motion there's no slide and the open/close timers are 0. `Escape` closes the sheet.
