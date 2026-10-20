@@ -230,6 +230,18 @@
 @media (max-width: 767px), (min-width: 1180px) {
   .abAppLayout[data-variant="panes"][data-tablet-header="main"] [data-ab-part="main-header"] { display: none; } /* 🙈 tablet-only bar */
 }
+/* 📟 0.2.1 (Joseph, God 00:08): at 768–1179 the main-header slot IS the bar, so it gets the header-row height
+   (--ab-header-height = 60px there) and its child fills it, like the app header row. Mock 06 `.mbar` = 60px. */
+@media (min-width: 768px) and (max-width: 1179px) {
+  .abAppLayout[data-variant="panes"][data-tablet-header="main"] [data-ab-part="main-header"] { height: var(--ab-header-height); flex: none; box-sizing: border-box; display: flex; flex-direction: column; }
+  .abAppLayout[data-variant="panes"][data-tablet-header="main"] [data-ab-part="main-header"] > * { flex: 1 1 auto; min-height: 0; }
+}
+/* 🏷️ 0.2.1: AbSidebar's `logo` row (data-ab-part="sidebar-logo", components ≥ 0.1.15) stands in for the hidden app
+   header, so it only shows where that header is gone: tabletHeader="main" at 768–1179. */
+.abAppLayout[data-variant="panes"]:not([data-tablet-header="main"]) [data-ab-part="sidebar-logo"] { display: none; }
+@media (max-width: 767px), (min-width: 1180px) {
+  .abAppLayout[data-variant="panes"][data-tablet-header="main"] [data-ab-part="sidebar-logo"] { display: none; } /* 🙈 the app bar has the brand */
+}
 /* 📏 WebKit e2e (2026-10-20): pin the panes to the 1fr row. Auto-placement moved them into row 1 (auto) when
    the header was absent or collapsed, and the panes measured 0px tall */
 .abAppLayout[data-variant="panes"] > .abAppLayout__contentWrapper { grid-row: 2; } /* 🧱 the minmax(0,1fr) row */

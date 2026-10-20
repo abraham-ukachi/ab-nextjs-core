@@ -55,3 +55,19 @@ describe('main pane background 🎨 (God 00:08)', () => {
     })
   }
 })
+
+describe('tabletHeader="main" bar + sidebar logo row 📟', () => {
+  for (const f of ['ab-app-layout/styles.module.css', 'server/ab-app-layout/styles.module.css']) {
+    it(`${f}: the tablet main-header is --ab-header-height (60px) tall and its child fills it`, () => {
+      const css = read(f) // 📄
+      expect(css).toMatch(/@media \(min-width: 768px\) and \(max-width: 1179px\) \{\s*\.abAppLayout\[data-variant="panes"\]\[data-tablet-header="main"\] \[data-ab-part="main-header"\] \{ height: var\(--ab-header-height\);/) // 📏
+      expect(css).toMatch(/\[data-tablet-header="main"\] \[data-ab-part="main-header"\] > \* \{ flex: 1 1 auto; min-height: 0; \}/) // 🧱
+      expect(css).toMatch(/:where\(\.abAppLayout\[data-variant="panes"\]\) \{ --ab-header-height: 60px; \}/) // 🔢 60 at tablet
+    })
+    it(`${f}: the sidebar logo row shows only for tabletHeader="main" at 768–1179`, () => {
+      const css = read(f) // 📄
+      expect(css).toMatch(/\.abAppLayout\[data-variant="panes"\]:not\(\[data-tablet-header="main"\]\) \[data-ab-part="sidebar-logo"\] \{ display: none; \}/) // 🙈
+      expect(css).toMatch(/@media \(max-width: 767px\), \(min-width: 1180px\) \{\s*\.abAppLayout\[data-variant="panes"\]\[data-tablet-header="main"\] \[data-ab-part="sidebar-logo"\] \{ display: none; \}/) // 🙈
+    })
+  }
+})
