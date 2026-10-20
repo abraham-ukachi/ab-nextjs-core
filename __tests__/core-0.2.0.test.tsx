@@ -25,7 +25,7 @@
 *
 * @project: ab-nextjs-core
 * @name: Core 0.2.0 shell - Tests
-* @file: __tests__/core-0.1.7.test.tsx
+* @file: __tests__/core-0.2.0.test.tsx
 * @type: Vitest
 * @authors: Abraham Ukachi <abrahamukachi@gmail.com>
 */
