@@ -59,7 +59,9 @@ describe.each(['ab-app-layout/styles.module.css', 'server/ab-app-layout/styles.m
   })
   it('tabletHeader="main": app header 0px at 768–1179, main-header hidden elsewhere', () => {
     expect(css).toMatch(/@media \(min-width: 768px\) and \(max-width: 1179px\) \{\s*\.abAppLayout\[data-variant="panes"\]\[data-tablet-header="main"\] > \.abAppLayout__headerWrapper \{ display: none; \}/)
-    expect(css).toMatch(/@media \(max-width: 767px\), \(min-width: 1180px\) \{\s*\.abAppLayout\[data-variant="panes"\]\[data-tablet-header="main"\] \[data-ab-part="main-header"\] \{ display: none; \}/)
+    // 📐 0.2.1 split: ≥1180 always hidden; ≤767 hidden unless mobileHeader="main" reuses the bar
+    expect(css).toMatch(/@media \(min-width: 1180px\) \{\s*\.abAppLayout\[data-variant="panes"\]\[data-tablet-header="main"\] \[data-ab-part="main-header"\] \{ display: none; \}/)
+    expect(css).toMatch(/@media \(max-width: 767px\) \{\s*(\/\*[^*]*\*\/\s*)?\.abAppLayout\[data-variant="panes"\]\[data-tablet-header="main"\]:not\(\[data-mobile-header="main"\]\) \[data-ab-part="main-header"\] \{ display: none; \}/)
   })
   it('--ab-pane-shadow is the mock shadow in light, none in dark', () => {
     expect(css).toMatch(/--ab-pane-shadow: 0 1px 2px rgb\(33 26 22 \/ 0\.04\), 0 8px 28px rgb\(92 64 48 \/ 0\.06\);/)

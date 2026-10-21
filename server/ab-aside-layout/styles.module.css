@@ -45,7 +45,7 @@
   width: 100%;
   height: 100%;
   z-index: 10;
-  background-color: var(--color-background, var(--surface, #ffffff));
+  background-color: var(--ab-color-pane, var(--ab-color-pane-main, var(--color-background, var(--surface, #ffffff))));
 }
 
 @media (min-width: 1536px) {
@@ -57,7 +57,7 @@
 
 :global(.dark) .abAsideLayout,
 :global([data-theme="dark"]) .abAsideLayout {
-  background-color: var(--color-dark-background, var(--surface, #0a0a0a));
+  background-color: var(--ab-color-pane, var(--ab-color-pane-main, var(--color-dark-background, var(--surface, #0a0a0a))));
 }
 
 @media (max-width: 767px) {
@@ -109,12 +109,12 @@
   height: 100%;
   z-index: -1;
   transform: translateY(-100%);
-  background-image: linear-gradient(to bottom, transparent, var(--color-background, var(--surface, #ffffff)));
+  background-image: linear-gradient(to bottom, transparent, var(--ab-color-pane, var(--ab-color-pane-main, var(--color-background, var(--surface, #ffffff)))));
 }
 
 :global(.dark) .abAsideLayout__footerWrapper::before,
 :global([data-theme="dark"]) .abAsideLayout__footerWrapper::before {
-  background-image: linear-gradient(to bottom, transparent, var(--color-dark-background, var(--surface, #0a0a0a)));
+  background-image: linear-gradient(to bottom, transparent, var(--ab-color-pane, var(--ab-color-pane-main, var(--color-dark-background, var(--surface, #0a0a0a)))));
 }
 
 .abAsideLayout__backdrop {
