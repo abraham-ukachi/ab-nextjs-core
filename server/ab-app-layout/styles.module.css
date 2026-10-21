@@ -158,7 +158,9 @@
 /*    · sidebar, main content and aside content each scroll on their   */
 /*      own (min-height:0 + overflow:auto + overscroll containment)    */
 /*    · no hard-coded bar heights: rows size to their content          */
-/*    Tokens: --ab-pane-gap / --ab-pane-radius / --ab-divider-hairline */
+/*    Tokens: --ab-pane-gap / --ab-pane-radius / --ab-pane-divider */
+/* ➖ 0.2.2 (God 02:44): ONE pane divider = AbAppBar's compact header border (1px · --ab-color-div, faint) */
+:where(.abAppLayout[data-variant="panes"]) { --ab-pane-divider: 1px solid var(--ab-color-div, rgb(92 64 48 / 0.11)); }
 /*    (ab-nextjs-theme ≥ 0.3.4), with safe fallbacks                    */
 /* ================================================================== */
 
@@ -351,6 +353,7 @@
     overflow: hidden auto; /* 📜 D42: the sidebar is the third scroller */
     scrollbar-gutter: stable; /* 📏 no jump when it starts scrolling */
     transition: width var(--ab-rail-duration) ease; /* 🎞️ rail */
+    border-right: var(--ab-pane-divider); /* ➖ 0.2.2 (God 02:44, mock 06 .T .sidebar): the tablet divider = the header hairline */
   }
   .abAppLayout[data-variant="panes"][data-rail="true"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]),
   .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="rail"] {
@@ -362,7 +365,7 @@
   .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"] {
     inset: 0 0 0 auto; /* ➡️ pinned right, inside the panes box */
     width: var(--ab-aside-width); /* 📑 ~30–40% */
-    border-left: var(--ab-divider-hairline, 1px solid rgb(0 0 0 / 0.12)); /* ➖ */
+    border-left: var(--ab-pane-divider); /* ➖ 0.2.2 (God 02:44): the same faint hairline as the header's bottom border */
     background: var(--ab-color-surface, Canvas); /* 🎨 opaque over the page */
   }
   /* 🌫️ tablet overlay backdrop (James review): dims the panes, click closes the sheet */
@@ -375,10 +378,21 @@
   }
 }
 
+/* 📑 0.2.2 (God 02:44, mock .toc): the aside content gets the mock's padding (26/22 joined, 28/24 gapped) */
+@media (min-width: 1180px) {
+  .abAppLayout[data-variant="panes"] [data-ab-part="aside"] > [data-ab-part="aside-content"] {
+    padding: var(--ab-aside-padding, 26px 22px); /* 📦 vertical · horizontal */
+    box-sizing: border-box; /* 📦 inside the column width */
+  }
+}
+@media (min-width: 1920px) {
+  .abAppLayout[data-variant="panes"] { --ab-aside-padding: 28px 24px; } /* 📦 the gapped pane breathes a bit more */
+}
+
 /* 💻 laptop: three joined panes with hairline dividers, aside in the flow */
 @media (min-width: 1180px) {
   .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]) {
-    border-right: var(--ab-divider-hairline, 1px solid rgb(0 0 0 / 0.12)); /* ➖ joined */
+    border-right: var(--ab-pane-divider); /* ➖ joined, 0.2.2: identical to the header hairline */
   }
   .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside"] {
     position: relative; /* 📌 back in the flow, a full-height column */
