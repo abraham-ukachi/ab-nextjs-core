@@ -378,6 +378,17 @@
   }
 }
 
+/* 📑 0.2.2 (God 02:44, mock .toc): the aside content gets the mock's padding (26/22 joined, 28/24 gapped) */
+@media (min-width: 1180px) {
+  .abAppLayout[data-variant="panes"] [data-ab-part="aside"] > [data-ab-part="aside-content"] {
+    padding: var(--ab-aside-padding, 26px 22px); /* 📦 vertical · horizontal */
+    box-sizing: border-box; /* 📦 inside the column width */
+  }
+}
+@media (min-width: 1920px) {
+  .abAppLayout[data-variant="panes"] { --ab-aside-padding: 28px 24px; } /* 📦 the gapped pane breathes a bit more */
+}
+
 /* 💻 laptop: three joined panes with hairline dividers, aside in the flow */
 @media (min-width: 1180px) {
   .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]) {
