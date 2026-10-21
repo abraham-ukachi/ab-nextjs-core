@@ -63,7 +63,7 @@ describe('G17: four-breakpoint panes 🧭', () => {
       expect(t).toMatch(/inset: 0 0 0 auto;\s*width: var\(--ab-aside-width\)/) // ➡️ overlay
     })
     it(`${file}: laptop joined with hairlines, desktop gapped with radii`, () => {
-      expect(media(css, '@media (min-width: 1180px)')).toMatch(/border-right: var\(--ab-divider-hairline/) // ➖
+      expect(media(css, '@media (min-width: 1180px)')).toMatch(/border-right: var\(--ab-pane-divider/) // ➖
       const d = media(css, '@media (min-width: 1920px)')
       expect(d).toMatch(/gap: var\(--ab-pane-gap, 16px\)/) // 🧱 0.1.7: mock 05
       expect(d).toMatch(/padding: 0 var\(--ab-pane-gap, 16px\) var\(--ab-pane-gap, 16px\)/) // 🖼️ sides + bottom only
