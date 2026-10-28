@@ -301,6 +301,16 @@
   overscroll-behavior: contain; /* 🚫 scroll chaining */
 }
 
+/* 🧹 0.2.3 (Joseph, Welcome 0.2.21): the legacy ≥1536px rules hit `> *:nth-child(1|2)`, so ANY first (or second)
+   item of the row (e.g. an <AbCarousel> wrapping <main>, which has no data-ab-part) used to get the 1.5rem margins,
+   the 24px radius, `margin: auto` centring and the 100vh cap. Reset them for every item, not just the four panes,
+   so apps can drop overrides like `.app .carousel:first-child`. Higher specificity (0,4,0) than the legacy (0,2,0). 🎯 */
+.abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > :is(:first-child, :nth-child(2)) {
+  margin: 0; /* 🧹 legacy ≥1536px auto / 1.5rem margins */
+  border-radius: 0; /* 🧹 legacy ≥1536px radius */
+  max-height: none; /* 🧹 legacy calc(100vh - 3rem) cap */
+}
+
 /* 🪟 0.2.1 (God 00:41): the sidebar / rail pane reads theme ≥ 0.3.6 --ab-color-pane (#fff only at ≥ 1920px light,
    mock 05). Unset anywhere else (and `initial` in dark), so it stays transparent like before. :where() = 0 specificity,
    so an app's own sidebar background still wins. */
