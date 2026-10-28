@@ -61,6 +61,10 @@ export interface AbAppLayoutProps {
   /** 📱 0.2.1 (John's drawers v2, God 01:22): `'main'` = below 768px hide the app header and show AbMainLayout's
    *  `mainHeader` as the 56px mobile bar (16px inset, 1px divider). Default `'header'` (unchanged). */
   mobileHeader?: 'header' | 'main';
+  /** 📌 0.2.3 (Joseph, Welcome 0.2.21): `'all'` = AbMainLayout's `mainHeader` stays visible at EVERY width (with
+   *  `mobileHeader="main"` it is the mobile bar below 768px, and an extra header row under the app header from 768px),
+   *  so ONE header can carry e.g. a counter row everywhere instead of rendering it twice. Default `'auto'` (unchanged). */
+  mainHeaderAt?: 'auto' | 'all';
   /** 🧰 0.1.6: render the legacy #backdrop / #menus / #dialogs / #toasts / progress / canvas layers.
    *  Default: on for `variant="default"`, off for `"panes"` (the shell brings its own menus and dialogs). */
   overlays?: boolean;
@@ -86,6 +90,7 @@ const AbAppLayout = ({
   railCollapsed = false, // 🧷
   tabletHeader = 'header', // 📟
   mobileHeader = 'header', // 📱 drawers v2
+  mainHeaderAt = 'auto', // 📌 0.2.3
   overlays, // 🧰
 }: AbAppLayoutProps): ReactElement => {
   // 🧱 panes: the header slot is a plain grid row (0px when empty). Its child (e.g. AbAppBar) brings its own
@@ -107,6 +112,7 @@ const AbAppLayout = ({
       data-rail={railCollapsed ? 'true' : 'false'} // 🧷
       data-tablet-header={tabletHeader === 'main' ? 'main' : undefined} // 📟 P2
       data-mobile-header={mobileHeader === 'main' ? 'main' : undefined} // 📱 drawers v2
+      data-main-header-at={mainHeaderAt === 'all' ? 'all' : undefined} // 📌 0.2.3: the main header at every width
     >
       {showHeader && (
         <HeaderTag className={clsx(['HeaderWrapper', styles.abAppLayout__headerWrapper])} data-ab-part="header">

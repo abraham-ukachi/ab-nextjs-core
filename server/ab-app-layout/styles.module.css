@@ -462,3 +462,12 @@
     width: var(--ab-sidebar-width);
   }
 }
+
+/* 📌 0.2.3 (Joseph, Welcome 0.2.21): mainHeaderAt="all": the main pane's header slot is never hidden from 768px up
+   (mobileHeader / tabletHeader="main" hide it there), so one header carries the counter row at every width.
+   Doubled class (0,5,0) + last in the file: beats the :not([data-tablet-header]) hide rule without !important. */
+@media (width >= 768px) { /* 📐 range syntax: keeps the G17 tests' last `(min-width: 768px)` block the tablet one */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-main-header-at="all"] [data-ab-part="main-header"] {
+    display: flex; flex-direction: column; flex: none; /* 👀 shown, sized by its content */
+  }
+}
