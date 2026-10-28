@@ -248,6 +248,11 @@
     position: relative; z-index: 10; /* 🥞 spec z-order: bars = 10, below the scrim (20) */
   }
   .abAppLayout[data-variant="panes"][data-mobile-header="main"] [data-ab-part="main-header"] > * { flex: 1 1 auto; min-height: 0; }
+  /* ➕ 0.2.3 (Joseph, Welcome 0.2.21): a mobile header with extra content (components ≥ 0.2.3 AbMobileHeader `row`,
+     marked data-ab-header-extra) grows past 56px instead of being clipped; 56px stays the floor. */
+  .abAppLayout[data-variant="panes"][data-mobile-header="main"] [data-ab-part="main-header"]:has([data-ab-header-extra]) {
+    height: auto; min-height: calc(56px + env(safe-area-inset-top, 0px)); /* 📏 the bar + the row */
+  }
 }
 @media (min-width: 768px) {
   .abAppLayout[data-variant="panes"][data-mobile-header="main"]:not([data-tablet-header="main"]) [data-ab-part="main-header"] { display: none; } /* 🙈 mobile-only bar */
