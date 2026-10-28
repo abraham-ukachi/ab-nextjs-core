@@ -54,4 +54,11 @@ describe('➕ mobileHeader="main" grows for an extra row (Joseph, Welcome 0.2.21
       expect(css).toMatch(/height: calc\(56px \+ env\(safe-area-inset-top, 0px\)\); padding-top/) // 🧱 the plain bar is still 56px
     })
   }
+  for (const f of ['ab-app-layout/styles.module.css', 'server/ab-app-layout/styles.module.css']) {
+    it(`${f}: a compact header (data-ab-header-size="compact") is 48px, or auto with a 48px floor when it has a row`, () => {
+      const css = read(f) // 📄
+      expect(css).toMatch(/:has\(\[data-ab-header-size="compact"\]\) \{\s*height: calc\(48px \+ env\(safe-area-inset-top, 0px\)\);/) // 📏
+      expect(css).toMatch(/:has\(\[data-ab-header-size="compact"\]\):has\(\[data-ab-header-extra\]\) \{\s*height: auto; min-height: calc\(48px/) // ➕
+    })
+  }
 })

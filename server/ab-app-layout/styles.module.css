@@ -253,6 +253,13 @@
   .abAppLayout[data-variant="panes"][data-mobile-header="main"] [data-ab-part="main-header"]:has([data-ab-header-extra]) {
     height: auto; min-height: calc(56px + env(safe-area-inset-top, 0px)); /* 📏 the bar + the row */
   }
+  /* 📏 0.2.3: a compact AbMobileHeader (size="compact", data-ab-header-size) is a 48px bar (Welcome v6 mock) */
+  .abAppLayout[data-variant="panes"][data-mobile-header="main"] [data-ab-part="main-header"]:has([data-ab-header-size="compact"]) {
+    height: calc(48px + env(safe-area-inset-top, 0px)); /* 📏 48 + 📱 notch */
+  }
+  .abAppLayout[data-variant="panes"][data-mobile-header="main"] [data-ab-part="main-header"]:has([data-ab-header-size="compact"]):has([data-ab-header-extra]) {
+    height: auto; min-height: calc(48px + env(safe-area-inset-top, 0px)); /* 📏 the 48px bar + the row */
+  }
 }
 @media (min-width: 768px) {
   .abAppLayout[data-variant="panes"][data-mobile-header="main"]:not([data-tablet-header="main"]) [data-ab-part="main-header"] { display: none; } /* 🙈 mobile-only bar */
