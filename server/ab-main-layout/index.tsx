@@ -64,6 +64,11 @@ export interface AbMainLayoutProps {
   /** @deprecated 0.1.6: `false` drops the legacy backdrop / menus / dialogs / toasts / progress / canvas layers.
    *  Empty header / bar slots are never rendered any more, so this only gates those layers (default `true`). */
   chrome?: boolean;
+  /** ⌨️ 0.2.3: accessible name of the main scroller (the focusable `data-ab-part="main-content"` region).
+   *  Pass a translated string (default `'Main content'`). */
+  scrollerLabel?: string;
+  /** ⌨️ 0.2.3: `false` takes the main scroller out of the tab order (default `true`: tabIndex 0). */
+  scrollerFocusable?: boolean;
 }
 
 /**
@@ -84,6 +89,8 @@ const AbMainLayout = ({
   menus,
   id, // 🆔
   chrome = true, // 🧰
+  scrollerLabel = 'Main content', // ⌨️ 0.2.3: the scroller's accessible name
+  scrollerFocusable = true, // ⌨️ 0.2.3: a tab stop by default
 }: AbMainLayoutProps): ReactElement => {
   // 🔝🔚 G52: the new slot names win, the 0.1.5 names still work
   const top = toAbSlot(mainHeader ?? header);
@@ -113,6 +120,9 @@ const AbMainLayout = ({
           styles.abMainLayout__contentWrapper,
           orientation === 'horizontal' && 'md:!flex-row',
         ])}
+        tabIndex={scrollerFocusable ? 0 : undefined} // ⌨️ 0.2.3: keyboard users can focus + arrow-scroll it
+        role={scrollerFocusable ? 'region' : undefined} // 🗺️ a named region, so screen readers announce the label
+        aria-label={scrollerFocusable ? scrollerLabel : undefined} // 🏷️ 0.2.3: its accessible name
         data-ab-part="main-content" // 📜 G51/G55: THE scroller of this pane (useAbScrollSpy root)
         data-orientation={orientation ? orientation.toString() : undefined}
       >

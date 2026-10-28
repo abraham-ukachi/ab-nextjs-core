@@ -91,6 +91,15 @@
   overflow-x: hidden;
 }
 
+/* ⌨️ 0.2.3 (Joseph, Welcome 0.2.21): the main scroller is a tab stop (tabIndex 0 + aria-label), so keyboard users
+   can scroll it with the arrow keys (axe: scrollable-region-focusable). The ring only shows for keyboard focus and reads
+   the theme tokens: --ab-focus-ring (colour), --ab-focus-ring-width and --ab-focus-ring-offset. 💍 */
+.abMainLayout__contentWrapper:focus { outline: none; } /* 🖱️ no ring on mouse / programmatic focus */
+.abMainLayout__contentWrapper:focus-visible {
+  outline: var(--ab-focus-ring-width, 2px) solid var(--ab-focus-ring, var(--ab-color-accent, var(--ab-color-primary, #8f4c38))); /* 💍 */
+  outline-offset: calc(-1 * var(--ab-focus-ring-width, 2px)); /* ⬅️ drawn inside, so overflow: hidden never clips it */
+}
+
 .abMainLayout__footerWrapper {
   position: relative;
   display: flex;
