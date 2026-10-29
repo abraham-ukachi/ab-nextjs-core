@@ -592,10 +592,11 @@
     border-left: var(--ab-pane-divider, 1px solid var(--ab-color-div, rgb(92 64 48 / 11%))); /* ➖ */
     background: var(--ab-color-pane, var(--ab-color-surface, Canvas)); /* 🎨 opaque */
     box-shadow: -12px 0 32px rgb(33 26 22 / 18%); /* 🌫️ lifted */
+    z-index: var(--ab-aside-drawer-z, 120); /* ⬆️ 0.2.3 (Joseph 02:55): above theme's layout main (z-index 99), so taps hit the drawer */
     touch-action: pan-y; /* 👆 vertical scroll stays native; horizontal = the swipe-close */
   }
   .abAppLayout.abAppLayout[data-variant="panes"][data-aside-drawer-at="mobile"] .abAppLayout__contentWrapper > [data-ab-part="aside-backdrop"][data-open="true"] {
-    display: block; position: absolute; inset: 0; z-index: 29; background: rgb(0 0 0 / 0.32); /* 🌫️ scrim, click closes */
+    display: block; position: absolute; inset: 0; z-index: calc(var(--ab-aside-drawer-z, 120) - 1); background: rgb(0 0 0 / 0.32); /* 🌫️ scrim just under the drawer, above main (99): a tap closes */
   }
 }
 /* 🔘 AbAsideDrawerTrigger: only where the drawer exists (data-at="mobile" → < 768px) */
