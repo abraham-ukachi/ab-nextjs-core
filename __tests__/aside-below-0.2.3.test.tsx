@@ -96,12 +96,12 @@ describe('📜 AbAppLayout asideBelow="inline-in-main" + AbMainLayout asideAncho
     })
   }
   it('CSS: one scroller, main dissolved, order header 1 · anchor 2 · aside 3 · content 4, nothing pinned', () => {
-    expect(inMain).toMatch(/\[data-aside-below="inline-in-main"\] \.abAppLayout__contentWrapper \{[^}]*overflow-y: auto;/) // 📜
+    expect(inMain).toMatch(/\[data-aside-below="inline-in-main"\](?::not\(\[data-aside-drawer-at="mobile"\]\))? \.abAppLayout__contentWrapper \{[^}]*overflow-y: auto;/) // 📜
     expect(inMain).toMatch(/> \[data-ab-part="main-content"\] \{\s*display: contents;/) // 🫥
     expect(inMain).toMatch(/\[data-ab-part="main-header"\] \{ order: 1;/); expect(inMain).toMatch(/\[data-ab-part="aside-anchor"\] \{ order: 2;/) // 🔝 ⚓
     expect(inMain).toMatch(/> \[data-ab-part="aside"\] \{\s*order: 3;[^}]*display: flex !important;[^}]*position: relative;/) // 🎠
     expect(inMain).toMatch(/:not\(\[data-ab-part="aside-anchor"\]\) \{ order: 4; \}/) // 📄
-    expect(inMain).not.toMatch(/inline-in-main"\][^{]*aside"\] \{[^}]*position: (sticky|fixed)/) // 🚫 never pinned
+    expect(inMain).not.toMatch(/inline-in-main"\](?::not\(\[data-aside-drawer-at="mobile"\]\))?[^{]*aside"\] \{[^}]*position: (sticky|fixed)/) // 🚫 never pinned
   })
   it('the existing values keep working (inline-before-main rules untouched)', () => {
     expect(css).toMatch(/\[data-aside-below="inline-before-main"\][^{]*> \[data-ab-part="aside"\] \{[^}]*grid-row: 1;/) // ✅

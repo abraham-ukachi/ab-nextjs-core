@@ -530,17 +530,17 @@
    ♿ the main landmark keeps its role (display: contents keeps the a11y tree in current engines); the scroller's
    focus stop moves to the wrapper. */
 @media (width < 1180px) {
-  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"] .abAppLayout__contentWrapper {
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) .abAppLayout__contentWrapper {
     display: flex; flex-direction: column; /* 📜 one column */
     overflow-y: auto; overscroll-behavior: contain; /* 📜 THE scroller */
   }
-  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"] .abAppLayout__contentWrapper > [data-ab-part="main"],
-  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"] .abAppLayout__contentWrapper > [data-ab-part="main"] > [data-ab-part="main-content"] {
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) .abAppLayout__contentWrapper > [data-ab-part="main"],
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) .abAppLayout__contentWrapper > [data-ab-part="main"] > [data-ab-part="main-content"] {
     display: contents; /* 🫥 dissolve: their children become items of the one scroller */
   }
-  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"] [data-ab-part="main"] > [data-ab-part="main-header"] { order: 1; flex: none; } /* 🔝 header bar */
-  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"] [data-ab-part="main-content"] > [data-ab-part="aside-anchor"] { order: 2; flex: none; } /* ⚓ e.g. the counter row */
-  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"] .abAppLayout__contentWrapper > [data-ab-part="aside"] {
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) [data-ab-part="main"] > [data-ab-part="main-header"] { order: 1; flex: none; } /* 🔝 header bar */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) [data-ab-part="main-content"] > [data-ab-part="aside-anchor"] { order: 2; flex: none; } /* ⚓ e.g. the counter row */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) .abAppLayout__contentWrapper > [data-ab-part="aside"] {
     order: 3; flex: none; /* 🎠 the scene */
     display: flex !important; /* 👀 always shown (beats `!hidden` / the closed-sheet rule) */
     position: relative; inset: auto; z-index: auto; /* 📄 in the flow, not a sheet */
@@ -548,11 +548,56 @@
     border-left: 0; /* ➖ */
     animation: none; /* 🚫 no slide-in for an inline pane */
   }
-  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"] .abAppLayout__contentWrapper > [data-ab-part="aside"] > [data-ab-part="aside-content"] { flex: 0 1 auto; overflow: visible; } /* 📏 no inner scroller */
-  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"] [data-ab-part="main-content"] > :not([data-ab-part="aside-anchor"]) { order: 4; } /* 📄 text · nav */
-  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"] [data-ab-part="main"] > [data-ab-part="main-bar"] { order: 5; } /* 🔚 */
-  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"] .abAppLayout__contentWrapper > [data-ab-part="bottomBar"] { order: 6; flex: none; } /* ⬇️ last in the scroll (D35: no sticky columns; the Welcome has no bottom bar) */
-  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"] .abAppLayout__contentWrapper > [data-ab-part="aside-backdrop"] { display: none; } /* 🙈 no sheet, no scrim */
-  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]) { display: none; } /* 🗂️ one column (the drawer still opens from the header) */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) .abAppLayout__contentWrapper > [data-ab-part="aside"] > [data-ab-part="aside-content"] { flex: 0 1 auto; overflow: visible; } /* 📏 no inner scroller */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) [data-ab-part="main-content"] > :not([data-ab-part="aside-anchor"]) { order: 4; } /* 📄 text · nav */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) [data-ab-part="main"] > [data-ab-part="main-bar"] { order: 5; } /* 🔚 */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) .abAppLayout__contentWrapper > [data-ab-part="bottomBar"] { order: 6; flex: none; } /* ⬇️ last in the scroll (D35: no sticky columns; the Welcome has no bottom bar) */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) .abAppLayout__contentWrapper > [data-ab-part="aside-backdrop"] { display: none; } /* 🙈 no sheet, no scrim */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]) { display: none; } /* 🗂️ one column (the drawer still opens from the header) */
 }
-
+/* 📱 0.2.3 (God 02:45): `asideDrawerAt="mobile"`: the inline-in-main order only from 768px (tablet) … */
+@media (width >= 768px) and (width < 1180px) {
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] .abAppLayout__contentWrapper {
+    display: flex; flex-direction: column; /* 📜 one column */
+    overflow-y: auto; overscroll-behavior: contain; /* 📜 THE scroller */
+  }
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] .abAppLayout__contentWrapper > [data-ab-part="main"],
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] .abAppLayout__contentWrapper > [data-ab-part="main"] > [data-ab-part="main-content"] {
+    display: contents; /* 🫥 dissolve: their children become items of the one scroller */
+  }
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] [data-ab-part="main"] > [data-ab-part="main-header"] { order: 1; flex: none; } /* 🔝 header bar */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] [data-ab-part="main-content"] > [data-ab-part="aside-anchor"] { order: 2; flex: none; } /* ⚓ e.g. the counter row */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] .abAppLayout__contentWrapper > [data-ab-part="aside"] {
+    order: 3; flex: none; /* 🎠 the scene */
+    display: flex !important; /* 👀 always shown (beats `!hidden` / the closed-sheet rule) */
+    position: relative; inset: auto; z-index: auto; /* 📄 in the flow, not a sheet */
+    width: auto; min-width: 0; height: auto; max-height: none; /* 📏 its content */
+    border-left: 0; /* ➖ */
+    animation: none; /* 🚫 no slide-in for an inline pane */
+  }
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] .abAppLayout__contentWrapper > [data-ab-part="aside"] > [data-ab-part="aside-content"] { flex: 0 1 auto; overflow: visible; } /* 📏 no inner scroller */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] [data-ab-part="main-content"] > :not([data-ab-part="aside-anchor"]) { order: 4; } /* 📄 text · nav */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] [data-ab-part="main"] > [data-ab-part="main-bar"] { order: 5; } /* 🔚 */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] .abAppLayout__contentWrapper > [data-ab-part="bottomBar"] { order: 6; flex: none; } /* ⬇️ last in the scroll (D35: no sticky columns; the Welcome has no bottom bar) */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] .abAppLayout__contentWrapper > [data-ab-part="aside-backdrop"] { display: none; } /* 🙈 no sheet, no scrim */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]) { display: none; } /* 🗂️ one column (the drawer still opens from the header) */
+}
+/* … and below 768px the SAME aside is a right drawer (closed = out of the page flow), opened by AbAsideDrawerTrigger /
+   useAbPage().setAsideOpenOnMobile(true); backdrop click, Esc and a right swipe close it; focus returns to the trigger. */
+@media (width < 768px) {
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-drawer-at="mobile"] .abAppLayout__contentWrapper > [data-ab-part="aside"] {
+    inset: 0 0 0 auto; /* ➡️ pinned right */
+    width: min(var(--ab-aside-drawer-width, 88vw), 420px); /* 📏 a drawer, not a full sheet */
+    border-left: var(--ab-pane-divider, 1px solid var(--ab-color-div, rgb(92 64 48 / 11%))); /* ➖ */
+    background: var(--ab-color-pane, var(--ab-color-surface, Canvas)); /* 🎨 opaque */
+    box-shadow: -12px 0 32px rgb(33 26 22 / 18%); /* 🌫️ lifted */
+    touch-action: pan-y; /* 👆 vertical scroll stays native; horizontal = the swipe-close */
+  }
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-drawer-at="mobile"] .abAppLayout__contentWrapper > [data-ab-part="aside-backdrop"][data-open="true"] {
+    display: block; position: absolute; inset: 0; z-index: 29; background: rgb(0 0 0 / 0.32); /* 🌫️ scrim, click closes */
+  }
+}
+/* 🔘 AbAsideDrawerTrigger: only where the drawer exists (data-at="mobile" → < 768px) */
+@media (width >= 768px) {
+  :global([data-ab-part="aside-drawer-trigger"][data-at="mobile"]) { display: none; } /* 🙈 tablet+: the aside is inline */
+}

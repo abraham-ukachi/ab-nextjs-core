@@ -292,4 +292,34 @@ export function useAbAsideToggle(): AbAsideToggle {
   return { isSheet, expanded, toggle, props: { 'aria-expanded': expanded, 'aria-controls': asideId, onClick: toggle } };
 }
 
+/** 📱 What {@link useAbAsideDrawer} returns: spread `props` on any button or link. */
+export interface AbAsideDrawer {
+  /** 👀 is the mobile drawer open? */
+  isOpen: boolean;
+  /** 🔓 open it (remembers the focused element, so focus returns there on close). */
+  open: () => void;
+  /** 🔒 close it (focus returns to the opener). */
+  close: () => void;
+  /** ♿ `aria-haspopup` + `aria-expanded` + `aria-controls` + `onClick` (focuses itself first: Safari never focuses buttons on click). */
+  props: { 'aria-haspopup': 'dialog'; 'aria-expanded': boolean; 'aria-controls': string; onClick: (e: { currentTarget: { focus?: (o?: FocusOptions) => void } }) => void };
+}
+
+/**
+ * 📱 useAbAsideDrawer (0.2.3, God 02:45) — open the aside as the mobile RIGHT DRAWER (`asideDrawerAt="mobile"`) from
+ * anywhere, e.g. a "Show playground" link on every slide. Esc, backdrop click and a right swipe close it, and focus
+ * returns to whatever opened it (AbPageProvider). Works for the plain sheet too.
+ */
+export function useAbAsideDrawer(): AbAsideDrawer {
+  const { isAsideOpenOnMobile, setAsideOpenOnMobile, asideId } = useAbPage();
+  const open = useCallback(() => setAsideOpenOnMobile(true), [setAsideOpenOnMobile]); // 🔓
+  const close = useCallback(() => setAsideOpenOnMobile(false), [setAsideOpenOnMobile]); // 🔒
+  return {
+    isOpen: isAsideOpenOnMobile, open, close,
+    props: {
+      'aria-haspopup': 'dialog', 'aria-expanded': isAsideOpenOnMobile, 'aria-controls': asideId, // ♿
+      onClick: (e) => { e.currentTarget.focus?.({ preventScroll: true }); open(); }, // 🎯 the opener is the focus-return target
+    },
+  };
+}
+
 export default AbPageProvider;

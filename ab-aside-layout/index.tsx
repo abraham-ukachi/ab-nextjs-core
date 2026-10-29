@@ -77,6 +77,11 @@ export interface AbAsideLayoutProps {
  * Ab Aside Layout — Core Client Component (from LYD client LydAsideLayout).
  * Uses minimal useAbPage contract (AbPageProvider), not LydPageProvider.
  */
+/** 👉 0.2.3: does a pointer move (dx, dy px) close the right drawer? ≥ 60px to the right and mostly horizontal. */
+export function shouldCloseAbAsideOnSwipe(dx: number, dy: number, threshold = 60): boolean {
+  return dx >= threshold && Math.abs(dy) < dx * 0.6; // ➡️ right, not a vertical scroll
+}
+
 const AbAsideLayout = ({
   orientation,
   className,
@@ -109,6 +114,7 @@ const AbAsideLayout = ({
   } = useAbPage();
 
   const asideRef = useRef<HTMLElement | null>(null);
+  const swipeRef = useRef<{ x: number; y: number } | null>(null); // 👆 0.2.3: swipe-to-close start point
 
   useEffect(() => {
     const el = asideRef.current;
@@ -188,6 +194,14 @@ const AbAsideLayout = ({
       aria-labelledby={ariaLabelledBy} // 🏷️ 0.2.3: or a heading's id
       data-opened={isAsideOpen}
       data-open-on-mobile={isAsideOpenOnMobile}
+      role={isAsideOpenOnMobile ? 'dialog' : undefined} // 📱 0.2.3: the open drawer / sheet is a modal dialog (named by aria-label)
+      aria-modal={isAsideOpenOnMobile ? true : undefined} // 📱 0.2.3
+      onPointerDown={(e) => { swipeRef.current = isAsideOpenOnMobile ? { x: e.clientX, y: e.clientY } : null; }} // 👆 0.2.3: swipe start
+      onPointerUp={(e) => { // 👉 0.2.3: a mostly-horizontal right swipe ≥ 60px closes the drawer (core has no hooks dependency)
+        const s0 = swipeRef.current; swipeRef.current = null;
+        if (s0 && shouldCloseAbAsideOnSwipe(e.clientX - s0.x, e.clientY - s0.y)) setAsideOpenOnMobile(false);
+      }}
+      onPointerCancel={() => { swipeRef.current = null; }} // 🧹
     >
       {top != null && ( // 🫥 not rendered when empty (D37)
         <header className={clsx(['HeaderWrapper', styles.abAsideLayout__headerWrapper])} data-ab-part="aside-header">

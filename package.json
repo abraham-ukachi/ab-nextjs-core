@@ -66,7 +66,8 @@
     "ab-dotted-surface",
     "README.md",
     "LICENSE",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "ab-aside-drawer-trigger"
   ],
   "exports": {
     ".": {
@@ -84,6 +85,7 @@
     "./ab-aside-layout": "./ab-aside-layout/index.tsx",
     "./ab-page-provider": "./ab-page-provider/index.tsx",
     "./ab-linear-progress": "./ab-linear-progress/index.tsx",
-    "./ab-dotted-surface": "./ab-dotted-surface/index.tsx"
+    "./ab-dotted-surface": "./ab-dotted-surface/index.tsx",
+    "./ab-aside-drawer-trigger": "./ab-aside-drawer-trigger/index.tsx"
   }
 }
