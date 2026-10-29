@@ -96,6 +96,9 @@ export interface AbAppLayoutProps {
    *  1180px, after the main header (and after AbMainLayout's `asideAnchor` block when given): v6 phone order
    *  header bar · counter · scene · text · nav, nothing pinned. ≥ 1180px: the normal side pane. */
   asideBelow?: 'hidden' | 'inline-before-main' | 'inline-in-main';
+  /** 🎠 0.2.3 (Joseph 02:35): `'page'` sets `data-ab-surface="page"`: with theme ≥ 0.3.7 every pane paints the v6
+   *  page surface (`--ab-color-welcome-pane` / `-main`) instead of the white ≥ 1920px light panes. Default: none. */
+  surface?: 'page';
   /** 🧰 0.1.6: render the legacy #backdrop / #menus / #dialogs / #toasts / progress / canvas layers.
    *  Default: on for `variant="default"`, off for `"panes"` (the shell brings its own menus and dialogs). */
   overlays?: boolean;
@@ -120,6 +123,7 @@ const AbAppLayout = ({
   mobileHeader = 'header', // 📱 drawers v2
   mainHeaderAt = 'auto', // 📌 0.2.3
   asideBelow = 'hidden', // 📑 0.2.3
+  surface, // 🎠 0.2.3
   overlays, // 🧰
 }: AbAppLayoutProps): ReactElement => {
   // 🧱 panes: the header slot is a plain grid row (0px when empty). Its child (e.g. AbAppBar) brings its own
@@ -147,7 +151,8 @@ const AbAppLayout = ({
       data-tablet-header={tabletHeader === 'main' ? 'main' : undefined} // 📟 P2
       data-mobile-header={mobileHeader === 'main' ? 'main' : undefined} // 📱 drawers v2
       data-main-header-at={mainHeaderAt === 'all' ? 'all' : undefined} // 📌 0.2.3: the main header at every width
-      data-aside-below={asideBelow === 'hidden' ? undefined : asideBelow} // 📑 0.2.3
+      data-aside-below={asideBelow === 'hidden' ? undefined : asideBelow}
+      data-ab-surface={surface === 'page' ? 'page' : undefined} // 🎠 0.2.3: the v6 page surface opt-out (theme ≥ 0.3.7) // 📑 0.2.3
     >
       {showHeader && (
         <HeaderTag className={clsx(['HeaderWrapper', styles.abAppLayout__headerWrapper])} data-ab-part="header">

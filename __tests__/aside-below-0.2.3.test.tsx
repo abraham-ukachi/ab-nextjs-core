@@ -107,3 +107,13 @@ describe('📜 AbAppLayout asideBelow="inline-in-main" + AbMainLayout asideAncho
     expect(css).toMatch(/\[data-aside-below="inline-before-main"\][^{]*> \[data-ab-part="aside"\] \{[^}]*grid-row: 1;/) // ✅
   })
 })
+
+// 🎠 Joseph 02:35: the page-surface opt-out (theme ≥ 0.3.7 maps it to --ab-color-welcome-*)
+describe('🎠 AbAppLayout surface="page"', () => {
+  for (const [name, C] of [['client', AbAppLayout], ['server', ServerAbAppLayout]] as const) {
+    it(`${name}: sets data-ab-surface="page" only when asked`, () => {
+      expect(renderToStaticMarkup(createElement(C, { orientation: 'horizontal', variant: 'panes', surface: 'page' }, main))).toMatch(/class="AbAppLayout[^"]*"[^>]*data-ab-surface="page"/) // ✅
+      expect(renderToStaticMarkup(createElement(C, { orientation: 'horizontal', variant: 'panes' }, main))).not.toMatch(/data-ab-surface/) // 🫥
+    })
+  }
+})
