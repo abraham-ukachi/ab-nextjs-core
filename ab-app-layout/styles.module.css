@@ -493,9 +493,12 @@
     display: flex !important; /* 👀 always shown (beats `!hidden` / the closed-sheet rule) */
     position: relative; inset: auto; z-index: auto; /* 📄 in the flow, not a sheet */
     grid-row: 1; grid-column: 1 / -1; /* ⬆️ before main */
-    width: auto; height: auto; max-height: var(--ab-aside-below-max-height, 60%); /* 📏 its content, capped */
+    width: auto; height: auto; max-height: var(--ab-aside-below-max-height, 60dvh); /* 📏 its content, capped (dvh: a % of an auto grid row has nothing to resolve against) */
     border-left: 0; border-bottom: var(--ab-pane-divider, 1px solid var(--ab-color-div, rgb(92 64 48 / 11%))); /* ➖ */
     animation: none; /* 🚫 no slide-in for an inline pane */
+  }
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-before-main"] .abAppLayout__contentWrapper > [data-ab-part="aside"] > [data-ab-part="aside-content"] {
+    flex: 0 1 auto; /* 📏 the pane's `flex: 1 1 0` scroller would be 0px in an auto-height aside: size to the content */
   }
   .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-before-main"] .abAppLayout__contentWrapper > [data-ab-part="main"] {
     grid-row: 2; grid-column: 1 / -1; /* 📄 under the aside */

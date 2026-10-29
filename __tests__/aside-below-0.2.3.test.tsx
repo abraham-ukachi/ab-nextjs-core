@@ -67,6 +67,8 @@ describe('📑 AbAppLayout asideBelow', () => {
     expect(block).toMatch(/\[data-aside-below="inline-before-main"\][^{]*> \[data-ab-part="aside"\] \{[^}]*display: flex !important;[^}]*position: relative;[^}]*grid-row: 1;/) // ⬆️
     expect(block).toMatch(/> \[data-ab-part="main"\] \{\s*grid-row: 2;/) // 📄
     expect(block).toMatch(/aside-backdrop"\] \{\s*display: none;/) // 🙈
+    expect(block).toMatch(/> \[data-ab-part="aside-content"\] \{\s*flex: 0 1 auto;/) // 📏 consumer shot: not a 0px scroller
+    expect(block).toMatch(/max-height: var\(--ab-aside-below-max-height, 60dvh\)/) // 📏
   })
   it('CSS: the laptop rules (≥ 1180px) are untouched: the rule only lives under width < 1180px', () => {
     const before = css.slice(0, css.indexOf('@media (width < 1180px)')) // ✂️
