@@ -64,6 +64,11 @@ export interface AbAsideLayoutProps {
   /** @deprecated 0.1.6: `false` drops the legacy backdrop / menus / dialogs / toasts / progress / canvas layers.
    *  Empty header / bar slots are never rendered any more, so this only gates those layers (default `true`). */
   chrome?: boolean;
+  /** 🏷️ 0.2.3 (Joseph, Welcome 0.2.21): names the <aside> landmark (e.g. "Live Playground"), so screen readers
+   *  don't list an anonymous "complementary". Pass a translated string. */
+  'aria-label'?: string;
+  /** 🏷️ 0.2.3: or point at a visible heading's id (wins over `aria-label` per ARIA). */
+  'aria-labelledby'?: string;
 }
 
 /**
@@ -84,6 +89,8 @@ const AbAsideLayout = ({
   menus,
   id, // 🆔
   chrome = true, // 🧰
+  'aria-label': ariaLabel, // 🏷️ 0.2.3
+  'aria-labelledby': ariaLabelledBy, // 🏷️ 0.2.3
 }: AbAsideLayoutProps): ReactElement => {
   // 🔝🔚 G52: the new slot names win, the 0.1.5 names still work
   const top = toAbSlot(asideHeader ?? header);
@@ -95,6 +102,8 @@ const AbAsideLayout = ({
       hidden={hidden}
       data-page-name={pageName}
       data-ab-part="aside"
+      aria-label={ariaLabel} // 🏷️ 0.2.3: the landmark's name
+      aria-labelledby={ariaLabelledBy} // 🏷️ 0.2.3: or a heading's id
     >
       {top != null && ( // 🫥 not rendered when empty (D37)
         <header className={clsx(['HeaderWrapper', styles.abAsideLayout__headerWrapper])} data-ab-part="aside-header">
