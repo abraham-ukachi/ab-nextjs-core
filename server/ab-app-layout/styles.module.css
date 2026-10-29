@@ -602,3 +602,9 @@
 @media (width >= 768px) {
   :global([data-ab-part="aside-drawer-trigger"][data-at="mobile"]) { display: none; } /* 🙈 tablet+: the aside is inline */
 }
+
+/* 📌 0.2.3 (God 04:16): pinned main bar → the ONE inline-in-main scroller (and main's own) keep focused / anchored
+ *    content clear of it (--ab-main-bar-h is published by the AbMainLayout island). */
+.abAppLayout:is([data-main-bar-pin="always"], :has([data-ab-part="main-bar"][data-main-bar-pin="always"])) :is(.abAppLayout__contentWrapper, [data-ab-part="main-content"]) {
+  scroll-padding-bottom: var(--ab-main-bar-h, 0px); /* 📜 */
+}

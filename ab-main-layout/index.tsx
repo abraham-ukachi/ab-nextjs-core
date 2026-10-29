@@ -37,6 +37,8 @@
 
 import type { ReactElement, ReactNode } from 'react';
 import clsx from 'clsx';
+// 📏 0.2.3: publishes --ab-main-bar-h (client island, shared by both twins)
+import AbMainBarHeight from './main-bar-height';
 import AbLinearProgress from '../ab-linear-progress';
 import { useAbPage } from '../ab-page-provider';
 import styles from './styles.module.css';
@@ -53,6 +55,10 @@ export interface AbMainLayoutProps {
   mainHeader?: ReactNode;
   /** 🔚 0.1.6 (G52): the main pane's bottom bar slot (data-ab-part="main-bar"); 0px and not rendered when empty. */
   mainBar?: ReactNode;
+  /** 📌 0.2.3 (God 04:16): 'always' pins the main bar to the bottom of the scroller at every width (sticky, opaque). */
+  mainBarPin?: 'never' | 'always';
+  /** 🏷️ 0.2.3: the main bar's accessible name (aria-label on the <footer>). */
+  mainBarLabel?: string;
   /** @deprecated 0.1.6: use `mainHeader` (kept as an alias for one minor). */
   header?: ReactNode;
   content?: ReactNode;
@@ -86,6 +92,8 @@ const AbMainLayout = ({
   screenName,
   mainHeader,
   mainBar,
+  mainBarPin = 'never', // 📌 0.2.3
+  mainBarLabel, // 🏷️ 0.2.3
   header, // 🕰️ deprecated alias
   content,
   footer, // 🕰️ deprecated alias
@@ -139,8 +147,9 @@ const AbMainLayout = ({
         {content ?? children}
       </div>
       {bar != null && ( // 🫥 not rendered when empty (D37)
-        <footer className={clsx(['FooterWrapper', styles.abMainLayout__footerWrapper])} data-ab-part="main-bar">
+        <footer className={clsx(['FooterWrapper', styles.abMainLayout__footerWrapper])} data-ab-part="main-bar" data-main-bar-pin={mainBarPin === 'always' ? 'always' : 'never'} aria-label={mainBarLabel}>
           {bar}
+          <AbMainBarHeight />{/* 📏 0.2.3 */}
         </footer>
       )}
       {chrome && ( // 🧰 0.1.6: legacy layers

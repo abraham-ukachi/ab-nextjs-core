@@ -81,6 +81,8 @@ export interface AbAppLayoutProps {
    *  `AbAsideDrawerTrigger` / `useAbPage().setAsideOpenOnMobile(true)`), while `asideBelow="inline-in-main"` still
    *  puts the SAME element inline at 768–1179px. Rendered once. Default: none (unchanged). */
   asideDrawerAt?: 'mobile';
+  /** 📌 0.2.3 (God 04:16): mirror of AbMainLayout `mainBarPin` on the root (either one pins the bar). */
+  mainBarPin?: 'never' | 'always';
   /** 🧰 0.1.6: render the legacy #backdrop / #menus / #dialogs / #toasts / progress / canvas layers.
    *  Default: on for `variant="default"`, off for `"panes"` (the shell brings its own menus and dialogs). */
   overlays?: boolean;
@@ -110,6 +112,7 @@ const AbAppLayout = ({
   asideBelow = 'hidden', // 📑 0.2.3
   surface, // 🎠 0.2.3
   asideDrawerAt, // 📱 0.2.3
+  mainBarPin, // 📌 0.2.3
   overlays, // 🧰
 }: AbAppLayoutProps): ReactElement => {
   // 🧱 panes: the header slot is a plain grid row (0px when empty). Its child (e.g. AbAppBar) brings its own
@@ -134,6 +137,7 @@ const AbAppLayout = ({
       data-main-header-at={mainHeaderAt === 'all' ? 'all' : undefined} // 📌 0.2.3: the main header at every width
       data-aside-below={asideBelow === 'hidden' ? undefined : asideBelow}
       data-aside-drawer-at={asideDrawerAt === 'mobile' ? 'mobile' : undefined} // 📱 0.2.3: right drawer below 768px
+      data-main-bar-pin={mainBarPin} // 📌 0.2.3: root mirror (omitted when undefined)
       data-ab-surface={surface === 'page' ? 'page' : undefined} // 🎠 0.2.3: the v6 page surface opt-out (theme ≥ 0.3.7) // 📑 0.2.3
     >
       {showHeader && (
