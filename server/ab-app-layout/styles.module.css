@@ -245,7 +245,7 @@
     height: calc(56px + env(safe-area-inset-top, 0px)); padding-top: env(safe-area-inset-top, 0px); /* 📏 56 + 📱 notch */
     flex: none; box-sizing: border-box; display: flex; flex-direction: column; /* 📐 the child fills it */
     border-bottom: 1px solid var(--ab-color-border, rgb(92 64 48 / 0.13)); /* ➖ the divider */
-    position: relative; z-index: 10; /* 🥞 spec z-order: bars = 10, below the scrim (20) */
+    position: relative; z-index: var(--ab-main-header-z, 11); /* 🥞 0.2.3: ABOVE the main scroller (10, a sibling) so a <details> list dropping out of the bar stays clickable; still below the scrim (20) */
   }
   .abAppLayout[data-variant="panes"][data-mobile-header="main"] [data-ab-part="main-header"] > * { flex: 1 1 auto; min-height: 0; }
   /* ➕ 0.2.3 (Joseph, Welcome 0.2.21): a mobile header with extra content (components ≥ 0.2.3 AbMobileHeader `row`,
@@ -476,5 +476,6 @@
 @media (width >= 768px) { /* 📐 range syntax: keeps the G17 tests' last `(min-width: 768px)` block the tablet one */
   .abAppLayout.abAppLayout[data-variant="panes"][data-main-header-at="all"] [data-ab-part="main-header"] {
     display: flex; flex-direction: column; flex: none; /* 👀 shown, sized by its content */
+    position: relative; z-index: var(--ab-main-header-z, 11); /* 🥞 0.2.3: above the main scroller (10) */
   }
 }
