@@ -63,6 +63,7 @@
     "ab-aside-layout",
     "ab-linear-progress",
     "ab-page-provider",
+    "ab-dotted-surface",
     "README.md",
     "LICENSE",
     "CHANGELOG.md"
@@ -82,6 +83,7 @@
     "./ab-main-layout": "./ab-main-layout/index.tsx",
     "./ab-aside-layout": "./ab-aside-layout/index.tsx",
     "./ab-page-provider": "./ab-page-provider/index.tsx",
-    "./ab-linear-progress": "./ab-linear-progress/index.tsx"
+    "./ab-linear-progress": "./ab-linear-progress/index.tsx",
+    "./ab-dotted-surface": "./ab-dotted-surface/index.tsx"
   }
 }
