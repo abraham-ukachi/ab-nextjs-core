@@ -216,3 +216,7 @@
   scrollbar-gutter: stable; /* 📏 no layout jump */
   justify-content: flex-start; /* ⬆️ */
 }
+/* 📱 0.2.3 (Joseph): phones use overlay scrollbars, and a reserved gutter just shifts the content off-centre */
+@media (max-width: 767px) {
+  :global(.AbAppLayout[data-variant="panes"]) .abMainLayout__contentWrapper { scrollbar-gutter: auto; } /* 📏 stable from 768px */
+}
