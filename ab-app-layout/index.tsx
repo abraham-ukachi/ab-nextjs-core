@@ -41,6 +41,8 @@ import AbLinearProgress from '../ab-linear-progress';
 import styles from './styles.module.css';
 // 🫥 G50: empty-slot helper
 import { toAbSlot } from '../ab-page-provider/slot';
+// 📜 0.2.3: publish the content wrapper (the inline-in-main scroller)
+import { useAbPage } from '../ab-page-provider';
 
 // 🔢 how many panes layouts are mounted (module scope: one document per bundle)
 let abLayoutLocks = 0;
@@ -136,6 +138,8 @@ const AbAppLayout = ({
   const HeaderTag = variant === 'panes' || (isValidElement(header) && header.type === 'header') ? 'div' : 'header';
   // 🧰 legacy overlay layers (off in panes unless asked for)
   const showOverlays = overlays ?? variant !== 'panes';
+  // 📜 0.2.3 (Joseph 02:55): useAbPage().appScrollElement / useAbInlineScroller()
+  const { setAppScrollElement } = useAbPage();
   // 🫥 G50 (D37): panes never render an empty header / footer row (0px); the CSS :empty / :has() catch the rest
   const top = toAbSlot(header);
   const showHeader = variant !== 'panes' || top != null;
@@ -165,7 +169,7 @@ const AbAppLayout = ({
           {variant === 'panes' ? top : header}
         </HeaderTag>
       )}
-      <div className={clsx(['ContentWrapper', styles.abAppLayout__contentWrapper])}>
+      <div className={clsx(['ContentWrapper', styles.abAppLayout__contentWrapper])} ref={setAppScrollElement}>
         {sideBar}
         {content ?? children}
         {navBar}

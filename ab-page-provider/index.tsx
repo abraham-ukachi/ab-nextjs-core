@@ -54,6 +54,9 @@ export interface AbPageContextValue {
   asideScrollElement: HTMLElement | null;
   /** 🔗 ref callbacks used by AbMainLayout / AbAsideLayout. */
   setMainScrollElement: (el: HTMLElement | null) => void;
+  /** 📜 0.2.3 (Joseph 02:55): AbAppLayout's content wrapper: THE scroller in `asideBelow="inline-in-main"` (< 1180px). */
+  appScrollElement: HTMLElement | null;
+  setAppScrollElement: (el: HTMLElement | null) => void;
   setAsideScrollElement: (el: HTMLElement | null) => void;
   isAsideOpen: boolean;
   isAsideOpenOnMobile: boolean;
@@ -97,6 +100,8 @@ const defaultValue: AbPageContextValue = {
   mainScrollElement: null,
   asideScrollElement: null,
   setMainScrollElement: () => {},
+  appScrollElement: null, // 📜 0.2.3
+  setAppScrollElement: () => {},
   setAsideScrollElement: () => {},
   isAsideOpen: true,
   isAsideOpenOnMobile: false,
@@ -144,6 +149,7 @@ export function AbPageProvider({
   const [asideElement, setAsideElementState] = useState<HTMLElement | null>(null);
   // 📜 G55: the two pane scrollers (state, so consumers re-render once they mount)
   const [mainScrollElement, setMainScrollElement] = useState<HTMLElement | null>(null);
+  const [appScrollElement, setAppScrollElement] = useState<HTMLElement | null>(null); // 📜 0.2.3
   const [asideScrollElement, setAsideScrollElement] = useState<HTMLElement | null>(null);
 
   const setAsideElement = useCallback((el: HTMLElement | null) => {
@@ -212,6 +218,8 @@ export function AbPageProvider({
   const value = useMemo<AbPageContextValue>(
     () => ({
       mainScrollElement,
+      appScrollElement, // 📜 0.2.3
+      setAppScrollElement,
       asideScrollElement,
       setMainScrollElement,
       setAsideScrollElement,
@@ -232,6 +240,7 @@ export function AbPageProvider({
     }),
     [
       mainScrollElement,
+      appScrollElement,
       asideScrollElement,
       isAsideOpen,
       isAsideOpenOnMobile,
@@ -320,6 +329,28 @@ export function useAbAsideDrawer(): AbAsideDrawer {
       onClick: (e) => { e.currentTarget.focus?.({ preventScroll: true }); open(); }, // 🎯 the opener is the focus-return target
     },
   };
+}
+
+/** 📜 does this element scroll vertically right now? */
+const scrollsY = (el: HTMLElement | null): boolean => !!el && /(auto|scroll)/.test(getComputedStyle(el).overflowY);
+
+/**
+ * 📜 useAbInlineScroller (0.2.3, Joseph 02:55) — the element that ACTUALLY scrolls the main content right now:
+ * AbAppLayout's content wrapper while `asideBelow="inline-in-main"` makes it the one scroller (< 1180px, aside inline),
+ * otherwise AbMainLayout's own scroller (`mainScrollElement`). Re-checked on resize; `null` on the server.
+ * Use it as a scroll-spy `root` or to scroll a slide back to the top.
+ */
+export function useAbInlineScroller(): HTMLElement | null {
+  const { appScrollElement, mainScrollElement } = useAbPage();
+  const [el, setEl] = useState<HTMLElement | null>(null);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const pick = () => setEl(scrollsY(appScrollElement) ? appScrollElement : mainScrollElement); // 🎯
+    pick();
+    window.addEventListener('resize', pick);
+    return () => window.removeEventListener('resize', pick);
+  }, [appScrollElement, mainScrollElement]);
+  return el;
 }
 
 export default AbPageProvider;
