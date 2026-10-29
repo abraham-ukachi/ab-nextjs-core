@@ -480,7 +480,6 @@
   }
 }
 
-/* 🪞 0.2.3: the server twin ships the same asideBelow rules as the client layout */
 /* 📑 0.2.3 (Joseph, Welcome 0.2.21): asideBelow="inline-before-main": below 1180px the ONE aside element leaves the
    sheet / drawer and sits in the flow above main (a grid: aside row, main row). It is never duplicated in the DOM.
    Doubled class (0,5,0)+ and last in the file; `!important` only on display, to beat the client's `!hidden` utility. */
