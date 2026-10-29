@@ -45,7 +45,20 @@
   width: 100%;
   height: 100%;
   z-index: 10;
+  overflow: hidden;
+  /* 🚫 0.2.1 (James P2): no `transition: all 300ms` here (the no-transitions rule; motion = ab-nextjs-animations only) */
   background-color: var(--ab-color-pane, var(--ab-color-pane-main, var(--color-background, var(--surface, #ffffff))));
+
+  /* 🎞️ 0.1.6: the slideFromRight keyframe (ab-nextjs-animations) runs 240ms here (brief §4) */
+  --slide-from-right-animation-duration: 240ms;
+}
+
+/* ♿ 0.1.6: reduced motion = instant toggle, no slide (the provider also drops its timers to 0) */
+@media (prefers-reduced-motion: reduce) {
+  .abAsideLayout {
+    animation: none !important; /* 🚫 beats the global .slideFromRight class */
+    transition: none;
+  }
 }
 
 @media (min-width: 1536px) {
@@ -89,6 +102,7 @@
   z-index: 10;
   overflow: auto;
   overflow-x: hidden;
+  pointer-events: auto;
 }
 
 .abAsideLayout__footerWrapper {

@@ -61,6 +61,28 @@ export interface AbAppLayoutProps {
   /** 📱 0.2.1 (John's drawers v2, God 01:22): `'main'` = below 768px hide the app header and show AbMainLayout's
    *  `mainHeader` as the 56px mobile bar (16px inset, 1px divider). Default `'header'` (unchanged). */
   mobileHeader?: 'header' | 'main';
+  /** 📌 0.2.3 (Joseph, Welcome 0.2.21): `'all'` = AbMainLayout's `mainHeader` stays visible at EVERY width (with
+   *  `mobileHeader="main"` it is the mobile bar below 768px, and an extra header row under the app header from 768px),
+   *  so ONE header can carry e.g. a counter row everywhere instead of rendering it twice. Default `'auto'` (unchanged). */
+  mainHeaderAt?: 'auto' | 'all';
+  /** 📑 0.2.3 (Joseph, Welcome 0.2.21): where the aside pane goes below the laptop breakpoint (< 1180px).
+   *  `'hidden'` (default) = unchanged: an overlay sheet / right drawer opened by the TOC button.
+   *  `'inline-before-main'` = the SAME aside element (rendered once, no duplicate DOM) sits in the flow above the main
+   *  pane (mobile: aside · main · bottom bar; tablet: sidebar | aside over main), e.g. the Welcome live playground.
+   *  For any other spot, render your aside content into your own node (a portal) and keep `'hidden'`. */
+  /** 📜 0.2.3 (Joseph 02:35) `'inline-in-main'` = the SAME aside element joins the main pane's ONE scroller below
+   *  1180px, after the main header (and after AbMainLayout's `asideAnchor` block when given): v6 phone order
+   *  header bar · counter · scene · text · nav, nothing pinned. ≥ 1180px: the normal side pane. */
+  asideBelow?: 'hidden' | 'inline-before-main' | 'inline-in-main';
+  /** 🎠 0.2.3 (Joseph 02:35): `'page'` sets `data-ab-surface="page"`: with theme ≥ 0.3.7 every pane paints the v6
+   *  page surface (`--ab-color-welcome-pane` / `-main`) instead of the white ≥ 1920px light panes. Default: none. */
+  surface?: 'page';
+  /** 📱 0.2.3 (God 02:45): `'mobile'` = below 768px the aside is a RIGHT DRAWER (out of the page flow until opened by
+   *  `AbAsideDrawerTrigger` / `useAbPage().setAsideOpenOnMobile(true)`), while `asideBelow="inline-in-main"` still
+   *  puts the SAME element inline at 768–1179px. Rendered once. Default: none (unchanged). */
+  asideDrawerAt?: 'mobile';
+  /** 📌 0.2.3 (God 04:16): mirror of AbMainLayout `mainBarPin` on the root (either one pins the bar). */
+  mainBarPin?: 'never' | 'always';
   /** 🧰 0.1.6: render the legacy #backdrop / #menus / #dialogs / #toasts / progress / canvas layers.
    *  Default: on for `variant="default"`, off for `"panes"` (the shell brings its own menus and dialogs). */
   overlays?: boolean;
@@ -86,6 +108,11 @@ const AbAppLayout = ({
   railCollapsed = false, // 🧷
   tabletHeader = 'header', // 📟
   mobileHeader = 'header', // 📱 drawers v2
+  mainHeaderAt = 'auto', // 📌 0.2.3
+  asideBelow = 'hidden', // 📑 0.2.3
+  surface, // 🎠 0.2.3
+  asideDrawerAt, // 📱 0.2.3
+  mainBarPin, // 📌 0.2.3
   overlays, // 🧰
 }: AbAppLayoutProps): ReactElement => {
   // 🧱 panes: the header slot is a plain grid row (0px when empty). Its child (e.g. AbAppBar) brings its own
@@ -107,6 +134,11 @@ const AbAppLayout = ({
       data-rail={railCollapsed ? 'true' : 'false'} // 🧷
       data-tablet-header={tabletHeader === 'main' ? 'main' : undefined} // 📟 P2
       data-mobile-header={mobileHeader === 'main' ? 'main' : undefined} // 📱 drawers v2
+      data-main-header-at={mainHeaderAt === 'all' ? 'all' : undefined} // 📌 0.2.3: the main header at every width
+      data-aside-below={asideBelow === 'hidden' ? undefined : asideBelow}
+      data-aside-drawer-at={asideDrawerAt === 'mobile' ? 'mobile' : undefined} // 📱 0.2.3: right drawer below 768px
+      data-main-bar-pin={mainBarPin} // 📌 0.2.3: root mirror (omitted when undefined)
+      data-ab-surface={surface === 'page' ? 'page' : undefined} // 🎠 0.2.3: the v6 page surface opt-out (theme ≥ 0.3.7) // 📑 0.2.3
     >
       {showHeader && (
         <HeaderTag className={clsx(['HeaderWrapper', styles.abAppLayout__headerWrapper])} data-ab-part="header">

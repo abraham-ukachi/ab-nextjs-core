@@ -35,6 +35,8 @@
 
 import type { ReactElement, ReactNode } from 'react';
 import clsx from 'clsx';
+// 📏 0.2.3: publishes --ab-main-bar-h (client island, shared by both twins)
+import AbMainBarHeight from '../../ab-main-layout/main-bar-height';
 import AbLinearProgress from '../../ab-linear-progress';
 import styles from './styles.module.css';
 // 🫥 G52: empty-slot helper (strings get a <span>, so the :has() collapse never hides text)
@@ -52,6 +54,10 @@ export interface AbMainLayoutProps {
   mainHeader?: ReactNode;
   /** 🔚 0.1.6 (G52): the main pane's bottom bar slot (data-ab-part="main-bar"); 0px and not rendered when empty. */
   mainBar?: ReactNode;
+  /** 📌 0.2.3 (God 04:16): 'always' pins the main bar to the bottom of the scroller at every width (sticky, opaque). */
+  mainBarPin?: 'never' | 'always';
+  /** 🏷️ 0.2.3: the main bar's accessible name (aria-label on the <footer>). */
+  mainBarLabel?: string;
   /** @deprecated 0.1.6: use `mainHeader` (kept as an alias for one minor). */
   header?: ReactNode;
   content?: ReactNode;
@@ -64,6 +70,16 @@ export interface AbMainLayoutProps {
   /** @deprecated 0.1.6: `false` drops the legacy backdrop / menus / dialogs / toasts / progress / canvas layers.
    *  Empty header / bar slots are never rendered any more, so this only gates those layers (default `true`). */
   chrome?: boolean;
+  /** ⌨️ 0.2.3: accessible name of the main scroller (the focusable `data-ab-part="main-content"` region).
+   *  Pass a translated string (default `'Main content'`). */
+  scrollerLabel?: string;
+  /** ⌨️ 0.2.3: `false` takes the main scroller out of the tab order (default `true`: tabIndex 0). */
+  scrollerFocusable?: boolean;
+  /** ⚓ 0.2.3 (Joseph, Welcome 0.2.21): content that comes BEFORE the aside when AbAppLayout
+   *  `asideBelow="inline-in-main"` pulls the aside into this scroller (< 1180px), e.g. a counter row:
+   *  order = main header · `asideAnchor` · aside · children. At ≥ 1180px (or any other asideBelow) it simply
+   *  renders first in the scroller, so the reading order is the same everywhere. */
+  asideAnchor?: ReactNode;
 }
 
 /**
@@ -77,6 +93,8 @@ const AbMainLayout = ({
   screenName,
   mainHeader,
   mainBar,
+  mainBarPin = 'never', // 📌 0.2.3
+  mainBarLabel, // 🏷️ 0.2.3
   header, // 🕰️ deprecated alias
   content,
   footer, // 🕰️ deprecated alias
@@ -84,6 +102,9 @@ const AbMainLayout = ({
   menus,
   id, // 🆔
   chrome = true, // 🧰
+  scrollerLabel = 'Main content', // ⌨️ 0.2.3: the scroller's accessible name
+  scrollerFocusable = true, // ⌨️ 0.2.3: a tab stop by default
+  asideAnchor, // ⚓ 0.2.3: what goes before the inline aside
 }: AbMainLayoutProps): ReactElement => {
   // 🔝🔚 G52: the new slot names win, the 0.1.5 names still work
   const top = toAbSlot(mainHeader ?? header);
@@ -113,17 +134,24 @@ const AbMainLayout = ({
           styles.abMainLayout__contentWrapper,
           orientation === 'horizontal' && 'md:!flex-row',
         ])}
+        tabIndex={scrollerFocusable ? 0 : undefined} // ⌨️ 0.2.3: keyboard users can focus + arrow-scroll it
+        role={scrollerFocusable ? 'region' : undefined} // 🗺️ a named region, so screen readers announce the label
+        aria-label={scrollerFocusable ? scrollerLabel : undefined} // 🏷️ 0.2.3: its accessible name
         data-ab-part="main-content" // 📜 G51/G55: THE scroller of this pane (useAbScrollSpy root)
         data-orientation={orientation ? orientation.toString() : undefined}
       >
         {/* 📜 sets mainScrollElement (server components can't hold refs) */}
         <AbScrollRegistrar pane="main" />
+        {asideAnchor != null && ( // ⚓ 0.2.3: the pre-aside block + the anchor point the CSS orders the aside after
+          <div data-ab-part="aside-anchor">{asideAnchor}</div>
+        )}
         {content ?? children}
       </div>
 
       {bar != null && ( // 🫥 not rendered when empty (D37)
-        <footer className={clsx(['FooterWrapper', styles.abMainLayout__footerWrapper])} data-ab-part="main-bar">
+        <footer className={clsx(['FooterWrapper', styles.abMainLayout__footerWrapper])} data-ab-part="main-bar" data-main-bar-pin={mainBarPin === 'always' ? 'always' : 'never'} aria-label={mainBarLabel}>
           {bar}
+          <AbMainBarHeight />{/* 📏 0.2.3 */}
         </footer>
       )}
 

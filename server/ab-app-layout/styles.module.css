@@ -245,9 +245,21 @@
     height: calc(56px + env(safe-area-inset-top, 0px)); padding-top: env(safe-area-inset-top, 0px); /* 📏 56 + 📱 notch */
     flex: none; box-sizing: border-box; display: flex; flex-direction: column; /* 📐 the child fills it */
     border-bottom: 1px solid var(--ab-color-border, rgb(92 64 48 / 0.13)); /* ➖ the divider */
-    position: relative; z-index: 10; /* 🥞 spec z-order: bars = 10, below the scrim (20) */
+    position: relative; z-index: var(--ab-main-header-z, 11); /* 🥞 0.2.3: ABOVE the main scroller (10, a sibling) so a <details> list dropping out of the bar stays clickable; still below the scrim (20) */
   }
   .abAppLayout[data-variant="panes"][data-mobile-header="main"] [data-ab-part="main-header"] > * { flex: 1 1 auto; min-height: 0; }
+  /* ➕ 0.2.3 (Joseph, Welcome 0.2.21): a mobile header with extra content (components ≥ 0.2.3 AbMobileHeader `row`,
+     marked data-ab-header-extra) grows past 56px instead of being clipped; 56px stays the floor. */
+  .abAppLayout[data-variant="panes"][data-mobile-header="main"] [data-ab-part="main-header"]:has([data-ab-header-extra]) {
+    height: auto; min-height: calc(56px + env(safe-area-inset-top, 0px)); /* 📏 the bar + the row */
+  }
+  /* 📏 0.2.3: a compact AbMobileHeader (size="compact", data-ab-header-size) is a 48px bar (Welcome v6 mock) */
+  .abAppLayout[data-variant="panes"][data-mobile-header="main"] [data-ab-part="main-header"]:has([data-ab-header-size="compact"]) {
+    height: calc(48px + env(safe-area-inset-top, 0px)); /* 📏 48 + 📱 notch */
+  }
+  .abAppLayout[data-variant="panes"][data-mobile-header="main"] [data-ab-part="main-header"]:has([data-ab-header-size="compact"]):has([data-ab-header-extra]) {
+    height: auto; min-height: calc(48px + env(safe-area-inset-top, 0px)); /* 📏 the 48px bar + the row */
+  }
 }
 @media (min-width: 768px) {
   .abAppLayout[data-variant="panes"][data-mobile-header="main"]:not([data-tablet-header="main"]) [data-ab-part="main-header"] { display: none; } /* 🙈 mobile-only bar */
@@ -299,6 +311,16 @@
   border-radius: 0; /* 🧹 legacy ≥1536px 1.5rem sidebar radius (the 1920 gapped rule sets 20px back) */
   box-sizing: border-box; /* 📦 */
   overscroll-behavior: contain; /* 🚫 scroll chaining */
+}
+
+/* 🧹 0.2.3 (Joseph, Welcome 0.2.21): the legacy ≥1536px rules hit `> *:nth-child(1|2)`, so ANY first (or second)
+   item of the row (e.g. an <AbCarousel> wrapping <main>, which has no data-ab-part) used to get the 1.5rem margins,
+   the 24px radius, `margin: auto` centring and the 100vh cap. Reset them for every item, not just the four panes,
+   so apps can drop overrides like `.app .carousel:first-child`. Higher specificity (0,4,0) than the legacy (0,2,0). 🎯 */
+.abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > :is(:first-child, :nth-child(2)) {
+  margin: 0; /* 🧹 legacy ≥1536px auto / 1.5rem margins */
+  border-radius: 0; /* 🧹 legacy ≥1536px radius */
+  max-height: none; /* 🧹 legacy calc(100vh - 3rem) cap */
 }
 
 /* 🪟 0.2.1 (God 00:41): the sidebar / rail pane reads theme ≥ 0.3.6 --ab-color-pane (#fff only at ≥ 1920px light,
@@ -366,7 +388,7 @@
     inset: 0 0 0 auto; /* ➡️ pinned right, inside the panes box */
     width: var(--ab-aside-width); /* 📑 ~30–40% */
     border-left: var(--ab-pane-divider); /* ➖ 0.2.2 (God 02:44): the same faint hairline as the header's bottom border */
-    background: var(--ab-color-surface, Canvas); /* 🎨 opaque over the page */
+    background: var(--ab-color-pane, var(--ab-color-surface, Canvas)); /* 🎨 opaque over the page. 0.2.3 (Joseph): the pane token first, so a dark inline aside is exactly #19120C, not the M3 surface #19120D */
   }
   /* 🌫️ tablet overlay backdrop (James review): dims the panes, click closes the sheet */
   .abAppLayout[data-variant="panes"] .abAppLayout__contentWrapper > [data-ab-part="aside-backdrop"][data-open="true"] {
@@ -446,4 +468,143 @@
   .abAppLayout[data-variant="panes"][data-rail="true"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]) {
     width: var(--ab-sidebar-width);
   }
+}
+
+/* 📌 0.2.3 (Joseph, Welcome 0.2.21): mainHeaderAt="all": the main pane's header slot is never hidden from 768px up
+   (mobileHeader / tabletHeader="main" hide it there), so one header carries the counter row at every width.
+   Doubled class (0,5,0) + last in the file: beats the :not([data-tablet-header]) hide rule without !important. */
+@media (width >= 768px) { /* 📐 range syntax: keeps the G17 tests' last `(min-width: 768px)` block the tablet one */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-main-header-at="all"] [data-ab-part="main-header"] {
+    display: flex; flex-direction: column; flex: none; /* 👀 shown, sized by its content */
+    position: relative; z-index: var(--ab-main-header-z, 11); /* 🥞 0.2.3: above the main scroller (10) */
+  }
+}
+
+/* 📑 0.2.3 (Joseph, Welcome 0.2.21): asideBelow="inline-before-main": below 1180px the ONE aside element leaves the
+   sheet / drawer and sits in the flow above main (a grid: aside row, main row). It is never duplicated in the DOM.
+   Doubled class (0,5,0)+ and last in the file; `!important` only on display, to beat the client's `!hidden` utility. */
+@media (width < 1180px) { /* 📐 range syntax: leaves the G17 tests' `(max-width: 1179px)` blocks alone */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-before-main"] .abAppLayout__contentWrapper {
+    display: grid; /* 🧱 aside · main · bottom bar */
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+  }
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-before-main"] .abAppLayout__contentWrapper > [data-ab-part="aside"] {
+    display: flex !important; /* 👀 always shown (beats `!hidden` / the closed-sheet rule) */
+    position: relative; inset: auto; z-index: auto; /* 📄 in the flow, not a sheet */
+    grid-row: 1; grid-column: 1 / -1; /* ⬆️ before main */
+    width: auto; min-width: 0; height: auto; max-height: var(--ab-aside-below-max-height, 60dvh); /* 📏 its content, capped (dvh: a % of an auto grid row has nothing to resolve against) */
+    border-left: 0; border-bottom: var(--ab-pane-divider, 1px solid var(--ab-color-div, rgb(92 64 48 / 11%))); /* ➖ */
+    animation: none; /* 🚫 no slide-in for an inline pane */
+  }
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-before-main"] .abAppLayout__contentWrapper > [data-ab-part="aside"] > [data-ab-part="aside-content"] {
+    flex: 0 1 auto; /* 📏 the pane's `flex: 1 1 0` scroller would be 0px in an auto-height aside: size to the content */
+  }
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-before-main"] .abAppLayout__contentWrapper > [data-ab-part="main"] {
+    grid-row: 2; grid-column: 1 / -1; /* 📄 under the aside */
+  }
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-before-main"] .abAppLayout__contentWrapper > [data-ab-part="bottomBar"] {
+    grid-row: 3; grid-column: 1 / -1; /* ⬇️ */
+  }
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-before-main"] .abAppLayout__contentWrapper > [data-ab-part="aside-backdrop"] {
+    display: none; /* 🙈 no sheet, no scrim */
+  }
+}
+@media (width >= 768px) and (width < 1180px) { /* 📟 tablet: sidebar column on the left, aside over main on the right */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-before-main"] .abAppLayout__contentWrapper {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-before-main"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]) {
+    grid-row: 1 / -1; grid-column: 1; /* 🗂️ full height */
+  }
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-before-main"] .abAppLayout__contentWrapper > :is([data-ab-part="aside"], [data-ab-part="main"]) {
+    grid-column: 2; /* ➡️ */
+  }
+}
+
+/* 📜 0.2.3 (Joseph 02:35): asideBelow="inline-in-main": below 1180px the panes' content wrapper becomes the ONE
+   scroller and the main pane + its scroller dissolve into it (display: contents), so the SAME aside element (never
+   duplicated) slots in by `order`: main header (1) · AbMainLayout `asideAnchor` block (2) · aside (3) · main content (4)
+   · main bar (5) · bottom bar (6, in the flow). Nothing is pinned: the aside scrolls away with the text, like v6's phone.
+   ♿ the main landmark keeps its role (display: contents keeps the a11y tree in current engines); the scroller's
+   focus stop moves to the wrapper. */
+@media (width < 1180px) {
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) .abAppLayout__contentWrapper {
+    display: flex; flex-direction: column; /* 📜 one column */
+    overflow-y: auto; overscroll-behavior: contain; /* 📜 THE scroller */
+  }
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) .abAppLayout__contentWrapper > [data-ab-part="main"],
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) .abAppLayout__contentWrapper > [data-ab-part="main"] > [data-ab-part="main-content"] {
+    display: contents; /* 🫥 dissolve: their children become items of the one scroller */
+  }
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) [data-ab-part="main"] > [data-ab-part="main-header"] { order: 1; flex: none; } /* 🔝 header bar */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) [data-ab-part="main-content"] > [data-ab-part="aside-anchor"] { order: 2; flex: none; } /* ⚓ e.g. the counter row */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) .abAppLayout__contentWrapper > [data-ab-part="aside"] {
+    order: 3; flex: none; /* 🎠 the scene */
+    display: flex !important; /* 👀 always shown (beats `!hidden` / the closed-sheet rule) */
+    position: relative; inset: auto; z-index: auto; /* 📄 in the flow, not a sheet */
+    width: auto; min-width: 0; height: auto; max-height: none; /* 📏 its content */
+    border-left: 0; /* ➖ */
+    animation: none; /* 🚫 no slide-in for an inline pane */
+  }
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) .abAppLayout__contentWrapper > [data-ab-part="aside"] > [data-ab-part="aside-content"] { flex: 0 1 auto; overflow: visible; } /* 📏 no inner scroller */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) [data-ab-part="main-content"] > :not([data-ab-part="aside-anchor"]) { order: 4; } /* 📄 text · nav */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) [data-ab-part="main"] > [data-ab-part="main-bar"] { order: 5; } /* 🔚 */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) .abAppLayout__contentWrapper > [data-ab-part="bottomBar"] { order: 6; flex: none; } /* ⬇️ last in the scroll (D35: no sticky columns; the Welcome has no bottom bar) */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) .abAppLayout__contentWrapper > [data-ab-part="aside-backdrop"] { display: none; } /* 🙈 no sheet, no scrim */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"]:not([data-aside-drawer-at="mobile"]) .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]) { display: none; } /* 🗂️ one column (the drawer still opens from the header) */
+}
+/* 📱 0.2.3 (God 02:45): `asideDrawerAt="mobile"`: the inline-in-main order only from 768px (tablet) … */
+@media (width >= 768px) and (width < 1180px) {
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] .abAppLayout__contentWrapper {
+    display: flex; flex-direction: column; /* 📜 one column */
+    overflow-y: auto; overscroll-behavior: contain; /* 📜 THE scroller */
+  }
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] .abAppLayout__contentWrapper > [data-ab-part="main"],
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] .abAppLayout__contentWrapper > [data-ab-part="main"] > [data-ab-part="main-content"] {
+    display: contents; /* 🫥 dissolve: their children become items of the one scroller */
+  }
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] [data-ab-part="main"] > [data-ab-part="main-header"] { order: 1; flex: none; } /* 🔝 header bar */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] [data-ab-part="main-content"] > [data-ab-part="aside-anchor"] { order: 2; flex: none; } /* ⚓ e.g. the counter row */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] .abAppLayout__contentWrapper > [data-ab-part="aside"] {
+    order: 3; flex: none; /* 🎠 the scene */
+    display: flex !important; /* 👀 always shown (beats `!hidden` / the closed-sheet rule) */
+    position: relative; inset: auto; z-index: auto; /* 📄 in the flow, not a sheet */
+    width: auto; min-width: 0; height: auto; max-height: none; /* 📏 its content */
+    border-left: 0; /* ➖ */
+    animation: none; /* 🚫 no slide-in for an inline pane */
+  }
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] .abAppLayout__contentWrapper > [data-ab-part="aside"] > [data-ab-part="aside-content"] { flex: 0 1 auto; overflow: visible; } /* 📏 no inner scroller */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] [data-ab-part="main-content"] > :not([data-ab-part="aside-anchor"]) { order: 4; } /* 📄 text · nav */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] [data-ab-part="main"] > [data-ab-part="main-bar"] { order: 5; } /* 🔚 */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] .abAppLayout__contentWrapper > [data-ab-part="bottomBar"] { order: 6; flex: none; } /* ⬇️ last in the scroll (D35: no sticky columns; the Welcome has no bottom bar) */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] .abAppLayout__contentWrapper > [data-ab-part="aside-backdrop"] { display: none; } /* 🙈 no sheet, no scrim */
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-below="inline-in-main"][data-aside-drawer-at="mobile"] .abAppLayout__contentWrapper > :is([data-ab-part="sidebar"], [data-ab-part="rail"]) { display: none; } /* 🗂️ one column (the drawer still opens from the header) */
+}
+/* … and below 768px the SAME aside is a right drawer (closed = out of the page flow), opened by AbAsideDrawerTrigger /
+   useAbPage().setAsideOpenOnMobile(true); backdrop click, Esc and a right swipe close it; focus returns to the trigger. */
+@media (width < 768px) {
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-drawer-at="mobile"] .abAppLayout__contentWrapper > [data-ab-part="aside"] {
+    inset: 0 0 0 auto; /* ➡️ pinned right */
+    width: min(var(--ab-aside-drawer-width, 88vw), 420px); /* 📏 a drawer, not a full sheet */
+    border-left: var(--ab-pane-divider, 1px solid var(--ab-color-div, rgb(92 64 48 / 11%))); /* ➖ */
+    background: var(--ab-color-pane, var(--ab-color-surface, Canvas)); /* 🎨 opaque */
+    box-shadow: -12px 0 32px rgb(33 26 22 / 18%); /* 🌫️ lifted */
+    z-index: var(--ab-aside-drawer-z, 120); /* ⬆️ 0.2.3 (Joseph 02:55): above theme's layout main (z-index 99), so taps hit the drawer */
+    touch-action: pan-y; /* 👆 vertical scroll stays native; horizontal = the swipe-close */
+  }
+  .abAppLayout.abAppLayout[data-variant="panes"][data-aside-drawer-at="mobile"] .abAppLayout__contentWrapper > [data-ab-part="aside-backdrop"][data-open="true"] {
+    display: block; position: absolute; inset: 0; z-index: calc(var(--ab-aside-drawer-z, 120) - 1); background: rgb(0 0 0 / 0.32); /* 🌫️ scrim just under the drawer, above main (99): a tap closes */
+  }
+}
+/* 🔘 AbAsideDrawerTrigger: only where the drawer exists (data-at="mobile" → < 768px) */
+@media (width >= 768px) {
+  :global([data-ab-part="aside-drawer-trigger"][data-at="mobile"]) { display: none; } /* 🙈 tablet+: the aside is inline */
+}
+
+/* 📌 0.2.3 (God 04:16): pinned main bar → the ONE inline-in-main scroller (and main's own) keep focused / anchored
+ *    content clear of it (--ab-main-bar-h is published by the AbMainLayout island). */
+.abAppLayout:is([data-main-bar-pin="always"], :has([data-ab-part="main-bar"][data-main-bar-pin="always"])) :is(.abAppLayout__contentWrapper, [data-ab-part="main-content"]) {
+  scroll-padding-bottom: var(--ab-main-bar-h, 0px); /* 📜 */
 }

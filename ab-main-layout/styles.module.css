@@ -91,6 +91,15 @@
   overflow-x: hidden;
 }
 
+/* ⌨️ 0.2.3 (Joseph, Welcome 0.2.21): the main scroller is a tab stop (tabIndex 0 + aria-label), so keyboard users
+   can scroll it with the arrow keys (axe: scrollable-region-focusable). The ring only shows for keyboard focus and reads
+   the theme tokens: --ab-focus-ring (colour), --ab-focus-ring-width and --ab-focus-ring-offset. 💍 */
+.abMainLayout__contentWrapper:focus { outline: none; } /* 🖱️ no ring on mouse / programmatic focus */
+.abMainLayout__contentWrapper:focus-visible {
+  outline: var(--ab-focus-ring-width, 2px) solid var(--ab-focus-ring, var(--ab-color-accent, var(--ab-color-primary, #8f4c38))); /* 💍 */
+  outline-offset: calc(-1 * var(--ab-focus-ring-width, 2px)); /* ⬅️ drawn inside, so overflow: hidden never clips it */
+}
+
 .abMainLayout__footerWrapper {
   position: relative;
   display: flex;
@@ -207,3 +216,36 @@
   scrollbar-gutter: stable; /* 📏 no layout jump */
   justify-content: flex-start; /* ⬆️ */
 }
+/* 📱 0.2.3 (Joseph): phones use overlay scrollbars, and a reserved gutter just shifts the content off-centre */
+@media (max-width: 767px) {
+  :global(.AbAppLayout[data-variant="panes"]) .abMainLayout__contentWrapper { scrollbar-gutter: auto; } /* 📏 stable from 768px */
+}
+
+/* 📌 0.2.3 (God 04:16): mainBarPin="always" (on the bar, or mirrored on the AbAppLayout root) pins the main bar to the
+ *    bottom of whichever element scrolls it, at EVERY width: its own pane (≥ 1180px: already the flex end) or the one
+ *    inline-in-main scroller below 1180px (main is display: contents there; the app layout keeps order 5).
+ *    Tokens: --ab-main-bar-bg (opaque; default the main pane surface) · --ab-main-bar-divider · --ab-main-bar-shadow ·
+ *    --ab-main-bar-padding-block (12px, + the bottom safe area) · --ab-main-bar-padding-inline (16px, 32px ≥ 768px) ·
+ *    --ab-main-bar-max-width (content) · --ab-main-bar-z (20, under --ab-aside-drawer-z). The client island publishes
+ *    --ab-main-bar-h, used as the scrollers' scroll-padding-bottom. */
+.abMainLayout__footerWrapper[data-main-bar-pin="always"],
+:global(.AbAppLayout[data-main-bar-pin="always"]) .abMainLayout__footerWrapper {
+  position: sticky; bottom: 0; /* 📌 */
+  z-index: var(--ab-main-bar-z, 20); /* ⬇️ below the drawer (120) and its scrim */
+  flex: none; box-sizing: border-box; pointer-events: auto; /* 👆 the bar itself takes taps */
+  background: var(--ab-main-bar-bg, var(--ab-color-pane-main, var(--ab-color-pane, var(--ab-color-surface, #fff)))); /* 🧱 opaque */
+  border-top: var(--ab-main-bar-divider, 0 solid transparent); /* ➖ */
+  box-shadow: var(--ab-main-bar-shadow, none); /* 🌫️ */
+  padding: var(--ab-main-bar-padding-block, 12px) var(--ab-main-bar-padding-inline, 16px) calc(var(--ab-main-bar-padding-block, 12px) + env(safe-area-inset-bottom, 0px)); /* 📦 */
+}
+.abMainLayout__footerWrapper[data-main-bar-pin="always"]::before,
+:global(.AbAppLayout[data-main-bar-pin="always"]) .abMainLayout__footerWrapper::before { pointer-events: none; } /* 🫥 the fade above never eats taps */
+.abMainLayout__footerWrapper[data-main-bar-pin="always"] > :not([hidden]),
+:global(.AbAppLayout[data-main-bar-pin="always"]) .abMainLayout__footerWrapper > :not([hidden]) {
+  width: 100%; max-width: var(--ab-main-bar-max-width, none); margin-inline: auto; /* 📏 */
+}
+@media (width >= 768px) {
+  .abMainLayout__footerWrapper[data-main-bar-pin="always"],
+  :global(.AbAppLayout[data-main-bar-pin="always"]) .abMainLayout__footerWrapper { padding-inline: var(--ab-main-bar-padding-inline, 32px); } /* 📟 */
+}
+.abMainLayout:has(> [data-main-bar-pin="always"]) > [data-ab-part="main-content"] { scroll-padding-bottom: var(--ab-main-bar-h, 0px); } /* 📜 */
