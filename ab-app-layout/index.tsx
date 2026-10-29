@@ -92,7 +92,10 @@ export interface AbAppLayoutProps {
    *  `'inline-before-main'` = the SAME aside element (rendered once, no duplicate DOM) sits in the flow above the main
    *  pane (mobile: aside · main · bottom bar; tablet: sidebar | aside over main), e.g. the Welcome live playground.
    *  For any other spot, render your aside content into your own node (a portal) and keep `'hidden'`. */
-  asideBelow?: 'hidden' | 'inline-before-main';
+  /** 📜 0.2.3 (Joseph 02:35) `'inline-in-main'` = the SAME aside element joins the main pane's ONE scroller below
+   *  1180px, after the main header (and after AbMainLayout's `asideAnchor` block when given): v6 phone order
+   *  header bar · counter · scene · text · nav, nothing pinned. ≥ 1180px: the normal side pane. */
+  asideBelow?: 'hidden' | 'inline-before-main' | 'inline-in-main';
   /** 🧰 0.1.6: render the legacy #backdrop / #menus / #dialogs / #toasts / progress / canvas layers.
    *  Default: on for `variant="default"`, off for `"panes"` (the shell brings its own menus and dialogs). */
   overlays?: boolean;
@@ -144,7 +147,7 @@ const AbAppLayout = ({
       data-tablet-header={tabletHeader === 'main' ? 'main' : undefined} // 📟 P2
       data-mobile-header={mobileHeader === 'main' ? 'main' : undefined} // 📱 drawers v2
       data-main-header-at={mainHeaderAt === 'all' ? 'all' : undefined} // 📌 0.2.3: the main header at every width
-      data-aside-below={asideBelow === 'inline-before-main' ? 'inline-before-main' : undefined} // 📑 0.2.3
+      data-aside-below={asideBelow === 'hidden' ? undefined : asideBelow} // 📑 0.2.3
     >
       {showHeader && (
         <HeaderTag className={clsx(['HeaderWrapper', styles.abAppLayout__headerWrapper])} data-ab-part="header">

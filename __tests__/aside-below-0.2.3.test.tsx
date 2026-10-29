@@ -76,3 +76,34 @@ describe('📑 AbAppLayout asideBelow', () => {
     expect(before).not.toMatch(/data-aside-below/) // 🧱
   })
 })
+
+// 📜 Joseph 02:35: asideBelow="inline-in-main" + AbMainLayout asideAnchor (v6 phone: header · counter · scene · text · nav)
+import AbMainLayout from '../ab-main-layout'
+import ServerAbMainLayout from '../server/ab-main-layout'
+describe('📜 AbAppLayout asideBelow="inline-in-main" + AbMainLayout asideAnchor', () => {
+  const inMain = css.slice(css.lastIndexOf('@media (width < 1180px)')) // 🔍 the inline-in-main block
+  const serverCss = readFileSync(join(__dirname, '..', 'server/ab-app-layout/styles.module.css'), 'utf8') // 🖥️
+  it('the server twin ships both asideBelow blocks', () => { expect(serverCss).toContain('[data-aside-below="inline-in-main"]'); expect(serverCss).toContain('[data-aside-below="inline-before-main"]') }) // 🪞
+  for (const [name, C, M] of [['client', AbAppLayout, AbMainLayout], ['server', ServerAbAppLayout, ServerAbMainLayout]] as const) {
+    it(`${name}: sets data-aside-below="inline-in-main" and still renders the aside ONCE`, () => {
+      const html = renderToStaticMarkup(createElement(C, { orientation: 'horizontal', variant: 'panes', asideBelow: 'inline-in-main' }, main, aside))
+      expect(html).toMatch(/data-aside-below="inline-in-main"/); expect(html.match(/Live Playground/g)).toHaveLength(1) // 1️⃣
+    })
+    it(`${name}: asideAnchor renders first in the scroller, before the children`, () => {
+      const html = renderToStaticMarkup(createElement(M, { mainHeader: 'bar', asideAnchor: '2 / 9' } as never, 'text'))
+      expect(html).toMatch(/data-ab-part="main-content"[^>]*>(<span hidden="" data-ab-part="scroll-registrar"><\/span>)?<div data-ab-part="aside-anchor">2 \/ 9<\/div>text</) // ⚓
+      expect(renderToStaticMarkup(createElement(M, {} as never, 'text'))).not.toMatch(/aside-anchor/) // 🫥 none by default
+    })
+  }
+  it('CSS: one scroller, main dissolved, order header 1 · anchor 2 · aside 3 · content 4, nothing pinned', () => {
+    expect(inMain).toMatch(/\[data-aside-below="inline-in-main"\] \.abAppLayout__contentWrapper \{[^}]*overflow-y: auto;/) // 📜
+    expect(inMain).toMatch(/> \[data-ab-part="main-content"\] \{\s*display: contents;/) // 🫥
+    expect(inMain).toMatch(/\[data-ab-part="main-header"\] \{ order: 1;/); expect(inMain).toMatch(/\[data-ab-part="aside-anchor"\] \{ order: 2;/) // 🔝 ⚓
+    expect(inMain).toMatch(/> \[data-ab-part="aside"\] \{\s*order: 3;[^}]*display: flex !important;[^}]*position: relative;/) // 🎠
+    expect(inMain).toMatch(/:not\(\[data-ab-part="aside-anchor"\]\) \{ order: 4; \}/) // 📄
+    expect(inMain).not.toMatch(/inline-in-main"\][^{]*aside"\] \{[^}]*position: (sticky|fixed)/) // 🚫 never pinned
+  })
+  it('the existing values keep working (inline-before-main rules untouched)', () => {
+    expect(css).toMatch(/\[data-aside-below="inline-before-main"\][^{]*> \[data-ab-part="aside"\] \{[^}]*grid-row: 1;/) // ✅
+  })
+})

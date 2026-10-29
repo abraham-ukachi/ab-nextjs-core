@@ -70,6 +70,11 @@ export interface AbMainLayoutProps {
   scrollerLabel?: string;
   /** ⌨️ 0.2.3: `false` takes the main scroller out of the tab order (default `true`: tabIndex 0). */
   scrollerFocusable?: boolean;
+  /** ⚓ 0.2.3 (Joseph, Welcome 0.2.21): content that comes BEFORE the aside when AbAppLayout
+   *  `asideBelow="inline-in-main"` pulls the aside into this scroller (< 1180px), e.g. a counter row:
+   *  order = main header · `asideAnchor` · aside · children. At ≥ 1180px (or any other asideBelow) it simply
+   *  renders first in the scroller, so the reading order is the same everywhere. */
+  asideAnchor?: ReactNode;
 }
 
 /** Client markup mirror of server AbMainLayout. */
@@ -90,6 +95,7 @@ const AbMainLayout = ({
   chrome = true, // 🧰
   scrollerLabel = 'Main content', // ⌨️ 0.2.3: the scroller's accessible name
   scrollerFocusable = true, // ⌨️ 0.2.3: a tab stop by default
+  asideAnchor, // ⚓ 0.2.3: what goes before the inline aside
 }: AbMainLayoutProps): ReactElement => {
   // 🔝🔚 G52: the new slot names win, the 0.1.5 names still work
   const top = toAbSlot(mainHeader ?? header);
@@ -127,6 +133,9 @@ const AbMainLayout = ({
         ref={setMainScrollElement} // 📜 G55: useAbPage().mainScrollElement
         data-orientation={orientation ? orientation.toString() : undefined}
       >
+        {asideAnchor != null && ( // ⚓ 0.2.3: the pre-aside block + the anchor point the CSS orders the aside after
+          <div data-ab-part="aside-anchor">{asideAnchor}</div>
+        )}
         {content ?? children}
       </div>
       {bar != null && ( // 🫥 not rendered when empty (D37)
