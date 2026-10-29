@@ -87,6 +87,12 @@ export interface AbAppLayoutProps {
    *  `mobileHeader="main"` it is the mobile bar below 768px, and an extra header row under the app header from 768px),
    *  so ONE header can carry e.g. a counter row everywhere instead of rendering it twice. Default `'auto'` (unchanged). */
   mainHeaderAt?: 'auto' | 'all';
+  /** 📑 0.2.3 (Joseph, Welcome 0.2.21): where the aside pane goes below the laptop breakpoint (< 1180px).
+   *  `'hidden'` (default) = unchanged: an overlay sheet / right drawer opened by the TOC button.
+   *  `'inline-before-main'` = the SAME aside element (rendered once, no duplicate DOM) sits in the flow above the main
+   *  pane (mobile: aside · main · bottom bar; tablet: sidebar | aside over main), e.g. the Welcome live playground.
+   *  For any other spot, render your aside content into your own node (a portal) and keep `'hidden'`. */
+  asideBelow?: 'hidden' | 'inline-before-main';
   /** 🧰 0.1.6: render the legacy #backdrop / #menus / #dialogs / #toasts / progress / canvas layers.
    *  Default: on for `variant="default"`, off for `"panes"` (the shell brings its own menus and dialogs). */
   overlays?: boolean;
@@ -110,6 +116,7 @@ const AbAppLayout = ({
   tabletHeader = 'header', // 📟
   mobileHeader = 'header', // 📱 drawers v2
   mainHeaderAt = 'auto', // 📌 0.2.3
+  asideBelow = 'hidden', // 📑 0.2.3
   overlays, // 🧰
 }: AbAppLayoutProps): ReactElement => {
   // 🧱 panes: the header slot is a plain grid row (0px when empty). Its child (e.g. AbAppBar) brings its own
@@ -137,6 +144,7 @@ const AbAppLayout = ({
       data-tablet-header={tabletHeader === 'main' ? 'main' : undefined} // 📟 P2
       data-mobile-header={mobileHeader === 'main' ? 'main' : undefined} // 📱 drawers v2
       data-main-header-at={mainHeaderAt === 'all' ? 'all' : undefined} // 📌 0.2.3: the main header at every width
+      data-aside-below={asideBelow === 'inline-before-main' ? 'inline-before-main' : undefined} // 📑 0.2.3
     >
       {showHeader && (
         <HeaderTag className={clsx(['HeaderWrapper', styles.abAppLayout__headerWrapper])} data-ab-part="header">
