@@ -53,19 +53,22 @@ for (const [w, h] of [[390, 844], [900, 1000], [1440, 900]]) {
   await page.goto(URL, { waitUntil: 'networkidle' }); await page.waitForTimeout(200);
   // 📜 scroll the bar's real scroller to its middle
   const m = await page.evaluate((sel) => {
-    const bar = document.querySelector(sel); let s = bar.parentElement
-    while (s && !(/(auto|scroll)/.test(getComputedStyle(s).overflowY) && s.scrollHeight > s.clientHeight)) s = s.parentElement // 🔎
+    const bar = document.querySelector(sel); const scrolls = (e) => /(auto|scroll)/.test(getComputedStyle(e).overflowY) && e.scrollHeight > e.clientHeight
+    const own = bar.closest('main')?.querySelector(':scope > [data-ab-part="main-content"]') // 📜 main's own scroller (bar = its sibling)
+    const sibling = !!own && getComputedStyle(own).display !== 'contents' && scrolls(own)
+    let s = sibling ? own : bar.parentElement
+    while (!sibling && s && !scrolls(s)) s = s.parentElement // 🔎 the one scroller (bar = its sticky child)
     s = s ?? document.scrollingElement
     s.scrollTop = (s.scrollHeight - s.clientHeight) / 2 // 🎯 middle
     const b = bar.getBoundingClientRect(); const r = s.getBoundingClientRect()
     const hit = document.elementFromPoint(b.x + b.width / 2, b.y + b.height / 2) // 👆
     const root = bar.closest('.AbAppLayout')
-    return { part: s.dataset.abPart ?? s.className.split(' ')[0], top: s.scrollTop, max: s.scrollHeight - s.clientHeight, barBottom: b.bottom, scBottom: Math.min(r.bottom, innerHeight), barH: b.height, hitBar: !!hit?.closest(sel), inMain: !!bar.closest('main'), tag: bar.tagName,
+    return { vh: innerHeight, sibling, barTop: b.top, scRaw: r.bottom, part: s.dataset.abPart ?? s.className.split(' ')[0], top: s.scrollTop, max: s.scrollHeight - s.clientHeight, barBottom: b.bottom, scBottom: Math.min(r.bottom, innerHeight), barH: b.height, hitBar: !!hit?.closest(sel), inMain: !!bar.closest('main'), tag: bar.tagName,
       pos: getComputedStyle(bar).position, bg: getComputedStyle(bar).backgroundColor, pad: getComputedStyle(bar).padding, varH: getComputedStyle(root).getPropertyValue('--ab-main-bar-h').trim(), spb: getComputedStyle(s).scrollPaddingBottom, label: bar.getAttribute('aria-label'), pin: bar.dataset.mainBarPin, rootPin: root?.dataset.mainBarPin }
   }, BAR);
   console.log(`== ${w}×${h}`, JSON.stringify(m))
   check(`${w}: scrolled to the middle of a real scroller`, m.top > 0 && m.top < m.max, `${m.part} ${Math.round(m.top)}/${m.max}`)
-  check(`${w}: bar flush with the scroller bottom`, Math.abs(m.barBottom - m.scBottom) <= 1, `${m.barBottom} vs ${m.scBottom}`)
+  check(`${w}: bar flush with the scroller bottom (and inside the viewport)`, (m.sibling ? Math.abs(m.barTop - m.scRaw) <= 1 : Math.abs(m.barBottom - m.scBottom) <= 1) && m.barBottom <= m.vh + 1, m.sibling ? `own pane: bar top ${m.barTop} = scroller bottom ${m.scRaw}` : `one scroller: bar bottom ${m.barBottom} = scroller bottom ${m.scBottom}`)
   check(`${w}: elementFromPoint over the bar hits the bar`, m.hitBar)
   check(`${w}: <footer> still inside <main>, labelled, pinned on bar + root`, m.tag === 'FOOTER' && m.inMain && m.label === 'Slide controls' && m.pin === 'always' && m.rootPin === 'always')
   check(`${w}: --ab-main-bar-h published = bar height, used as scroll-padding-bottom`, m.varH === `${Math.round(m.barH)}px` && m.spb === m.varH, `${m.varH} / ${m.spb}`)
