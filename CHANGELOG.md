@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.4](https://github.com/abraham-ukachi/ab-nextjs-core/compare/v0.2.3...v0.2.4) (2026-11-12)
+
+* Normalize the changelog format and backfill missing entries.
+
 ## [0.2.3](https://github.com/abraham-ukachi/ab-nextjs-core/compare/v0.2.2...v0.2.3) (2026-10-29)
 
 * 📱 **Mobile aside drawer:** `AbAsideDrawerTrigger`, `useAbAsideDrawer`, and `--ab-aside-drawer-z` lift the mobile aside drawer above main. E2E covers the drawer.
