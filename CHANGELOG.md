@@ -2,11 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
-## 0.2.1 (Unreleased)
+## [0.2.4](https://github.com/abraham-ukachi/ab-nextjs-core/compare/v0.2.3...v0.2.4) (2026-11-12)
+
+* Normalize the changelog format and backfill missing entries.
+
+## [0.2.3](https://github.com/abraham-ukachi/ab-nextjs-core/compare/v0.2.2...v0.2.3) (2026-10-29)
+
+* 📱 **Mobile aside drawer:** `AbAsideDrawerTrigger`, `useAbAsideDrawer`, and `--ab-aside-drawer-z` lift the mobile aside drawer above main. E2E covers the drawer.
+* 🧩 **`asideBelow`:** place the aside inline before main (`useAbInlineScroller`); sized to its content and kept within the phone width below 1180px. **`asideAnchor`** slot.
+* 📌 **`mainBarPin`:** pins the main bar at every width (`mainBarLabel`); unit tests (client + server, CSS) and e2e
+* 🏠 **`surface="page"`:** `AbAppLayout` can use the v6 Welcome page background. **`AbDottedSurface`** and the `data-ab-surface` dotted hook
+* ✨ **`mainHeaderAt="all"`** keeps one main header at all widths; the mobile main header can grow for an extra row and is sized for a compact AbMobileHeader
+* ♿ The main scroller is a focusable named region; `AbAsideLayout` can name its landmark with `aria-label`
+* 🐛 Server layout CSS twins stay in sync (drift guard test); the tablet aside uses the pane token for an exact dark; auto scrollbar gutter on the phone main scroller; the main header stays above the main scroller; legacy 1536px margins are reset on the first content item
+* 🛡️ Pack guard: shipped relative imports resolve inside `files`
+
+## [0.2.2](https://github.com/abraham-ukachi/ab-nextjs-core/compare/v0.2.1...v0.2.2) (2026-10-21)
+
+* ➖ **Pane dividers:** the faint header hairline
+* 📐 **Aside padding** matches the mock
+* ✅ Tests pin the hidden aside at mobile and tablet tiers
+
+## [0.2.1](https://github.com/abraham-ukachi/ab-nextjs-core/compare/v0.2.0...v0.2.1) (2026-10-21)
 
 * 🎨 **Main pane background:** `AbMainLayout` (client + server) paints `--ab-color-pane-main` (theme ≥ 0.3.5) in light and dark, then the old chains (`--color-background` → `--surface` → `#fff`; dark `--color-dark-background` → `--surface` → `#0a0a0a`). The theme never defined `--color-background`, so the pane was white instead of #fff8f5 / #1d150f. The bottom fade uses the same colour.
-* 🎨 **Aside pane background (James):** `AbAsideLayout` (client + server) does the same: `--ab-color-pane-main` first in light and dark, for the pane and its fade. It was white too.
-* 🪟 **Side panes at 1920 (God 00:41):** the sidebar / rail pane (`:where()`, zero specificity), the ≥ 1180px aside column and `AbAsideLayout` read theme 0.3.6's `--ab-color-pane` first. The theme only sets it at ≥ 1920px in light (#fff, mock 05), so everywhere else, and in dark, the fallbacks keep today's colours: a transparent sidebar and a `--ab-color-pane-main` aside.
+* 🎨 **Aside pane background:** `AbAsideLayout` (client + server) does the same: `--ab-color-pane-main` first in light and dark, for the pane and its fade. It was white too.
+* 🪟 **Side panes at 1920:** the sidebar / rail pane (`:where()`, zero specificity), the ≥ 1180px aside column and `AbAsideLayout` read theme 0.3.6's `--ab-color-pane` first. The theme only sets it at ≥ 1920px in light (#fff, mock 05), so everywhere else, and in dark, the fallbacks keep today's colours: a transparent sidebar and a `--ab-color-pane-main` aside.
 * 📟 **`tabletHeader="main"`:** from 768 to 1179px, the main-header slot is now exactly `--ab-header-height` (60px) tall and its child fills it, like the app header row (mock 06 `.mbar`). It used to take the child's own height, which was 48px.
 * 🏷️ **Sidebar logo row:** AbSidebar's `logo` row (`data-ab-part="sidebar-logo"`, components ≥ 0.1.15) is shown only where the app header is hidden, which is `tabletHeader="main"` at 768–1179px. Everywhere else in panes it's hidden, because the app bar already carries the brand.
 * 🚫 **AbAsideLayout:** no more `transition: all 300ms` (the no-transitions rule; motion comes from ab-nextjs-animations).
@@ -25,13 +46,13 @@ All notable changes to this project will be documented in this file.
 
 ### Changes
 
-* 📐 **Breakpoints (Decision 6, approved by God 2026-10-20):** mobile <768, tablet 768–1179 (the aside is a sheet), joined panes 1180–1919, gapped panes ≥1920. They were 1024 and 1440. `AB_ASIDE_SHEET_QUERY` is now `(max-width: 1179px)`. The 1180 boundary is the same one AbAppBar already uses to move its nav into More.
+* 📐 **Breakpoints (Decision 6, 2026-10-20):** mobile <768, tablet 768–1179 (the aside is a sheet), joined panes 1180–1919, gapped panes ≥1920. They were 1024 and 1440. `AB_ASIDE_SHEET_QUERY` is now `(max-width: 1179px)`. The 1180 boundary is the same one AbAppBar already uses to move its nav into More.
 * 🪟 **Gapped panes follow the desktop mock (05):** a 16px gap, an outer gap on the sides and bottom only (the header sits on top), a 20px radius and a soft `--ab-pane-shadow`. The defaults match `ab-nextjs-theme` 0.3.5.
 * 🗂️ **Pane widths + header height (spec §3):** the defaults are now in `:where()` (zero specificity), so an app's `--ab-sidebar-width` / `--ab-aside-width` / `--ab-rail-width` / `--ab-header-height` always win. The values: tablet sidebar 248 · aside 320; joined 260 / 236; gapped 288 / 272; rail 64. The header row is `--ab-header-height`: 52px on mobile, 60px from 768, 64px from 1920.
 * 📟 **`tabletHeader="main"` (P2):** from 768 to 1179 the app header row is hidden and AbMainLayout's `mainHeader` becomes the bar. At other widths that slot is hidden.
 * 🌗 **`--ab-pane-shadow`** is `none` in dark.
 
-### 0.1.6 (2026-10-16)
+## [0.1.6](https://github.com/abraham-ukachi/ab-nextjs-core/compare/e38f2d64b899c81d6d6cf1d76c575d38d099ac7e...v0.1.6) (2026-10-20)
 
 * 🧭 **Docs-shell panes (G17):** `AbAppLayout` (client + server) gets `variant="panes"` and `railCollapsed`. Four breakpoints: mobile (bottom bar, aside as a full-screen sheet), tablet 768–1023 (280px sidebar or 72px rail, overlay aside on the right, hidden by default), laptop 1024–1439 (joined panes, hairline dividers), desktop ≥ 1440 (gapped panes with radii). Uses the theme 0.3.4 tokens with fallbacks. The default variant is unchanged
 * 🧷 **Rail:** 200ms width transition, instant under reduced motion; stays expanded with JS off (`@media (scripting: none)`)
@@ -40,24 +61,36 @@ All notable changes to this project will be documented in this file.
 * 📏 **Layout rule (D35, G50–G52, G54):** the page never scrolls. In panes the app is a `100dvh` grid (`auto minmax(0,1fr) auto`, `overflow:hidden`) and `<html>`/`<body>` are locked while it is mounted (`:has()` plus a `data-ab-layout-lock` fallback, counted by `acquireAbLayoutLock()` so unmounting one of two layouts keeps it). Main, aside and sidebar each scroll on their own: `min-height:0`, `overscroll-behavior: contain`, `scrollbar-gutter: stable`, safe-area padding. The 64px `--ab-app-bar-height` offset and the sticky columns are gone
 * 🫥 **Empty chrome is 0px (G50):** null header/footer slots are not rendered, and `:empty` / `:has()` collapse the rest; strings are wrapped (`toAbSlot`) so text-only slots never collapse
 * 🔝 **New slots (G52):** `AbMainLayout` `mainHeader` / `mainBar`, `AbAsideLayout` `asideHeader` / `asideBar` (`data-ab-part="main-header"` …). `header` / `footer` / `chrome` stay as deprecated aliases
-* 📜 **Scrollers on useAbPage (G55):** `mainScrollElement` / `asideScrollElement` (content wrappers are `data-ab-part="main-content"` / `"aside-content"`), for hooks 0.1.7 `useAbScrollSpy({ root })`. The server `AbMainLayout` / `AbAsideLayout` set them too, through a tiny client island (`AbScrollRegistrar`, one hidden `<span>` as the scroller's first child) (Joseph)
+* 📜 **Scrollers on useAbPage (G55):** `mainScrollElement` / `asideScrollElement` (content wrappers are `data-ab-part="main-content"` / `"aside-content"`), for hooks 0.1.7 `useAbScrollSpy({ root })`. The server `AbMainLayout` / `AbAsideLayout` set them too, through a tiny client island (`AbScrollRegistrar`, one hidden `<span>` as the scroller's first child)
 * 🧱 **No nested headers:** in panes (or when the slot child is already a `<header>`) the header wrapper is a `<div>`; `overlays` drops the legacy layers (off by default in panes); the pane CSS also targets AbSidebar's `data-ab-part="rail"`
 * 🆔 **AbMainLayout / AbAsideLayout:** `id` prop, and `chrome={false}` drops their empty header/footer wrappers and backdrop/menus/dialogs/toasts/progress/canvas (default `true`, unchanged). Server `AbAsideLayout` sets `id` (default `ab-aside`)
-* 🌫️ **Sheet (James):** tablet backdrop (click closes), focus moves into the sheet and back to the opener, `Escape` skips events an inner menu already `preventDefault`ed, and one open/close timer so quick toggles never race
+* 🌫️ **Sheet:** tablet backdrop (click closes), focus moves into the sheet and back to the opener, `Escape` skips events an inner menu already `preventDefault`ed, and one open/close timer so quick toggles never race
 * 🔧 `typecheck` script; 📝 house `@authors` email in the code file headers
 * Tests: per-breakpoint CSS, rail + reduced motion + JS off, aside 240ms / reduced motion, toggles and aria. Checked in WebKit at 390 / 768 / 1280 / 1600px
 
-### 0.1.5 (2026-10-05)
+## [0.1.5](https://github.com/abraham-ukachi/ab-nextjs-core/compare/31b7513bd20892b56633b4d8adbb1592f48cfed9...e38f2d64b899c81d6d6cf1d76c575d38d099ac7e) (2026-10-05)
 
 * **Landmarks:** header / footer wrappers set `data-ab-part="header"` / `data-ab-part="footer"`
 
-### 0.1.4 (2026-10-05)
+## [0.1.4](https://github.com/abraham-ukachi/ab-nextjs-core/compare/1d560ffaa07d240844bfab8cacf4d1f759263fbf...31b7513bd20892b56633b4d8adbb1592f48cfed9) (2026-10-05)
 
 * **Semantics:** layout wrappers use landmark tags — `<header>` / `<footer>` (was `<div>`); `<main>` and `<aside>` unchanged; sidebar / bottom bar stay the consumer's `<nav>` (`AbSidebar` / `AbNavbar` in components)
 * **Aside targeting:** `AbAsideLayout` sets `data-ab-part="aside"` (and keeps `class="AbAsideLayout"`) so `useAbDialog` / `useAbMenu` / `useAbToast` can find the real aside, never a sidebar
 * **Main:** `AbMainLayout` sets `data-ab-part="main"`
 * **Animation:** client `AbAsideLayout` uses the real `.slideFromRight` class from `ab-nextjs-animations` (was undefined `animate-slide-from-right`)
 
-### 0.1.3 (2026-10-03)
+## [0.1.3](https://github.com/abraham-ukachi/ab-nextjs-core/compare/215273025cbd2063d847f4e26ace025d95e6c944...1d560ffaa07d240844bfab8cacf4d1f759263fbf) (2026-10-03)
 
 * Publish to npm with Trusted Publishing (OIDC); `next` peer `^16.3.4`
+
+## [0.1.2](https://github.com/abraham-ukachi/ab-nextjs-core/compare/57f7a01b254f709d3d50922579eba78bfa34bc26...215273025cbd2063d847f4e26ace025d95e6c944) (2026-09-23)
+
+* Version bump after a staged 0.1.1 publish conflict
+
+## [0.1.1](https://github.com/abraham-ukachi/ab-nextjs-core/compare/0343f6ae53629942d81a5c9f871256233d316a95...57f7a01b254f709d3d50922579eba78bfa34bc26) (2026-09-23)
+
+* Publish of the Next.js 16.3.4 layouts port
+
+## 0.1.0 (2024-06-03)
+
+* Initial release
